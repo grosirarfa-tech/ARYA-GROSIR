@@ -106,11 +106,11 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Harga Beli (Rp)</label>
-                        <input type="text" id="modal-stok-beli" oninput="handlePriceInput(this)" placeholder="0" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-zinc-200 font-mono-custom text-right focus:outline-none focus:border-amber-500">
+                        <input type="text" inputmode="numeric" id="modal-stok-beli" oninput="handlePriceInput(this)" placeholder="0" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-zinc-200 font-mono-custom text-right focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Harga Jual (Rp)</label>
-                        <input type="text" id="modal-stok-jual" oninput="handlePriceInput(this)" placeholder="0" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-zinc-200 font-mono-custom text-right focus:outline-none focus:border-amber-500">
+                        <input type="text" inputmode="numeric" id="modal-stok-jual" oninput="handlePriceInput(this)" placeholder="0" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-zinc-200 font-mono-custom text-right focus:outline-none focus:border-amber-500">
                     </div>
                 </div>
             </div>
@@ -328,17 +328,11 @@
                         </div>
                     </div>
 
+                    <!-- STREAMING_CHUNK: Menyusun ulang struktur field belanja barang (Tanggal -> Barcode -> Nama Barang -> Jejer Qty & Harga) -->
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4">
                         <div>
                             <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Tanggal Transaksi</label>
                             <input type="date" id="belanja-tanggal" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Nama Barang</label>
-                            <select id="belanja-nama-select" onchange="syncBelanjaFromNama()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
-                                <option value="">-- Pilih Nama Barang --</option>
-                            </select>
                         </div>
 
                         <div>
@@ -347,6 +341,13 @@
                                 <input type="text" inputmode="numeric" enterkeyhint="next" id="belanja-barcode" oninput="syncBelanjaFromBarcode()" placeholder="Ketik barcode..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 pl-4 pr-12 text-sm text-zinc-300 font-mono-custom focus:outline-none focus:border-yellow-500">
                                 <button onclick="startBarcodeScanner('belanja-barcode')" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-yellow-500"><i data-lucide="scan-line" class="w-5 h-5"></i></button>
                             </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Nama Barang</label>
+                            <select id="belanja-nama-select" onchange="syncBelanjaFromNama()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
+                                <option value="">-- Pilih Nama Barang --</option>
+                            </select>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -380,17 +381,11 @@
                         <p class="text-xs text-zinc-500">Transaksi penjualan produk grosir ke pelanggan</p>
                     </div>
 
+                    <!-- STREAMING_CHUNK: Menyusun ulang struktur field kasir penjualan (Tanggal -> Barcode -> Nama Barang -> Jejer Qty & Harga) -->
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4">
                         <div>
                             <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Tanggal Transaksi</label>
                             <input type="date" id="jual-tanggal" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Nama Barang</label>
-                            <select id="jual-nama-select" onchange="syncJualFromNama()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
-                                <option value="">-- Pilih Nama Barang --</option>
-                            </select>
                         </div>
 
                         <div>
@@ -399,6 +394,13 @@
                                 <input type="text" inputmode="numeric" enterkeyhint="next" id="jual-barcode" oninput="syncJualFromBarcode()" placeholder="Ketik barcode..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 pl-4 pr-12 text-sm text-zinc-300 font-mono-custom focus:outline-none focus:border-yellow-500">
                                 <button onclick="startBarcodeScanner('jual-barcode')" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-yellow-500"><i data-lucide="scan-line" class="w-5 h-5"></i></button>
                             </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Nama Barang</label>
+                            <select id="jual-nama-select" onchange="syncJualFromNama()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
+                                <option value="">-- Pilih Nama Barang --</option>
+                            </select>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -586,7 +588,7 @@ function doPost(e) {
         </div>
     </div>
 
-    <!-- SISTEM KODE JAVASCRIPT UTUH -->
+    <!-- JAVASCRIPT KONTROL FLUID DAN PERPINDAHAN FORM -->
     <script>
         // Database Memory Lokal
         let stok = JSON.parse(localStorage.getItem('stok_grosir')) || [];
@@ -704,25 +706,37 @@ function doPost(e) {
             return parseInt(text.replace(/[^0-9]/g, '')) || 0;
         }
 
-        // Perpindahan Fokus Input Form Android (Next)
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('keydown', function(e) {
+        document.addEventListener("DOMContentLoaded", function() {
+            setupFormFocusTransitions();
+        });
+
+        function setupFormFocusTransitions() {
+            // Mengambil semua input & select yang interaktif
+            const interactiveElements = 'input:not([disabled]), select:not([disabled])';
+            
+            document.body.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const formInputs = Array.from(document.querySelectorAll('input, select, button'));
-                    const currentIndex = formInputs.indexOf(this);
-                    const nextInput = formInputs.slice(currentIndex + 1).find(el => {
-                        return el.tagName !== 'BUTTON' && !el.disabled && el.id !== 'sync-url';
-                    });
-                    
-                    if (nextInput) {
-                        nextInput.focus();
-                    } else {
-                        this.blur(); // Tutup virtual keyboard android jika input terakhir
+                    // Cari container section tab aktif saat ini
+                    const activeTab = document.querySelector('section:not(.hidden)');
+                    if (!activeTab) return;
+
+                    const fields = Array.from(activeTab.querySelectorAll(interactiveElements));
+                    const currentIndex = fields.indexOf(e.target);
+
+                    if (currentIndex !== -1) {
+                        e.preventDefault();
+                        const nextField = fields[currentIndex + 1];
+
+                        if (nextField) {
+                            nextField.focus();
+                        } else {
+                            // Sembunyikan keyboard jika sudah di kolom terakhir (dengan menghilangkan fokus)
+                            e.target.blur();
+                        }
                     }
                 }
             });
-        });
+        }
 
         // Navigasi Sub-menu / Tab
         function switchTab(tabId) {
