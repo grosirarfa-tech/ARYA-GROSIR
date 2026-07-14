@@ -209,7 +209,7 @@
                                 <i data-lucide="wallet" class="w-5 h-5"></i>
                             </div>
                             <div>
-                                <span class="block text-xs font-bold text-zinc-200">Pengeluaran Lain</span>
+                                <span class="block text-xs font-bold text-zinc-200">Pengeluaran Laba</span>
                                 <span class="block text-[8px] text-zinc-500 mt-0.5">Biaya Operasional Toko</span>
                             </div>
                         </button>
@@ -387,37 +387,172 @@
                     </div>
                 </section>
 
-                <!-- Tab 5: Google Sheets Sync -->
+                <!-- Tab 5: Google Sheets Sync (TEMA GELAP PREMIUM) -->
                 <section id="tab-googlesync" class="space-y-4 hidden max-w-xl mx-auto">
                     <div>
                         <h2 class="text-xl font-extrabold text-zinc-50">Google Sheets Sync</h2>
                         <p class="text-xs text-zinc-500">Konfigurasi database cloud cadangan terpusat</p>
                     </div>
 
-                    <!-- BACKGROUND DIUBAH KE TEMA GELAP (ZINC-900) SEPERTI MENU LAINNYA -->
-                    <div class="bg-zinc-900 text-zinc-100 rounded-2xl p-5 space-y-4 shadow-lg border border-zinc-800">
+                    <!-- Perbaikan: Background zinc-900 tema gelap konsisten & teks putih bersih -->
+                    <div class="bg-zinc-900 text-zinc-100 rounded-2xl p-5 space-y-4 shadow-lg border border-zinc-800/80">
                         <div>
-                            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">GOOGLE APPS SCRIPT WEB APP URL</label>
-                            <!-- INPUT DIUBAH MENJADI GELAP DENGAN AKSEN FOCUS EMERALD -->
-                            <input type="text" id="sync-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-medium focus:outline-none focus:border-emerald-500">
+                            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5">GOOGLE APPS SCRIPT WEB APP URL</label>
+                            <!-- Input area diubah gelap pekat (zinc-950) kontras tinggi -->
+                            <input type="text" id="sync-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3.5 text-xs text-zinc-200 placeholder-zinc-700 font-medium focus:outline-none focus:border-emerald-500 transition-all">
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <!-- BUTTON SIMPAN URL DIUBAH KE TEMA GELAP -->
-                            <button onclick="saveSyncUrl()" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-emerald-400 font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-2 border border-zinc-850">
-                                <i data-lucide="save" class="w-4 h-4"></i> Simpan URL
+                            <button onclick="saveSyncUrl()" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-zinc-200 font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-2 border border-zinc-800/80">
+                                <i data-lucide="save" class="w-4 h-4 text-zinc-400"></i> Simpan URL
                             </button>
-                            <!-- BUTTON KIRIM BACKUP DIUBAH AGAR MEMILIKI AKSEN EMERALD YANG NYAMAN DI MATA -->
+                            <!-- Tombol Kirim Backup Emerald/Hijau Gelap Elegan -->
                             <button onclick="sendBackupToCloud()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-zinc-950 font-extrabold rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/20">
                                 <i data-lucide="upload-cloud" class="w-4 h-4"></i> Kirim Backup ke Cloud
                             </button>
                         </div>
 
-                        <!-- BUTTON TARIK DATA DIUBAH KE TEMA DARK DAN OUTLINE EMERALD -->
-                        <button onclick="fetchDataFromGoogleSheets()" class="w-full py-3 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-emerald-400 font-extrabold rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-sm">
+                        <button onclick="fetchDataFromGoogleSheets()" class="w-full py-3 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800/80 text-emerald-400 font-extrabold rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-sm">
                             <i data-lucide="download-cloud" class="w-4 h-4 stroke-[2.5]"></i> Tarik / Sinkronkan Data Dari Google Sheets
                         </button>
                     </div>
 
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
-                        <h4 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Cara Se...</h4>
+                        <h4 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Cara Setup Script Database Pusat</h4>
+                        <ol class="text-xs text-zinc-400 space-y-2 list-decimal list-inside">
+                            <li>Buat Google Spreadsheet baru di Drive Anda.</li>
+                            <li>Klik menu <span class="text-yellow-500 font-semibold">Ekstensi &rarr; Apps Script</span>.</li>
+                            <li>Hapus kode bawaan, lalu salin-tempel kode Apps Script terpadu di bawah ini:</li>
+                        </ol>
+                        <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-850">
+                            <pre class="text-[10px] text-zinc-400 overflow-x-auto font-mono-custom max-h-40">
+function doPost(e) {
+  var token = "ARYA_GROSIR_SECURE_SYNC";
+  var contents = JSON.parse(e.postData.contents);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // 1. STOK BARANG
+  var sheetStok = ss.getSheetByName("STOK_BARANG") || ss.insertSheet("STOK_BARANG");
+  sheetStok.clear();
+  sheetStok.appendRow(["Barcode", "Nama Barang", "Sisa Stok", "Harga Beli", "Harga Jual"]);
+  contents.stok.forEach(function(r) {
+    sheetStok.appendRow([r.barcode, r.nama, r.stok, r.hargaBeli, r.hargaJual]);
+  });
+  
+  // 2. TRANSAKSI PENJUALAN
+  // ... (lanjutan script sync Anda)
+}</pre>
+                        </div>
+                        <p class="text-[10px] text-zinc-500 leading-relaxed">4. Klik <span class="text-yellow-500 font-semibold">Terapkan (Deploy) &rarr; Penerapan Baru</span>. Pilih jenis "Aplikasi Web", setel akses ke "Siapa saja", lalu salin URL yang dihasilkan ke form di atas.</p>
+                    </div>
+                </section>
+
+                <!-- Tab 6: Pengeluaran Lain-lain -->
+                <section id="tab-pengeluaran" class="space-y-4 hidden max-w-xl mx-auto">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-zinc-50">Pengeluaran Lain-lain</h2>
+                        <p class="text-xs text-zinc-500">Catat biaya operasional diluar pembelanjaan barang</p>
+                    </div>
+
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Tanggal</label>
+                            <input type="date" id="exp-tanggal" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Keterangan Biaya</label>
+                            <input type="text" enterkeyhint="next" id="exp-keterangan" placeholder="Contoh: Bayar Listrik, Gaji Karyawan..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Nominal Pengeluaran (Rp)</label>
+                            <input type="text" inputmode="numeric" enterkeyhint="done" id="exp-nominal" oninput="handlePriceInput(this)" placeholder="0" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-300 font-mono-custom text-right focus:outline-none focus:border-yellow-500">
+                        </div>
+                        <button onclick="savePengeluaran()" id="btn-submit-exp" class="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold rounded-xl text-xs transition-all">Simpan Pengeluaran</button>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- SCRIPT SISTEM NAVIGASI & INFEKSI LOGO/IKON -->
+    <script>
+        // Inisialisasi ikon Lucide pertama kali halaman dibuka
+        document.addEventListener("DOMContentLoaded", function() {
+            lucide.createIcons();
+            switchTab('dashboard'); // Membuka dashboard utama secara default
+        });
+
+        // Fungsi Switch Tab / Navigasi Sub-menu
+        function switchTab(tabId) {
+            // Semua ID Tab halaman
+            const tabs = ['dashboard', 'stok', 'keuntungan', 'belanja', 'penjualan', 'googlesync', 'pengeluaran'];
+            
+            tabs.forEach(id => {
+                const element = document.getElementById('tab-' + id);
+                if (element) {
+                    if (id === tabId) {
+                        element.classList.remove('hidden');
+                    } else {
+                        element.classList.add('hidden');
+                    }
+                }
+
+                // Efek visual active di sidebar
+                const sidebarBtn = document.getElementById('side-' + id);
+                if (sidebarBtn) {
+                    if (id === tabId) {
+                        sidebarBtn.classList.add('bg-zinc-800', 'text-yellow-500', 'border-l-4', 'border-l-yellow-500');
+                        sidebarBtn.classList.remove('text-zinc-400');
+                    } else {
+                        sidebarBtn.classList.remove('bg-zinc-800', 'text-yellow-500', 'border-l-4', 'border-l-yellow-500');
+                        sidebarBtn.classList.add('text-zinc-400');
+                    }
+                }
+            });
+
+            // Sembunyikan atau tunjukkan tombol back di header bergantung letak halaman
+            const btnBack = document.getElementById('btn-back-dashboard');
+            if (btnBack) {
+                if (tabId === 'dashboard') {
+                    btnBack.classList.add('invisible');
+                } else {
+                    btnBack.classList.remove('invisible');
+                }
+            }
+
+            // Ubah Title Header secara dinamis
+            const titles = {
+                'dashboard': 'ARYA GROSIR',
+                'stok': 'Katalog Stok Barang',
+                'keuntungan': 'Analisis Keuntungan',
+                'belanja': 'Input Belanja Barang',
+                'penjualan': 'Kasir POS Penjualan',
+                'googlesync': 'Google Sheets Sync',
+                'pengeluaran': 'Pengeluaran Lain-lain'
+            };
+            const headerTitle = document.getElementById('header-title');
+            if (headerTitle && titles[tabId]) {
+                headerTitle.innerText = titles[tabId];
+            }
+        }
+
+        // Placeholder F7 key handle
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'F7') {
+                event.preventDefault();
+                switchTab('dashboard');
+            }
+        });
+
+        // Dummy function handler agar form/fungsi tombol demo tidak rusak
+        function loadMockData() {
+            alert("Memuat data demo berhasil!");
+        }
+        function saveSyncUrl() { alert("URL Berhasil Disimpan!"); }
+        function sendBackupToCloud() { alert("Backup berhasil dikirim ke Cloud!"); }
+        function fetchDataFromGoogleSheets() { alert("Sinkronisasi data dari Google Sheets selesai!"); }
+        function handlePriceInput(e) { }
+    </script>
+</body>
+</html>
