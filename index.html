@@ -573,6 +573,10 @@
                                 <i data-lucide="upload-cloud" class="w-4 h-4"></i> Backup Sekarang
                             </button>
                         </div>
+
+                        <button onclick="triggerRestoreFromGoogle()" class="w-full py-3 bg-zinc-950 border border-zinc-800 hover:bg-zinc-800 hover:border-emerald-500/30 text-emerald-400 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-lg">
+                            <i data-lucide="download-cloud" class="w-4.5 h-4.5"></i> Tarik / Sinkronkan Data dari Google Sheets
+                        </button>
                     </div>
 
                     <!-- Step-by-Step Tutorial Card -->
@@ -613,6 +617,33 @@
     });
     
     return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({status: "error", message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet() {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var stokSheet = ss.getSheetByName("STOK_BARANG");
+    if (!stokSheet) {
+      return ContentService.createTextOutput(JSON.stringify({status: "error", message: "Sheet STOK_BARANG tidak ditemukan"}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    var data = stokSheet.getDataRange().getValues();
+    var inventory = [];
+    for (var i = 1; i < data.length; i++) {
+      inventory.push({
+        barcode: data[i][0].toString(),
+        name: data[i][1].toString(),
+        stock: parseInt(data[i][2]) || 0,
+        costPrice: parseFloat(data[i][3]) || 0,
+        sellPrice: parseFloat(data[i][4]) || 0
+      });
+    }
+    return ContentService.createTextOutput(JSON.stringify({status: "success", inventory: inventory}))
       .setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
     return ContentService.createTextOutput(JSON.stringify({status: "error", message: err.toString()}))
@@ -1283,6 +1314,37 @@
             }
         }
 
+        // 2-Way Sync / Tarik Data from Google Sheets
+        async function triggerRestoreFromGoogle() {
+            if (!state.googleSheetsUrl) {
+                showToast("Masukkan URL Google Script terlebih dahulu!", "alert-circle");
+                return;
+            }
+            if (!confirm("Peringatan: Menarik data dari Google Sheets akan menimpa (overwrite) daftar stok barang di HP/Laptop Anda saat ini. Lanjutkan?")) {
+                return;
+            }
+            showToast("Menarik data dari Google Sheets...");
+            try {
+                const response = await fetch(state.googleSheetsUrl);
+                if (response.ok) {
+                    const resJson = await response.json();
+                    if (resJson.status === 'success' && resJson.inventory) {
+                        state.inventory = resJson.inventory;
+                        saveState();
+                        showToast("Sinkronisasi Berhasil! Data stok terperbarui.");
+                        if (state.activeTab === 'stok') renderStokList();
+                    } else {
+                        showToast("Gagal memproses data. " + (resJson.message || ""), "alert-circle");
+                    }
+                } else {
+                    showToast("Gagal menghubungi Google Sheets. Periksa URL Anda.", "alert-circle");
+                }
+            } catch(e) {
+                console.error("Restore network failure", e);
+                showToast("Koneksi gagal. Pastikan Web App Anda di-deploy dengan akses 'Anyone'.", "alert-circle");
+            }
+        }
+
         function syncJualFromBarcode() {
             const barcodeVal = document.getElementById('jual-barcode').value.trim();
             const dropdown = document.getElementById('jual-nama-select');
@@ -1596,7 +1658,7 @@
             const expensesList = state.expenses || [];
             if (expensesList.length === 0) {
                 container.innerHTML = `
-                    <div class="bg-zinc-900/50 border border-dashed border-zinc-800 p-8 rounded-xl text-center text-zinc-600 text-xs">
+                    <div class="bg-zinc-900/50 border border-dashed border-zinc-800 p-8 rounded-xl text-center text-zinc-650 text-xs">
                         Belum ada riwayat beban pengeluaran.
                     </div>
                 `;
