@@ -4,18 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ARYA GROSIR - Aplikasi Kasir Premium</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2pdf.js for invoice generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- html5-qrcode for barcode scanning -->
     <script src="https://unpkg.com/html5-qrcode"></script>
 
-    <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -56,29 +50,25 @@
             object-fit: contain;
         }
         .app-logo-large {
-            max-height: 120px;
+            max-height: 140px;
             object-fit: contain;
         }
     </style>
 </head>
 <body class="text-zinc-100 min-h-screen flex items-stretch">
 
-    <!-- Main Full-Width Container -->
     <div class="w-full flex flex-col lg:flex-row max-w-[1600px] mx-auto bg-zinc-950 border-x border-zinc-900 shadow-2xl overflow-hidden relative">
         
-        <!-- SIDEBAR VIEW - DESKTOP/TABLET -->
         <aside class="hidden lg:flex w-72 bg-zinc-900 border-r border-zinc-800/80 p-6 flex-col justify-between shrink-0">
             <div class="space-y-8">
-                <!-- Image Logo in Sidebar -->
                 <div class="flex items-center gap-3">
-                    <img src="logo-arya-grosir.png" alt="ARYA GROSIR" class="app-logo-img onerror-fallback">
+                    <img src="https://raw.githubusercontent.com/grosirarfa-tech/ARYA-GROSIR/main/logo%20web%20arya.png" alt="ARYA GROSIR" class="app-logo-img">
                     <div>
                         <h1 class="text-sm font-black tracking-wider text-amber-500">ARYA GROSIR</h1>
                         <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest block mt-0.5">Sistem Kasir Pintar</span>
                     </div>
                 </div>
 
-                <!-- Desktop Navigation -->
                 <nav class="space-y-1.5">
                     <button onclick="switchTab('stok')" id="side-stok" class="w-full py-3 px-4 rounded-xl flex items-center gap-3 transition-all text-sm font-semibold border border-transparent text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50">
                         <i data-lucide="package" class="w-4.5 h-4.5"></i> Stok Barang
@@ -115,10 +105,8 @@
             </div>
         </aside>
 
-        <!-- Right Content & Header Section -->
         <div class="flex-grow flex flex-col justify-between min-h-screen relative overflow-hidden">
             
-            <!-- Universal Header -->
             <header class="bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800/80 px-4 lg:px-6 py-4 sticky top-0 z-40 flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-3">
                     <button id="btn-back-dashboard" onclick="triggerAndroidBack()" class="p-2 bg-zinc-800 hover:bg-zinc-750 active:scale-95 text-zinc-300 rounded-xl transition-all border border-zinc-700/50 flex items-center justify-center">
@@ -126,7 +114,7 @@
                     </button>
                     
                     <div class="flex items-center gap-2.5">
-                        <img src="logo-arya-grosir.png" alt="Logo" class="lg:hidden h-8 w-auto object-contain onerror-fallback">
+                        <img src="https://raw.githubusercontent.com/grosirarfa-tech/ARYA-GROSIR/main/logo%20web%20arya.png" alt="Logo" class="lg:hidden h-8 w-auto object-contain">
                         <h1 id="header-title" class="text-sm lg:text-base font-extrabold tracking-wider text-zinc-200">ARYA GROSIR</h1>
                     </div>
                 </div>
@@ -142,17 +130,14 @@
                 </div>
             </header>
 
-            <!-- Main Content Area -->
             <main class="flex-grow overflow-y-auto px-4 lg:px-8 py-6" id="main-content">
                 
-                <!-- Tab 0: Dashboard Tampilan Awal (Android 2x6 Grid Layout) -->
                 <section id="tab-dashboard" class="space-y-6 py-2">
                     <div class="text-center space-y-3 flex flex-col items-center justify-center pt-4 lg:pt-6">
-                        <img src="logo-arya-grosir.png" alt="ARYA GROSIR LOGO" class="app-logo-large mb-2 onerror-fallback">
+                        <img src="https://raw.githubusercontent.com/grosirarfa-tech/ARYA-GROSIR/main/logo%20web%20arya.png" alt="ARYA GROSIR LOGO" class="app-logo-large mb-2">
                         <p class="text-xs text-zinc-400 font-medium">Sistem Pengelolaan Kasir Toko Grosir Modern</p>
                     </div>
 
-                    <!-- 2x6 Grid Layout for Mobile Android, default grid on desktop -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3.5 pt-4 max-w-4xl mx-auto">
                         <button onclick="switchTab('googlesync')" class="bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md col-span-2 md:col-span-1 border-t-2 border-t-emerald-500">
                             <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
@@ -209,14 +194,13 @@
                                 <i data-lucide="wallet" class="w-5 h-5"></i>
                             </div>
                             <div>
-                                <span class="block text-xs font-bold text-zinc-200">Pengeluaran Lain</span>
+                                <span class="block text-xs font-bold text-zinc-200">Pengeluaran Laba</span>
                                 <span class="block text-[8px] text-zinc-500 mt-0.5">Biaya Operasional Toko</span>
                             </div>
                         </button>
                     </div>
                 </section>
                 
-                <!-- Tab 1: Stok Barang -->
                 <section id="tab-stok" class="space-y-4 hidden max-w-5xl mx-auto">
                     <div class="flex justify-between items-center">
                         <div>
@@ -234,7 +218,6 @@
                     <div id="stok-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
                 </section>
 
-                <!-- Tab 2: Keuntungan -->
                 <section id="tab-keuntungan" class="space-y-5 hidden max-w-5xl mx-auto">
                     <div>
                         <h2 class="text-xl font-extrabold text-zinc-50">Analisis Keuntungan</h2>
@@ -265,7 +248,6 @@
                     </div>
                 </section>
 
-                <!-- Tab 3: Belanja Barang -->
                 <section id="tab-belanja" class="space-y-4 hidden max-w-xl mx-auto">
                     <div class="flex justify-between items-center">
                         <div>
@@ -275,7 +257,6 @@
                     </div>
 
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4">
-                        <!-- Input Tanggal Otomatis -->
                         <div>
                             <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Tanggal Transaksi</label>
                             <input type="date" id="belanja-tanggal" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
@@ -320,7 +301,6 @@
                     </div>
                 </section>
 
-                <!-- Tab 4: Penjualan -->
                 <section id="tab-penjualan" class="space-y-4 hidden max-w-xl mx-auto">
                     <div>
                         <h2 class="text-xl font-extrabold text-zinc-50">Kasir Penjualan</h2>
@@ -328,7 +308,6 @@
                     </div>
 
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4">
-                        <!-- Input Tanggal Otomatis -->
                         <div>
                             <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Tanggal Transaksi</label>
                             <input type="date" id="jual-tanggal" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:border-yellow-500">
@@ -363,11 +342,9 @@
                         <button onclick="addToJualCart()" id="btn-submit-jual" class="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold rounded-xl text-xs transition-all">Masukkan Keranjang</button>
                     </div>
 
-                    <!-- Simplified Cart Display as Requested -->
                     <div id="jual-total-panel" class="hidden bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-3">
                         <div id="jual-list-container" class="space-y-2 text-xs border-b border-zinc-800 pb-2">
-                            <!-- Format: Nama Barang / Jumlah Barang & Harga Per Unit -->
-                        </div>
+                            </div>
                         
                         <div class="space-y-2">
                             <div class="flex justify-between items-center text-xs font-bold text-zinc-300">
@@ -392,7 +369,54 @@
                     </div>
                 </section>
 
-                <!-- Tab 5: Pengeluaran Lain-lain -->
+                <section id="tab-googlesync" class="space-y-4 hidden max-w-xl mx-auto">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-zinc-50">Google Sheets Sync</h2>
+                        <p class="text-xs text-zinc-500">Konfigurasi database cloud cadangan terpusat</p>
+                    </div>
+
+                    <div class="bg-emerald-600 text-zinc-950 rounded-2xl p-5 space-y-4 shadow-lg border border-emerald-500">
+                        <div>
+                            <label class="block text-[10px] font-black text-emerald-950 uppercase tracking-wider mb-1">GOOGLE APPS SCRIPT WEB APP URL</label>
+                            <input type="text" id="sync-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-emerald-900/40 border border-emerald-800/80 rounded-xl py-2.5 px-3 text-sm text-zinc-900 placeholder-emerald-900/60 font-medium focus:outline-none focus:border-zinc-900">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="saveSyncUrl()" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-900 text-emerald-400 font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan URL
+                            </button>
+                            <button onclick="sendBackupToCloud()" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold rounded-xl text-xs transition-all flex items-center justify-center gap-2 border border-emerald-400">
+                                <i data-lucide="upload-cloud" class="w-4 h-4"></i> Kirim Backup ke Cloud
+                            </button>
+                        </div>
+
+                        <button onclick="fetchDataFromGoogleSheets()" class="w-full py-3 bg-white hover:bg-zinc-100 text-emerald-700 font-extrabold rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-sm">
+                            <i data-lucide="download-cloud" class="w-4 h-4 stroke-[2.5]"></i> Tarik / Sinkronkan Data Dari Google Sheets
+                        </button>
+                    </div>
+
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
+                        <h4 class="text-xs font-bold text-zinc-300 uppercase tracking-wider">Cara Setup Script Database Pusat</h4>
+                        <ol class="text-xs text-zinc-400 space-y-2 list-decimal list-inside">
+                            <li>Buat Google Spreadsheet baru di Drive Anda.</li>
+                            <li>Klik menu <span class="text-yellow-500 font-semibold">Ekstensi &rarr; Apps Script</span>.</li>
+                            <li>Hapus kode bawaan, lalu salin-tempel kode Apps Script terpadu di bawah ini:</li>
+                        </ol>
+                        <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-850">
+                            <pre class="text-[10px] text-zinc-400 overflow-x-auto font-mono-custom max-h-40">
+function doPost(e) {
+  var token = "ARYA_GROSIR_SECURE_SYNC";
+  var contents = JSON.parse(e.postData.contents);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // 1. STOK BARANG
+  // ... (lanjutan script sync Anda)
+}</pre>
+                        </div>
+                        <p class="text-[10px] text-zinc-500 leading-relaxed">4. Klik <span class="text-yellow-500 font-semibold">Terapkan (Deploy) &rarr; Penerapan Baru</span>. Pilih jenis "Aplikasi Web", setel akses ke "Siapa saja", lalu salin URL yang dihasilkan ke form di atas.</p>
+                    </div>
+                </section>
+
                 <section id="tab-pengeluaran" class="space-y-4 hidden max-w-xl mx-auto">
                     <div>
                         <h2 class="text-xl font-extrabold text-zinc-50">Pengeluaran Lain-lain</h2>
@@ -414,1006 +438,10 @@
                         </div>
                         <button onclick="savePengeluaran()" id="btn-submit-exp" class="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold rounded-xl text-xs transition-all">Simpan Pengeluaran</button>
                     </div>
-
-                    <div class="space-y-2">
-                        <h4 class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Riwayat Pengeluaran Hari Ini</h4>
-                        <div id="exp-list-container" class="space-y-2"></div>
-                    </div>
                 </section>
 
-                <!-- Tab 6: Google Sheets Sync (Paling Atas & Tombol Hijau) -->
-                <section id="tab-googlesync" class="space-y-4 hidden max-w-xl mx-auto">
-                    <div>
-                        <h2 class="text-xl font-extrabold text-zinc-50">Google Sheets Sync</h2>
-                        <p class="text-xs text-zinc-500">Konfigurasi database cloud cadangan terpusat</p>
-                    </div>
-
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4 border-t-4 border-t-emerald-500">
-                        <div>
-                            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Google Apps Script Web App URL</label>
-                            <input type="text" id="sync-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3.5 text-xs text-zinc-300 placeholder-zinc-700 focus:outline-none focus:border-emerald-500 transition-all">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="saveSyncSettings()" class="py-2.5 bg-zinc-800 hover:bg-zinc-750 text-zinc-200 font-bold rounded-xl text-xs transition-all border border-zinc-700">Simpan URL</button>
-                            <button onclick="triggerManualSync()" class="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs transition-all shadow-md shadow-emerald-900/20 flex items-center justify-center gap-1.5">
-                                <i data-lucide="cloud-upload" class="w-4 h-4"></i> Kirim Backup Ke Cloud
-                            </button>
-                        </div>
-
-                        <button onclick="pullDataFromSheets()" class="w-full py-3 bg-zinc-100 hover:bg-white text-zinc-950 font-extrabold rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-1.5">
-                            <i data-lucide="cloud-download" class="w-4.5 h-4.5"></i> Tarik / Sinkronkan Data Dari Google Sheets
-                        </button>
-                    </div>
-
-                    <div class="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-4 text-[11px] text-zinc-400 space-y-2">
-                        <span class="font-bold text-zinc-200 block border-b border-zinc-800 pb-1.5 uppercase tracking-wide text-[10px] text-yellow-500">Cara Setup Script Database Pusat</span>
-                        <p>1. Buat Google Spreadsheet baru di Drive Anda.</p>
-                        <p>2. Klik menu <strong>Ekstensi -> Apps Script</strong>.</p>
-                        <p>3. Hapus kode bawaan, lalu salin-tempel kode Apps Script terpadu di bawah ini:</p>
-                        <textarea readonly class="w-full h-24 bg-zinc-950 border border-zinc-800 rounded p-2 font-mono text-[10px] text-zinc-500 focus:outline-none">function doPost(e) {
-  var token = "ARYA_GROSIR_SECURE_SYNC";
-  var contents = JSON.parse(e.postData.contents);
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  
-  // 1. STOK_BARANG
-  var sheetStok = ss.getSheetByName("STOK_BARANG") || ss.insertSheet("STOK_BARANG");
-  sheetStok.clear();
-  sheetStok.appendRow(["Barcode", "Nama Barang", "Sisa Stok", "Harga Beli", "Harga Jual"]);
-  contents.stok.forEach(function(r) {
-    sheetStok.appendRow([r.barcode, r.nama, r.stok, r.hargaBeli, r.hargaJual]);
-  });
-  
-  // 2. TRANSAKSI_PENJUALAN
-  var sheetJual = ss.getSheetByName("TRANSAKSI_PENJUALAN") || ss.insertSheet("TRANSAKSI_PENJUALAN");
-  if(sheetJual.getLastRow() === 0) {
-    sheetJual.appendRow(["ID Transaksi", "Tanggal", "Barcode", "Nama Barang", "Qty", "Harga Jual", "Subtotal", "Laba Bersih"]);
-  }
-  contents.penjualan.forEach(function(r) {
-    sheetJual.appendRow([r.id, r.tanggal, r.barcode, r.nama, r.qty, r.hargaJual, r.subtotal, r.laba]);
-  });
-
-  // 3. RIWAYAT_BELANJA
-  var sheetBelanja = ss.getSheetByName("RIWAYAT_BELANJA") || ss.insertSheet("RIWAYAT_BELANJA");
-  if(sheetBelanja.getLastRow() === 0) {
-    sheetBelanja.appendRow(["Tanggal", "Barcode", "Nama Barang", "Qty", "Harga Beli", "Subtotal"]);
-  }
-  contents.belanja.forEach(function(r) {
-    sheetBelanja.appendRow([r.tanggal, r.barcode, r.nama, r.qty, r.hargaBeli, r.subtotal]);
-  });
-
-  // 4. BEBAN_PENGELUARAN
-  var sheetExp = ss.getSheetByName("BEBAN_PENGELUARAN") || ss.insertSheet("BEBAN_PENGELUARAN");
-  if(sheetExp.getLastRow() === 0) {
-    sheetExp.appendRow(["Tanggal", "Keterangan", "Nominal"]);
-  }
-  contents.pengeluaran.forEach(function(r) {
-    sheetExp.appendRow([r.tanggal, r.keterangan, r.nominal]);
-  });
-  
-  return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
-}
-
-function doGet() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("STOK_BARANG");
-  var data = [];
-  if (sheet) {
-    var rows = sheet.getDataRange().getValues();
-    for (var i = 1; i < rows.length; i++) {
-      data.push({
-        barcode: rows[i][0].toString(),
-        nama: rows[i][1].toString(),
-        stok: Number(rows[i][2]),
-        hargaBeli: Number(rows[i][3]),
-        hargaJual: Number(rows[i][4])
-      });
-    }
-  }
-  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
-}</textarea>
-                        <p>4. Klik <strong>Terapkan (Deploy) -> Penerapan Baru</strong>.</p>
-                        <p>5. Pilih Jenis: <strong>Aplikasi Web</strong>, Siapa yang memiliki akses: <strong>Siapa Saja (Anyone)</strong>, lalu salin URL Web App-nya ke form atas.</p>
-                    </div>
-                </section>
             </main>
         </div>
     </div>
-
-    <!-- MODAL POPUP: Tambah Barang Baru Ke Stok -->
-    <div id="modal-add-stok" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl p-5 space-y-4">
-            <div class="flex justify-between items-center"><h3 class="text-sm font-bold uppercase tracking-wider text-zinc-200">Tambah Data Master Barang</h3><button onclick="closeModal('modal-add-stok')" class="text-zinc-500 hover:text-zinc-300"><i data-lucide="x" class="w-5 h-5"></i></button></div>
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-zinc-500 mb-1">Barcode / Kode Unik</label>
-                    <div class="relative">
-                        <input type="text" inputmode="numeric" enterkeyhint="next" id="mst-barcode" placeholder="Scan atau ketik kode..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 pl-3 pr-10 text-zinc-300 font-mono-custom focus:outline-none focus:border-yellow-500">
-                        <button onclick="startBarcodeScanner('mst-barcode')" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-yellow-500"><i data-lucide="scan-line" class="w-4 h-4"></i></button>
-                    </div>
-                </div>
-                <div><label class="block text-zinc-500 mb-1">Nama Barang</label><input type="text" enterkeyhint="next" id="mst-nama" placeholder="Ketik nama produk..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-zinc-300 focus:outline-none focus:border-yellow-500"></div>
-                <div><label class="block text-zinc-500 mb-1">Stok Awal Awal</label><input type="number" inputmode="numeric" enterkeyhint="next" id="mst-stok" placeholder="0" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-center text-zinc-300 font-mono-custom focus:outline-none focus:border-yellow-500"></div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-zinc-500 mb-1">Harga Pokok (Beli)</label><input type="text" inputmode="numeric" enterkeyhint="next" id="mst-harga-beli" oninput="handlePriceInput(this)" placeholder="0" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-right text-zinc-300 font-mono-custom focus:outline-none focus:border-yellow-500"></div>
-                    <div><label class="block text-zinc-500 mb-1">Harga Jual Toko</label><input type="text" inputmode="numeric" enterkeyhint="done" id="mst-harga-jual" oninput="handlePriceInput(this)" placeholder="0" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-right text-zinc-300 font-mono-custom focus:outline-none focus:border-yellow-500"></div>
-                </div>
-            </div>
-            <button onclick="saveNewMasterStok()" id="btn-submit-mst" class="w-full py-2.5 bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold rounded-xl text-xs">Simpan Master Barang</button>
-        </div>
-    </div>
-
-    <!-- MODAL POPUP: Barcode Scanner Dialog -->
-    <div id="modal-scanner" class="fixed inset-0 bg-black z-50 flex flex-col justify-between p-4 hidden">
-        <div class="flex justify-between items-center py-2"><h3 class="text-sm font-bold text-yellow-500 uppercase tracking-widest">Kamera Barcode Scanner</h3><button onclick="stopBarcodeScanner()" class="p-2 bg-zinc-800 text-zinc-200 rounded-xl"><i data-lucide="x" class="w-5 h-5"></i></button></div>
-        <div class="w-full max-w-md mx-auto aspect-square bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative" id="reader"></div>
-        <div class="py-4 text-center text-xs text-zinc-500">Posisikan kode barcode barang tepat di tengah kotak kamera pemindai.</div>
-    </div>
-
-    <!-- INVOICE PRINTER TEMPLATE COMPONENT (HIDDEN) -->
-    <div class="hidden">
-        <div id="invoice-template" class="p-8 bg-white text-zinc-950 font-mono text-xs space-y-4 max-w-xs mx-auto">
-            <div class="text-center font-sans space-y-1">
-                <h2 class="text-base font-black tracking-wider uppercase text-zinc-900">ARYA GROSIR</h2>
-                <p class="text-[9px] text-zinc-500">Pusat Belanja Grosir & Eceran Indonesia</p>
-                <p class="text-[8px] text-zinc-400" id="inv-date-print"></p>
-            </div>
-            <div class="border-t border-dashed border-zinc-400 my-2"></div>
-            <div>
-                <p id="inv-id-print" class="text-[9px] text-zinc-600"></p>
-                <p class="text-[9px] text-zinc-600">Kasir: Operator Toko</p>
-            </div>
-            <div class="border-t border-dashed border-zinc-400 my-2"></div>
-            <div class="space-y-1.5 text-[10px]" id="inv-items-box"></div>
-            <div class="border-t border-dashed border-zinc-400 my-2"></div>
-            <div class="space-y-1 text-right text-[10px]">
-                <div class="flex justify-between font-bold text-zinc-900"><span>TOTAL AKHIR:</span><span id="inv-total-print"></span></div>
-                <div class="flex justify-between text-zinc-600"><span>DIBAYAR:</span><span id="inv-bayar-print"></span></div>
-                <div class="flex justify-between font-bold text-emerald-700"><span>KEMBALIAN:</span><span id="inv-kembali-print"></span></div>
-            </div>
-            <div class="border-t border-dashed border-zinc-400 my-2"></div>
-            <div class="text-center text-[8px] text-zinc-500 uppercase font-bold tracking-wider pt-2">Terima Kasih Atas Kunjungan Anda<br>Barang yang sudah dibeli tidak dapat ditukar</div>
-        </div>
-    </div>
-
-    <!-- Application Engine Logic JavaScript -->
-    <script>
-        // Data Store State Management
-        let appState = {
-            activeTab: 'dashboard',
-            stok: [],
-            penjualan: [],
-            belanja: [],
-            pengeluaran: [],
-            currentScanTargetId: null,
-            belanjaCart: [],
-            jualCart: [],
-            syncUrl: '',
-            lastBackupDate: ''
-        };
-
-        let html5QrcodeScanner = null;
-        let profitChartInstance = null;
-
-        // Image Fallback System for Broken Path Images
-        document.querySelectorAll('.onerror-fallback').forEach(img => {
-            img.onerror = function() {
-                this.style.display = 'none';
-                let txtElement = document.createElement('span');
-                txtElement.className = "text-amber-500 font-black tracking-widest text-lg";
-                txtElement.innerText = "ARYA GROSIR";
-                if(this.parentNode) this.parentNode.replaceChild(txtElement, this);
-            };
-        });
-
-        // Setup Event Listeners for Next/Done Input Handlers
-        function setupKeyboardSequence(formId) {
-            const container = document.getElementById(formId);
-            if (!container) return;
-            const inputs = Array.from(container.querySelectorAll('input:not([disabled]), select'));
-            inputs.forEach((input, index) => {
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        if (index < inputs.length - 1) {
-                            inputs[index + 1].focus();
-                        } else {
-                            input.blur();
-                            // Click the specific submit action automatically
-                            if (formId === 'tab-belanja') document.getElementById('btn-submit-belanja').click();
-                            if (formId === 'tab-penjualan') document.getElementById('btn-submit-jual').click();
-                            if (formId === 'tab-pengeluaran') document.getElementById('btn-submit-exp').click();
-                            if (formId === 'modal-add-stok') document.getElementById('btn-submit-mst').click();
-                        }
-                    }
-                });
-            });
-        }
-
-        // Initialize Core Engine
-        window.addEventListener('DOMContentLoaded', () => {
-            loadStateFromLocalStorage();
-            lucide.createIcons();
-            
-            // Set Default Dates to Today Automatically
-            const todayStr = new Date().toISOString().split('T')[0];
-            if(document.getElementById('belanja-tanggal')) document.getElementById('belanja-tanggal').value = todayStr;
-            if(document.getElementById('jual-tanggal')) document.getElementById('jual-tanggal').value = todayStr;
-            if(document.getElementById('exp-tanggal')) document.getElementById('exp-tanggal').value = todayStr;
-
-            switchTab('dashboard');
-            initProfitChart();
-            runClockScheduler();
-
-            setupKeyboardSequence('tab-belanja');
-            setupKeyboardSequence('tab-penjualan');
-            setupKeyboardSequence('tab-pengeluaran');
-            setupKeyboardSequence('modal-add-stok');
-
-            // Physical Hotkey Support PC (F7 Listener)
-            window.addEventListener('keydown', (e) => {
-                if(e.key === 'F7') {
-                    e.preventDefault();
-                    triggerAndroidBack();
-                }
-            });
-
-            // Native Android Physical Back Button Trap Setup
-            window.addEventListener('popstate', (event) => {
-                if (appState.activeTab !== 'dashboard') {
-                    appState.activeTab = 'dashboard';
-                    renderActiveView();
-                }
-            });
-        });
-
-        // Price Input Thousand Formatter Engine
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-
-        function unformatNumber(str) {
-            return parseFloat(str.replace(/\./g, '')) || 0;
-        }
-
-        function handlePriceInput(input) {
-            let position = input.selectionStart;
-            let rawValue = input.value.replace(/\D/g, '');
-            if(!rawValue) { input.value = ''; return; }
-            let formattedValue = formatNumber(rawValue);
-            input.value = formattedValue;
-        }
-
-        // Local Storage Methods
-        function saveStateToLocalStorage() {
-            localStorage.setItem('arya_grosir_state', JSON.stringify(appState));
-        }
-
-        function loadStateFromLocalStorage() {
-            const data = localStorage.getItem('arya_grosir_state');
-            if (data) {
-                const parsed = JSON.parse(data);
-                appState.stok = parsed.stok || [];
-                appState.penjualan = parsed.penjualan || [];
-                appState.belanja = parsed.belanja || [];
-                appState.pengeluaran = parsed.pengeluaran || [];
-                appState.syncUrl = parsed.syncUrl || '';
-                appState.lastBackupDate = parsed.lastBackupDate || '';
-                
-                document.getElementById('sync-url').value = appState.syncUrl;
-                document.getElementById('sidebar-backup-status').innerText = appState.lastBackupDate ? `Sukses: ${appState.lastBackupDate}` : 'Belum disinkronisasi';
-            }
-        }
-
-        // Navigation Controller
-        function switchTab(tabId) {
-            appState.activeTab = tabId;
-            
-            if(tabId !== 'dashboard') {
-                window.history.pushState({page: tabId}, "");
-            }
-            
-            renderActiveView();
-        }
-
-        function triggerAndroidBack() {
-            if (appState.activeTab !== 'dashboard') {
-                window.history.back();
-            }
-        }
-
-        function renderActiveView() {
-            const sections = ['dashboard', 'stok', 'keuntungan', 'belanja', 'penjualan', 'pengeluaran', 'googlesync'];
-            sections.forEach(s => {
-                const el = document.getElementById(`tab-${s}`);
-                if(el) {
-                    if (s === appState.activeTab) el.classList.remove('hidden');
-                    else el.classList.add('hidden');
-                }
-
-                const sideEl = document.getElementById(`side-${s}`);
-                if(sideEl) {
-                    if (s === appState.activeTab) {
-                        sideEl.className = "w-full py-3 px-4 rounded-xl flex items-center gap-3 transition-all text-sm font-semibold bg-yellow-500 text-zinc-950 shadow-md font-bold";
-                    } else {
-                        sideEl.className = "w-full py-3 px-4 rounded-xl flex items-center gap-3 transition-all text-sm font-semibold border border-transparent text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50";
-                    }
-                }
-            });
-
-            const btnBack = document.getElementById('btn-back-dashboard');
-            if (appState.activeTab === 'dashboard') {
-                btnBack.classList.add('opacity-30', 'pointer-events-none');
-                document.getElementById('header-title').innerText = "ARYA GROSIR";
-            } else {
-                btnBack.classList.remove('opacity-30', 'pointer-events-none');
-                const titleMap = {
-                    stok: 'STOK BARANG',
-                    keuntungan: 'LAPORAN KEUNTUNGAN',
-                    belanja: 'BELANJA PASOKAN',
-                    penjualan: 'KASIR POS',
-                    pengeluaran: 'BEBAN OPERASIONAL',
-                    googlesync: 'CLOUD BACKUP CONFIG'
-                };
-                document.getElementById('header-title').innerText = titleMap[appState.activeTab] || "ARYA GROSIR";
-            }
-
-            // Perform dynamic data loading on tabs initialization
-            if (appState.activeTab === 'stok') renderStokList();
-            if (appState.activeTab === 'keuntungan') refreshProfitReport();
-            if (appState.activeTab === 'belanja' || appState.activeTab === 'penjualan') populateProductDropdowns();
-            if (appState.activeTab === 'pengeluaran') renderPengeluaranList();
-            
-            lucide.createIcons();
-        }
-
-        // Dropdown Synchronizers (Pure names without stock numbers)
-        function populateProductDropdowns() {
-            const bSelect = document.getElementById('belanja-nama-select');
-            const jSelect = document.getElementById('jual-nama-select');
-            
-            bSelect.innerHTML = '<option value="">-- Pilih Nama Barang --</option>';
-            jSelect.innerHTML = '<option value="">-- Pilih Nama Barang --</option>';
-            
-            // Sort alphabetical
-            const sortedStok = [...appState.stok].sort((a,b) => a.nama.localeCompare(b.nama));
-            
-            sortedStok.forEach(item => {
-                const optB = document.createElement('option');
-                optB.value = item.nama;
-                optB.innerText = item.nama;
-                bSelect.appendChild(optB);
-
-                const optJ = document.createElement('option');
-                optJ.value = item.nama;
-                optJ.innerText = item.nama;
-                jSelect.appendChild(optJ);
-            });
-        }
-
-        // Form Synchronizers: Belanja
-        function syncBelanjaFromNama() {
-            const selectedNama = document.getElementById('belanja-nama-select').value;
-            const item = appState.stok.find(x => x.nama === selectedNama);
-            if(item) {
-                document.getElementById('belanja-barcode').value = item.barcode;
-                document.getElementById('belanja-harga').value = formatNumber(item.hargaBeli);
-            }
-        }
-
-        function syncBelanjaFromBarcode() {
-            const code = document.getElementById('belanja-barcode').value.trim();
-            const item = appState.stok.find(x => x.barcode === code);
-            if(item) {
-                document.getElementById('belanja-nama-select').value = item.nama;
-                document.getElementById('belanja-harga').value = formatNumber(item.hargaBeli);
-            }
-        }
-
-        // Form Synchronizers: Penjualan
-        function syncJualFromNama() {
-            const selectedNama = document.getElementById('jual-nama-select').value;
-            const item = appState.stok.find(x => x.nama === selectedNama);
-            if(item) {
-                document.getElementById('jual-barcode').value = item.barcode;
-                calculateJualPreviewPrice();
-            }
-        }
-
-        function syncJualFromBarcode() {
-            const code = document.getElementById('jual-barcode').value.trim();
-            const item = appState.stok.find(x => x.barcode === code);
-            if(item) {
-                document.getElementById('jual-nama-select').value = item.nama;
-                calculateJualPreviewPrice();
-            }
-        }
-
-        function calculateJualPreviewPrice() {
-            const selectedNama = document.getElementById('jual-nama-select').value;
-            const qty = parseFloat(document.getElementById('jual-qty').value) || 0;
-            const item = appState.stok.find(x => x.nama === selectedNama);
-            
-            if(item) {
-                const totalItemPrice = qty * item.hargaJual;
-                document.getElementById('jual-preview-harga').value = "Rp " + formatNumber(totalItemPrice);
-            } else {
-                document.getElementById('jual-preview-harga').value = "Rp 0";
-            }
-        }
-
-        // Cart Actions: Belanja
-        function addToBelanjaCart() {
-            const nama = document.getElementById('belanja-nama-select').value;
-            const barcode = document.getElementById('belanja-barcode').value.trim();
-            const qty = parseFloat(document.getElementById('belanja-qty').value) || 0;
-            const harga = unformatNumber(document.getElementById('belanja-harga').value);
-            const tanggal = document.getElementById('belanja-tanggal').value;
-
-            if(!nama || !barcode || qty <= 0 || harga <= 0) {
-                alert("Semua kolom input belanja harus diisi secara valid dengan angka!");
-                return;
-            }
-
-            appState.belanjaCart.push({ tanggal, barcode, nama, qty, hargaBeli: harga, subtotal: qty * harga });
-            
-            // Flush specific field lines
-            document.getElementById('belanja-nama-select').value = '';
-            document.getElementById('belanja-barcode').value = '';
-            document.getElementById('belanja-qty').value = '';
-            document.getElementById('belanja-harga').value = '';
-            
-            renderBelanjaCart();
-        }
-
-        function renderBelanjaCart() {
-            const container = document.getElementById('belanja-list-container');
-            const panel = document.getElementById('belanja-total-panel');
-            container.innerHTML = '';
-
-            if(appState.belanjaCart.length === 0) {
-                panel.classList.add('hidden');
-                return;
-            }
-            panel.classList.remove('hidden');
-
-            let gTotal = 0;
-            appState.belanjaCart.forEach((item, index) => {
-                gTotal += item.subtotal;
-                const row = document.createElement('div');
-                row.className = "flex justify-between items-center bg-zinc-950 p-2.5 border border-zinc-800 rounded-lg";
-                row.innerHTML = `
-                    <div>
-                        <span class="block font-bold text-zinc-300">${item.nama}</span>
-                        <span class="text-[10px] text-zinc-500 font-mono-custom">${item.qty} Pcs x Rp ${formatNumber(item.hargaBeli)}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-mono-custom text-zinc-200 font-bold">Rp ${formatNumber(item.subtotal)}</span>
-                        <button onclick="removeBelanjaItem(${index})" class="text-zinc-600 hover:text-red-400"><i data-lucide="x" class="w-4 h-4"></i></button>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-            document.getElementById('belanja-grand-total').innerText = "Rp " + formatNumber(gTotal);
-            lucide.createIcons();
-        }
-
-        function removeBelanjaItem(idx) {
-            appState.belanjaCart.splice(idx, 1);
-            renderBelanjaCart();
-        }
-
-        function clearBelanjaCart() {
-            appState.belanjaCart = [];
-            renderBelanjaCart();
-        }
-
-        function executeBelanja() {
-            if(appState.belanjaCart.length === 0) return;
-            
-            appState.belanjaCart.forEach(cartItem => {
-                appState.belanja.push({...cartItem});
-                let master = appState.stok.find(x => x.barcode === cartItem.barcode);
-                if(master) {
-                    master.stok += cartItem.qty; // Restock increments quantity counter
-                    master.hargaBeli = cartItem.hargaBeli; // Automatically adapt core procurement asset base price
-                }
-            });
-
-            clearBelanjaCart();
-            saveStateToLocalStorage();
-            alert("Transaksi belanja berhasil diproses dan sisa stok barang telah ditambahkan!");
-        }
-
-        // Cart Actions: Penjualan POS
-        function addToJualCart() {
-            const nama = document.getElementById('jual-nama-select').value;
-            const barcode = document.getElementById('jual-barcode').value.trim();
-            const qty = parseFloat(document.getElementById('jual-qty').value) || 0;
-            const tanggal = document.getElementById('jual-tanggal').value;
-
-            if(!nama || !barcode || qty <= 0) {
-                alert("Pilih barang dan jumlah qty penjualan secara valid!");
-                return;
-            }
-
-            const master = appState.stok.find(x => x.barcode === barcode);
-            if(!master) return;
-
-            if(master.stok < qty) {
-                alert(`Stok tidak mencukupi! Sisa stok barang ${master.nama} saat ini hanya: ${master.stok}`);
-                return;
-            }
-
-            const sub = qty * master.hargaJual;
-            const labaBersih = sub - (qty * master.hargaBeli);
-
-            appState.jualCart.push({
-                id: "TRX-" + Date.now().toString().slice(-6),
-                tanggal,
-                barcode,
-                nama,
-                qty,
-                hargaJual: master.hargaJual,
-                subtotal: sub,
-                laba: labaBersih
-            });
-
-            document.getElementById('jual-nama-select').value = '';
-            document.getElementById('jual-barcode').value = '';
-            document.getElementById('jual-qty').value = '';
-            document.getElementById('jual-preview-harga').value = 'Rp 0';
-
-            renderJualCart();
-        }
-
-        function renderJualCart() {
-            const container = document.getElementById('jual-list-container');
-            const panel = document.getElementById('jual-total-panel');
-            container.innerHTML = '';
-
-            if(appState.jualCart.length === 0) {
-                panel.classList.add('hidden');
-                return;
-            }
-            panel.classList.remove('hidden');
-
-            let grandTotal = 0;
-            appState.jualCart.forEach((item, index) => {
-                grandTotal += item.subtotal;
-                
-                // Pure simplified requested minimal output block
-                const itemBlock = document.createElement('div');
-                itemBlock.className = "flex justify-between items-center bg-zinc-950/60 p-2 rounded-lg border border-zinc-900";
-                itemBlock.innerHTML = `
-                    <div class="text-zinc-300">
-                        <span class="font-semibold block">${item.nama}</span>
-                        <span class="text-zinc-500 font-mono-custom text-[11px]">${item.qty} Unit x Rp ${formatNumber(item.hargaJual)}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold font-mono-custom text-yellow-500">Rp ${formatNumber(item.subtotal)}</span>
-                        <button onclick="removeJualItem(${index})" class="text-zinc-600 hover:text-red-400"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button>
-                    </div>
-                `;
-                container.appendChild(itemBlock);
-            });
-
-            document.getElementById('jual-grand-total').innerText = "Rp " + formatNumber(grandTotal);
-            calculateKembalian();
-            lucide.createIcons();
-        }
-
-        function removeJualItem(idx) {
-            appState.jualCart.splice(idx, 1);
-            renderJualCart();
-        }
-
-        function clearPenjualanCart() {
-            appState.jualCart = [];
-            renderJualCart();
-        }
-
-        function calculateKembalian() {
-            let total = 0;
-            appState.jualCart.forEach(x => total += x.subtotal);
-            let bayar = unformatNumber(document.getElementById('jual-bayar').value);
-            let kembali = bayar - total;
-            document.getElementById('jual-kembalian').value = kembali >= 0 ? "Rp " + formatNumber(kembali) : "Kurang Rp " + formatNumber(Math.abs(kembali));
-        }
-
-        function executePenjualan() {
-            if(appState.jualCart.length === 0) return;
-            
-            let total = 0;
-            appState.jualCart.forEach(x => total += x.subtotal);
-            let bayar = unformatNumber(document.getElementById('jual-bayar').value);
-            
-            if(bayar < total) {
-                alert("Nominal pembayaran tunai masih kurang!");
-                return;
-            }
-
-            // Process stock deduction update
-            appState.jualCart.forEach(cartItem => {
-                appState.penjualan.push({...cartItem});
-                let master = appState.stok.find(x => x.barcode === cartItem.barcode);
-                if(master) master.stok -= cartItem.qty; // Deduct warehouse assets inventory counters
-            });
-
-            // Generate high precision dynamic invoice PDF
-            printInvoicePdf(total, bayar);
-
-            clearPenjualanCart();
-            document.getElementById('jual-bayar').value = '';
-            document.getElementById('jual-kembalian').value = '';
-            saveStateToLocalStorage();
-            alert("Transaksi Penjualan Terบันทึก! Dokumen Faktur PDF siap diunduh.");
-        }
-
-        function printInvoicePdf(total, bayar) {
-            document.getElementById('inv-date-print').innerText = new Date().toLocaleString('id-ID');
-            document.getElementById('inv-id-print').innerText = "KODE TRX: " + appState.jualCart[0].id;
-            
-            const ibox = document.getElementById('inv-items-box');
-            ibox.innerHTML = '';
-            appState.jualCart.forEach(x => {
-                const row = document.createElement('div');
-                row.className = "space-y-0.5";
-                row.innerHTML = `
-                    <div class="flex justify-between font-bold text-zinc-800"><span>${x.nama}</span><span>Rp ${formatNumber(x.subtotal)}</span></div>
-                    <div class="text-[9px] text-zinc-500">${x.qty} Pcs x Rp ${formatNumber(x.hargaJual)}</div>
-                `;
-                ibox.appendChild(row);
-            });
-
-            document.getElementById('inv-total-print').innerText = "Rp " + formatNumber(total);
-            document.getElementById('inv-bayar-print').innerText = "Rp " + formatNumber(bayar);
-            document.getElementById('inv-kembali-print').innerText = "Rp " + formatNumber(bayar - total);
-
-            const element = document.getElementById('invoice-template');
-            const opt = {
-                margin: 0.2,
-                filename: `FAKTUR-${appState.jualCart[0].id}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, logging: false },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
-        }
-
-        // Section Form Logic: Master Stok Barang
-        function renderStokList() {
-            const container = document.getElementById('stok-container');
-            const query = document.getElementById('search-stok').value.toLowerCase().trim();
-            container.innerHTML = '';
-
-            const filtered = appState.stok.filter(x => x.nama.toLowerCase().includes(query) || x.barcode.includes(query));
-
-            if(filtered.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-zinc-600 font-mono-custom">Katalog barang kosong / Tidak ditemukan</div>`;
-                return;
-            }
-
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center relative overflow-hidden";
-                card.innerHTML = `
-                    <div class="space-y-1">
-                        <h4 class="font-bold text-sm text-zinc-200">${item.nama}</h4>
-                        <div class="flex gap-4 text-[10px] font-mono-custom text-zinc-500">
-                            <span>Beli: <strong class="text-zinc-300">Rp ${formatNumber(item.hargaBeli)}</strong></span>
-                            <span>Jual: <strong class="text-yellow-500">Rp ${formatNumber(item.hargaJual)}</strong></span>
-                        </div>
-                        <span class="block text-[10px] text-zinc-600 font-mono-custom">Barcode: ${item.barcode}</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="block text-[9px] font-bold text-zinc-500 uppercase">Sisa Stok</span>
-                        <span class="text-xl font-black ${item.stok <= 5 ? 'text-red-400 animate-pulse' : 'text-zinc-200'} font-mono-custom">${item.stok}</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function saveNewMasterStok() {
-            const barcode = document.getElementById('mst-barcode').value.trim();
-            const nama = document.getElementById('mst-nama').value.trim();
-            const stok = parseFloat(document.getElementById('mst-stok').value) || 0;
-            const hargaBeli = unformatNumber(document.getElementById('mst-harga-beli').value);
-            const hargaJual = unformatNumber(document.getElementById('mst-harga-jual').value);
-
-            if(!barcode || !nama || hargaBeli <= 0 || hargaJual <= 0) {
-                alert("Mohon lengkapi seluruh kolom isian data produk!");
-                return;
-            }
-
-            // Check duplicate barcode key entries
-            if(appState.stok.some(x => x.barcode === barcode)) {
-                alert("Kode barcode tersebut sudah terdaftar pada sistem database barang lain!");
-                return;
-            }
-
-            appState.stok.push({ barcode, nama, stok, hargaBeli, hargaJual });
-            
-            document.getElementById('mst-barcode').value = '';
-            document.getElementById('mst-nama').value = '';
-            document.getElementById('mst-stok').value = '';
-            document.getElementById('mst-harga-beli').value = '';
-            document.getElementById('mst-harga-jual').value = '';
-            
-            closeModal('modal-add-stok');
-            saveStateToLocalStorage();
-            renderStokList();
-        }
-
-        // Form Logic Section: Expenses / Pengeluaran
-        function savePengeluaran() {
-            const tanggal = document.getElementById('exp-tanggal').value;
-            const keterangan = document.getElementById('exp-keterangan').value.trim();
-            const nominal = unformatNumber(document.getElementById('exp-nominal').value);
-
-            if(!keterangan || nominal <= 0) {
-                alert("Data keterangan & isi nominal biaya keluar wajib diisi!");
-                return;
-            }
-
-            appState.pengeluaran.push({ tanggal, keterangan, nominal });
-            document.getElementById('exp-keterangan').value = '';
-            document.getElementById('exp-nominal').value = '';
-
-            saveStateToLocalStorage();
-            renderPengeluaranList();
-        }
-
-        function renderPengeluaranList() {
-            const container = document.getElementById('exp-list-container');
-            container.innerHTML = '';
-
-            const today = new Date().toISOString().split('T')[0];
-            const filtered = appState.pengeluaran.filter(x => x.tanggal === today);
-
-            if(filtered.length === 0) {
-                container.innerHTML = `<div class="text-center py-4 text-xs text-zinc-600 font-mono-custom">Belum ada biaya operasional hari ini.</div>`;
-                return;
-            }
-
-            filtered.forEach((item, idx) => {
-                const r = document.createElement('div');
-                r.className = "flex justify-between items-center bg-zinc-900 border border-zinc-800 p-3 rounded-xl text-xs";
-                r.innerHTML = `
-                    <div>
-                        <span class="block font-medium text-zinc-300">${item.keterangan}</span>
-                        <span class="text-[9px] text-zinc-500">${item.tanggal}</span>
-                    </div>
-                    <span class="font-bold text-red-400 font-mono-custom">Rp ${formatNumber(item.nominal)}</span>
-                `;
-                container.appendChild(r);
-            });
-        }
-
-        // Section Analysis Engine: Profit Dashboard Report calculation
-        function refreshProfitReport() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const currentMonthStr = todayStr.slice(0, 7); // Format: "YYYY-MM"
-
-            let labaHari = 0;
-            let labaBulan = 0;
-
-            let kotorTotal = 0;
-            let modalTotal = 0;
-            let expTotal = 0;
-
-            // Calculate from core sales transactions logs
-            appState.penjualan.forEach(x => {
-                kotorTotal += x.subtotal;
-                const master = appState.stok.find(m => m.barcode === x.barcode);
-                const cBeli = master ? master.hargaBeli : x.hargaJual * 0.7; // Fallback math protection algorithm
-                modalTotal += (x.qty * cBeli);
-
-                if (x.tanggal === todayStr) labaHari += x.laba;
-                if (x.tanggal && x.tanggal.startsWith(currentMonthStr)) labaBulan += x.laba;
-            });
-
-            // Calculate dynamic structural leakage deductions from expenses logs
-            appState.pengeluaran.forEach(x => {
-                expTotal += x.nominal;
-                if (x.tanggal === todayStr) labaHari -= x.nominal;
-                if (x.tanggal && x.tanggal.startsWith(currentMonthStr)) labaBulan -= x.nominal;
-            });
-
-            document.getElementById('laba-hari-ini').innerText = "Rp " + formatNumber(labaHari);
-            document.getElementById('laba-bulan-ini').innerText = "Rp " + formatNumber(labaBulan);
-
-            document.getElementById('stats-kotor').innerText = "Rp " + formatNumber(kotorTotal);
-            document.getElementById('stats-modal').innerText = "Rp " + formatNumber(modalTotal);
-            document.getElementById('stats-pengeluaran').innerText = "Rp " + formatNumber(expTotal);
-            document.getElementById('stats-bersih').innerText = "Rp " + formatNumber(kotorTotal - modalTotal - expTotal);
-
-            // Re-render data charting visuals
-            updateChartVisuals();
-        }
-
-        function initProfitChart() {
-            const ctx = document.getElementById('profitChart').getContext('2d');
-            profitChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['H-6', 'H-5', 'H-4', 'H-3', 'H-2', 'H-1', 'Hari Ini'],
-                    datasets: [{
-                        label: 'Laba Bersih Perhari',
-                        data: [0, 0, 0, 0, 0, 0, 0],
-                        backgroundColor: '#f59e0b',
-                        borderRadius: 6,
-                        borderSkipped: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#71717a', font: { size: 9 } } },
-                        y: { grid: { color: '#18181b' }, ticks: { color: '#71717a', font: { size: 9 } } }
-                    }
-                }
-            });
-        }
-
-        function updateChartVisuals() {
-            if(!profitChartInstance) return;
-            
-            let daysData = [0,0,0,0,0,0,0];
-            let labelDates = [];
-            
-            for(let i=6; i>=0; i--) {
-                let d = new Date();
-                d.setDate(d.getDate() - i);
-                let dStr = d.toISOString().split('T')[0];
-                labelDates.push(dStr.slice(5)); // Show Day-Month short codes string format
-                
-                let dayLaba = 0;
-                appState.penjualan.forEach(x => { if(x.tanggal === dStr) dayLaba += x.laba; });
-                appState.pengeluaran.forEach(x => { if(x.tanggal === dStr) dayLaba -= x.nominal; });
-                daysData[6 - i] = dayLaba;
-            }
-
-            profitChartInstance.data.labels = labelDates;
-            profitChartInstance.data.datasets[0].data = daysData;
-            profitChartInstance.update();
-        }
-
-        // Cloud Core Engine Operations Section: Google Sheets Sync Integrator
-        function saveSyncSettings() {
-            appState.syncUrl = document.getElementById('sync-url').value.trim();
-            saveStateToLocalStorage();
-            alert("URL Endpoint Google Apps Script berhasil tersimpan di sistem lokal!");
-        }
-
-        function triggerManualSync() {
-            if(!appState.syncUrl) { alert("Isi URL Web App Google Apps Script Terlebih Dahulu!"); return; }
-            
-            const payload = {
-                stok: appState.stok,
-                penjualan: appState.penjualan,
-                belanja: appState.belanja,
-                pengeluaran: appState.pengeluaran
-            };
-
-            fetch(appState.syncUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                const timeStamp = new Date().toLocaleString('id-ID');
-                appState.lastBackupDate = timeStamp;
-                saveStateToLocalStorage();
-                document.getElementById('sidebar-backup-status').innerText = `Sukses: ${timeStamp}`;
-                alert(`Sinkronisasi Awan Berhasil Terkirim pada: ${timeStamp}`);
-            })
-            .catch(err => alert("Gagal mengirim data sinkronisasi: " + err.message));
-        }
-
-        function pullDataFromSheets() {
-            if(!appState.syncUrl) { alert("Konfigurasikan URL Apps Script Web App terlebih dahulu!"); return; }
-            
-            if(!confirm("Peringatan: Proses tarik data cloud akan menggabungkan/menimpa master data stok lokal di HP saat ini. Lanjutkan?")) return;
-
-            fetch(appState.syncUrl, { method: 'GET' })
-            .then(res => res.json())
-            .then(cloudStokArray => {
-                if(Array.isArray(cloudStokArray) && cloudStokArray.length > 0) {
-                    appState.stok = cloudStokArray;
-                    saveStateToLocalStorage();
-                    renderStokList();
-                    populateProductDropdowns();
-                    alert(`Sukses menarik ${cloudStokArray.length} entri data barang dari Google Sheets ke HP.`);
-                } else {
-                    alert("Gagal memuat: Format respon data dari cloud kosong atau tidak valid.");
-                }
-            })
-            .catch(err => alert("Koneksi gagal saat menarik data dari Google Sheets: " + err.message));
-        }
-
-        // Clock Engine Loop Scheduler Background Worker
-        function runClockScheduler() {
-            setInterval(() => {
-                const now = new Date();
-                const currentHour = now.getHours();
-                const currentDateStr = now.toISOString().split('T')[0];
-
-                // Execute background cloud save operations precisely at 23:00 automatically
-                if (currentHour === 23 && appState.lastBackupDate.split(' ')[0] !== currentDateStr) {
-                    if (appState.syncUrl) {
-                        const payload = { stok: appState.stok, penjualan: appState.penjualan, belanja: appState.belanja, pengeluaran: appState.pengeluaran };
-                        fetch(appState.syncUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-                        .then(() => {
-                            appState.lastBackupDate = currentDateStr + " 23:00:00";
-                            saveStateToLocalStorage();
-                            document.getElementById('sidebar-backup-status').innerText = `Auto: ${appState.lastBackupDate}`;
-                        }).catch(() => {});
-                    }
-                }
-            }, 30000); // Pulse check processing every 30 seconds interval safely
-        }
-
-        // Camera Framework Handler: HTML5 Barcode Scanning Layer
-        function startBarcodeScanner(targetInputFieldId) {
-            appState.currentScanTargetId = targetInputFieldId;
-            openModal('modal-scanner');
-
-            if(html5QrcodeScanner === null) {
-                html5QrcodeScanner = new Html5Qrcode("reader");
-            }
-
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            html5QrcodeScanner.start(
-                { facingMode: "environment" }, 
-                config, 
-                (decodedText) => {
-                    document.getElementById(appState.currentScanTargetId).value = decodedText;
-                    
-                    // Fire synthetic oninput triggers code
-                    if(appState.currentScanTargetId === 'belanja-barcode') syncBelanjaFromBarcode();
-                    if(appState.currentScanTargetId === 'jual-barcode') syncJualFromBarcode();
-
-                    stopBarcodeScanner();
-                }, 
-                () => {} // Suppress internal continuous generic scanner loop log warnings
-            ).catch(() => {});
-        }
-
-        function stopBarcodeScanner() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.stop().then(() => {
-                    closeModal('modal-scanner');
-                }).catch(() => {
-                    closeModal('modal-scanner');
-                });
-            } else {
-                closeModal('modal-scanner');
-            }
-        }
-
-        // Basic Visual UI Helpers
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-        // Data Demo Engine Injector Mock Generator
-        function loadMockData() {
-            appState.stok = [
-                { barcode: "8999906101234", nama: "Minyak Goreng Bimoli 2L", stok: 45, hargaBeli: 28000, hargaJual: 34500 },
-                { barcode: "8999906105678", nama: "Gula Pasir Gulaku 1kg", stok: 80, hargaBeli: 13500, hargaJual: 16800 },
-                { barcode: "8998866200112", nama: "Sabun Cuci Rinso 800g", stok: 3, hargaBeli: 19000, hargaJual: 23400 },
-                { barcode: "8991001100223", nama: "Indomie Goreng Spesial (Kardus)", stok: 15, hargaBeli: 98000, hargaJual: 112000 },
-                { barcode: "8992002200334", nama: "Kopi Kapal Api Eco 165g", stok: 25, hargaBeli: 11000, hargaJual: 14500 }
-            ];
-            saveStateToLocalStorage();
-            if(appState.activeTab === 'stok') renderStokList();
-            populateProductDropdowns();
-            alert("5 Master data barang contoh berhasil diinjeksikan ke memori aplikasi ARYA GROSIR!");
-        }
-    </script>
 </body>
 </html>
