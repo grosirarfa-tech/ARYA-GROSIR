@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARYA GROSIR - Aplikasi Kasir Premium</title>
+    <title>ARYA GROSIR - by ARIS PRABOWO</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -300,9 +300,10 @@
                         <img src="https://raw.githubusercontent.com/grosirarfa-tech/ARYA-GROSIR/main/logo%20web%20arya.png" alt="ARYA GROSIR LOGO" class="app-logo-large">
                     </div>
 
-                    <!-- 2x6 Grid Layout for Mobile Android, default grid on desktop -->
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3.5 pt-2 max-w-4xl mx-auto">
-                        <button onclick="switchTab('googlesync')" class="bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md col-span-2 md:col-span-1 border-t-2 border-t-emerald-500">
+                    <!-- Penataan menu beranda khusus: Google Sheet Sync di atas, diikuti grid 2x3 -->
+                    <div class="space-y-3.5 pt-2 max-w-4xl mx-auto">
+                        <!-- Google Sheets Sync (Paling Atas) -->
+                        <button onclick="switchTab('googlesync')" class="w-full bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md border-t-2 border-t-emerald-500">
                             <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
                                 <i data-lucide="cloud-lightning" class="w-5 h-5"></i>
                             </div>
@@ -312,65 +313,74 @@
                             </div>
                         </button>
 
-                        <button onclick="switchTab('stok')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
-                            <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
-                                <i data-lucide="package" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <span class="block text-xs font-bold text-zinc-200">Stok Barang</span>
-                                <span class="block text-[8px] text-zinc-500 mt-0.5">Katalog & Inventaris</span>
-                            </div>
-                        </button>
+                        <!-- Grid Menu 2x3 (Handphone) / 3x2 (Desktop) -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3.5">
+                            <!-- [1,1] Stok Barang -->
+                            <button onclick="switchTab('stok')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
+                                <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
+                                    <i data-lucide="package" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-zinc-200">Stok Barang</span>
+                                    <span class="block text-[8px] text-zinc-500 mt-0.5">Katalog & Inventaris</span>
+                                </div>
+                            </button>
 
-                        <button onclick="switchTab('perkiraan')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
-                            <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
-                                <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <span class="block text-xs font-bold text-zinc-200">Perkiraan Belanja</span>
-                                <span class="block text-[8px] text-zinc-500 mt-0.5">Pengadaan Stok Aman</span>
-                            </div>
-                        </button>
+                            <!-- [1,2] Perkiraan Belanja -->
+                            <button onclick="switchTab('perkiraan')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
+                                <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
+                                    <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-zinc-200">Perkiraan Belanja</span>
+                                    <span class="block text-[8px] text-zinc-500 mt-0.5">Pengadaan Stok Aman</span>
+                                </div>
+                            </button>
 
-                        <button onclick="switchTab('keuntungan')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
-                            <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
-                                <i data-lucide="trending-up" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <span class="block text-xs font-bold text-zinc-200">Keuntungan</span>
-                                <span class="block text-[8px] text-zinc-500 mt-0.5">Laba Harian & Bulanan</span>
-                            </div>
-                        </button>
+                            <!-- [2,1] Keuntungan -->
+                            <button onclick="switchTab('keuntungan')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
+                                <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
+                                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-zinc-200">Keuntungan</span>
+                                    <span class="block text-[8px] text-zinc-500 mt-0.5">Laba Harian & Bulanan</span>
+                                </div>
+                            </button>
 
-                        <button onclick="switchTab('belanja')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
-                            <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
-                                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <span class="block text-xs font-bold text-zinc-200">Belanja Barang</span>
-                                <span class="block text-[8px] text-zinc-500 mt-0.5">Input Kulakan Baru</span>
-                            </div>
-                        </button>
+                            <!-- [2,2] Pengeluaran Lain -->
+                            <button onclick="switchTab('pengeluaran')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
+                                <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
+                                    <i data-lucide="wallet" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-zinc-200">Pengeluaran Laba</span>
+                                    <span class="block text-[8px] text-zinc-500 mt-0.5">Biaya Operasional Toko</span>
+                                </div>
+                            </button>
 
-                        <button onclick="switchTab('penjualan')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md col-span-2 md:col-span-1">
-                            <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
-                                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <span class="block text-xs font-bold text-zinc-200">Penjualan</span>
-                                <span class="block text-[8px] text-zinc-500 mt-0.5">Transaksi POS Kasir</span>
-                            </div>
-                        </button>
+                            <!-- [3,1] Belanja Barang -->
+                            <button onclick="switchTab('belanja')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
+                                <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
+                                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-zinc-200">Belanja Barang</span>
+                                    <span class="block text-[8px] text-zinc-500 mt-0.5">Input Kulakan Baru</span>
+                                </div>
+                            </button>
 
-                        <button onclick="switchTab('pengeluaran')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md col-span-2 md:col-span-1">
-                            <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
-                                <i data-lucide="wallet" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <span class="block text-xs font-bold text-zinc-200">Pengeluaran Laba</span>
-                                <span class="block text-[8px] text-zinc-500 mt-0.5">Biaya Operasional Toko</span>
-                            </div>
-                        </button>
+                            <!-- [3,2] Penjualan -->
+                            <button onclick="switchTab('penjualan')" class="bg-zinc-900 border border-zinc-800 hover:border-yellow-500/30 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95 group shadow-md">
+                                <div class="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
+                                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-zinc-200">Penjualan</span>
+                                    <span class="block text-[8px] text-zinc-500 mt-0.5">Transaksi POS Kasir</span>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </section>
                 
@@ -781,12 +791,12 @@
             
             lucide.createIcons();
 
-            // Sembunyikan setelah 3 detik
+            // Sembunyikan setelah 2 detik secara otomatis (Sesuai Permintaan)
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'pointer-events-none');
                 toast.classList.remove('translate-y-0');
                 toast.style.transform = 'translate(-50%, -20px)';
-            }, 3000);
+            }, 2000);
         }
 
         // Helper Format Titik Ribuan Rupiah
@@ -806,7 +816,16 @@
         }
 
         let html5QrcodeScanner = null;
+        let lastScanInputId = null; // Menyimpan inputId aktif saat ini
+        
         function startBarcodeScanner(inputId) {
+            lastScanInputId = inputId;
+            
+            // Jika memindai dari modal Tambah Barang Baru, sembunyikan modal terlebih dahulu
+            if (inputId === 'modal-stok-barcode') {
+                closeModal('modal-add-stok');
+            }
+            
             document.getElementById('modal-scanner').classList.remove('hidden');
             
             // Konfigurasi tombol simulasi scan cadangan
@@ -838,7 +857,7 @@
                         document.getElementById(inputId).value = decodedText;
                         if (inputId === 'belanja-barcode') syncBelanjaFromBarcode();
                         if (inputId === 'jual-barcode') syncJualFromBarcode();
-                        stopBarcodeScanner(); // Menutup kamera otomatis
+                        stopBarcodeScanner(); // Menutup kamera otomatis & memulihkan modal jika diperlukan
                         showToast("Pindai Barcode Berhasil!", "success");
                     },
                     (errorMessage) => {
@@ -853,15 +872,27 @@
         }
 
         function stopBarcodeScanner() {
+            // Tentukan apakah harus membuka kembali modal Tambah Barang Baru
+            const restoreStokModal = (lastScanInputId === 'modal-stok-barcode');
+            
             if (html5QrcodeScanner) {
                 html5QrcodeScanner.stop().then(() => {
                     html5QrcodeScanner = null;
                     document.getElementById('modal-scanner').classList.add('hidden');
+                    if (restoreStokModal) {
+                        openModal('modal-add-stok');
+                    }
                 }).catch(err => {
                     document.getElementById('modal-scanner').classList.add('hidden');
+                    if (restoreStokModal) {
+                        openModal('modal-add-stok');
+                    }
                 });
             } else {
                 document.getElementById('modal-scanner').classList.add('hidden');
+                if (restoreStokModal) {
+                    openModal('modal-add-stok');
+                }
             }
         }
 
