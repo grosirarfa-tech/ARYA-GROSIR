@@ -2,41 +2,41 @@
 <html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ARYA GROSIR - Premium POS System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts (Inter & Poppins) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Lucide Icons (Highly robust icon set) -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #09090b; /* Very dark zinc background */
+            background-color: #000000; /* True black background as requested */
+            -webkit-tap-highlight-color: transparent;
         }
         .font-poppins {
             font-family: 'Poppins', sans-serif;
         }
-        /* Hide scrollbars for a clean app feel */
+        /* Custom scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #18181b;
+            background: #09090b;
         }
         ::-webkit-scrollbar-thumb {
-            background: #3f3f46;
+            background: #27272a;
             border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #52525b;
+            background: #3f3f46;
         }
-        /* Custom Lunas Watermark animation */
         @keyframes watermark-fade {
             0% { opacity: 0; transform: scale(0.8) rotate(-12deg); }
-            100% { opacity: 0.15; transform: scale(1) rotate(-12deg); }
+            100% { opacity: 0.25; transform: scale(1) rotate(-12deg); }
         }
         .watermark-lunas {
             animation: watermark-fade 0.5s ease-out forwards;
@@ -46,24 +46,45 @@
 <body class="text-zinc-100 flex flex-col min-h-screen justify-between overflow-x-hidden selection:bg-amber-500/30 selection:text-amber-200">
 
     <!-- App Container -->
-    <div class="flex-grow flex flex-col pb-20">
+    <div class="flex-grow flex flex-col pb-6">
         <!-- Toast Notification Center -->
         <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col gap-2"></div>
 
-        <!-- Exit Confirmation Modal (Android back on main menu) -->
-        <div id="exit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
-            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl transform transition-all scale-95 duration-200">
+        <!-- Android Back Button Exit Confirmation Modal -->
+        <div id="exit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm hidden">
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl">
                 <div class="flex items-center gap-3 text-amber-500 mb-4">
                     <i data-lucide="log-out" class="w-8 h-8"></i>
                     <h3 class="text-lg font-bold font-poppins text-zinc-100">Keluar Aplikasi?</h3>
                 </div>
                 <p class="text-sm text-zinc-400 mb-6">Apakah Anda yakin ingin menutup dan keluar dari aplikasi ARYA GROSIR?</p>
                 <div class="flex justify-end gap-3">
-                    <button onclick="closeExitModal(false)" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-200 text-sm font-semibold">
+                    <button onclick="closeExitModal(false)" class="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-200 text-sm font-semibold">
                         Tidak
                     </button>
-                    <button onclick="closeExitModal(true)" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold text-sm hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-amber-500/20">
+                    <button onclick="closeExitModal(true)" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold text-sm hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-amber-500/20">
                         Ya, Keluar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Long Press Context Menu Action Sheet Modal -->
+        <div id="context-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl max-w-xs w-full p-6 shadow-2xl space-y-4">
+                <div class="text-center pb-2 border-b border-zinc-800">
+                    <h4 id="context-title" class="font-bold text-sm text-zinc-300 uppercase tracking-wider">PILIHAN BARANG</h4>
+                    <p id="context-subtitle" class="text-xs text-zinc-500 mt-1 font-mono"></p>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <button id="context-edit-btn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i> Edit Detail Barang
+                    </button>
+                    <button id="context-delete-btn" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> Hapus Barang
+                    </button>
+                    <button onclick="closeContextMenu()" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 rounded-xl text-xs transition-all">
+                        Batal
                     </button>
                 </div>
             </div>
@@ -71,41 +92,34 @@
 
         <!-- Simulated Fullscreen Camera Scanner Modal -->
         <div id="scanner-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between hidden">
-            <div class="p-4 flex items-center justify-between bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 z-10">
+            <div class="p-4 flex items-center justify-between bg-zinc-950 border-b border-zinc-900 z-10">
                 <span class="font-poppins font-bold text-amber-500 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                     PEMINDAI BARCODE AKTIF
                 </span>
-                <button onclick="closeScanner()" class="p-2 rounded-full bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
+                <button onclick="closeScanner()" class="p-2 rounded-full bg-zinc-900 text-zinc-400 hover:text-white transition-colors">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
             </div>
             
-            <!-- Scanning Target Area -->
             <div class="relative flex-grow flex items-center justify-center overflow-hidden">
-                <!-- Glowing scan line -->
                 <div class="absolute inset-x-0 h-1 bg-red-500 shadow-[0_0_15px_#ef4444] animate-[bounce_2.5s_infinite]"></div>
                 
-                <!-- Mock camera focus target corners -->
-                <div class="w-72 h-72 border-2 border-dashed border-amber-500/60 rounded-3xl relative flex flex-col items-center justify-center bg-zinc-900/30 backdrop-blur-[1px]">
+                <div class="w-72 h-72 border-2 border-dashed border-amber-500/60 rounded-3xl relative flex flex-col items-center justify-center bg-zinc-950/40 backdrop-blur-[1px]">
                     <span class="text-xs text-amber-400/80 uppercase tracking-widest text-center px-4">Posisikan Kode Batang<br>di Dalam Kotak</span>
                     <i data-lucide="scan" class="w-16 h-16 text-amber-500/40 absolute"></i>
                 </div>
 
-                <!-- Simulation interface: quick catalog trigger code -->
-                <div class="absolute bottom-10 left-1/2 -translate-x-1/2 bg-zinc-900/90 p-4 rounded-2xl border border-zinc-800 text-center max-w-xs w-full">
+                <div class="absolute bottom-10 left-1/2 -translate-x-1/2 bg-zinc-950 p-4 rounded-2xl border border-zinc-800 text-center max-w-xs w-full">
                     <p class="text-xs text-zinc-400 mb-2 font-medium">Simulasi: Ketuk Kode untuk Memindai</p>
-                    <div id="scanner-demo-codes" class="flex flex-col gap-1 text-sm font-mono max-h-32 overflow-y-auto">
-                        <!-- Filled dynamically -->
-                    </div>
+                    <div id="scanner-demo-codes" class="flex flex-col gap-1 text-sm font-mono max-h-32 overflow-y-auto"></div>
                 </div>
             </div>
 
-            <!-- Manual Barcode Fallback input at the bottom -->
-            <div class="p-6 bg-zinc-900/90 border-t border-zinc-800 flex flex-col gap-3">
+            <div class="p-6 bg-zinc-950 border-t border-zinc-900 flex flex-col gap-3">
                 <p class="text-xs text-zinc-400 text-center">Gagal memindai? Masukkan kode secara manual di bawah ini</p>
                 <div class="flex gap-2">
-                    <input type="text" id="manual-barcode-input" placeholder="Ketik barcode manual..." class="flex-grow bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <input type="text" id="manual-barcode-input" placeholder="Ketik barcode manual..." class="flex-grow bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500">
                     <button onclick="submitManualBarcode()" class="px-5 bg-amber-500 text-black font-bold rounded-xl active:scale-95 transition-transform">
                         Kirim
                     </button>
@@ -114,124 +128,106 @@
         </div>
 
         <!-- Header / Web Logo Section -->
-        <header class="p-4 border-b border-zinc-900 bg-zinc-950/80 sticky top-0 backdrop-blur-md z-40">
-            <div class="max-w-7xl mx-auto flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <img src="logo web arya.png" alt="Arya Grosir Logo" onerror="this.src='https://placehold.co/200x80/27272a/f59e0b?text=ARYA+GROSIR'" class="h-12 w-auto object-contain">
-                    <div>
-                        <h1 class="text-lg font-black font-poppins tracking-wider bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">ARYA GROSIR</h1>
-                        <p class="text-[10px] uppercase text-emerald-400 font-bold tracking-widest flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                            Premium POS System
-                        </p>
-                    </div>
-                </div>
-                <div class="text-right hidden sm:block">
-                    <span id="realtime-clock" class="text-xs font-mono text-zinc-400">Loading...</span>
-                </div>
-            </div>
+        <header class="p-6 bg-black flex flex-col items-center justify-center">
+            <img src="logo web arya.png" alt="Arya Grosir Logo" onerror="this.src='https://placehold.co/400x160/000000/f59e0b?text=ARYA+GROSIR'" class="h-28 md:h-36 w-auto object-contain mb-2">
+            <p class="text-[10px] uppercase text-emerald-400 font-bold tracking-widest flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                Premium POS System
+            </p>
+            <span id="realtime-clock" class="text-xs font-mono text-zinc-500 mt-2">Loading...</span>
         </header>
 
         <!-- Main Content Panel -->
         <main class="flex-grow p-4 md:p-6 max-w-7xl mx-auto w-full">
             
-            <!-- Tab: Main Dashboard -->
+            <!-- Tab: Main Dashboard Menu Grid (2x8 structure customized) -->
             <div id="tab-main" class="tab-pane animate-fade-in">
-                <!-- Welcome Banner -->
-                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 p-6 md:p-8 mb-6 shadow-xl">
-                    <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl"></div>
-                    <div class="absolute -left-10 -top-10 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl"></div>
-                    <h2 class="text-2xl md:text-3xl font-extrabold font-poppins mb-2">Selamat Datang di <span class="bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">Arya Grosir</span></h2>
-                    <p class="text-zinc-400 text-sm max-w-2xl">Aplikasi kasir grosir handal, cepat, didukung sinkronisasi Google Sheets dua arah, manajemen inventaris, dan kalkulasi keuntungan otomatis.</p>
-                </div>
-
-                <!-- 2x8 / Responsive Menu Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                     <!-- 1. Google Spreadsheet Sync -->
-                    <button onclick="switchTab('sync')" class="group p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 hover:from-zinc-800/80 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
-                            <i data-lucide="refresh-cw" class="w-6 h-6 animate-spin-slow"></i>
+                    <button onclick="switchTab('sync')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-800 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i data-lucide="refresh-cw" class="w-6 h-6"></i>
                         </div>
                         <div class="mt-4">
                             <h3 class="font-bold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors">Sinkronisasi</h3>
-                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Atur & hubungkan Google Spreadsheet</p>
+                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Hubungkan & Sinkronisasi Google Spreadsheet</p>
                         </div>
                     </button>
 
                     <!-- 2. Invoice Settings -->
-                    <button onclick="switchTab('invoice')" class="group p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 hover:from-zinc-800/80 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
+                    <button onclick="switchTab('invoice')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-800 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
                         <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="receipt" class="w-6 h-6"></i>
                         </div>
                         <div class="mt-4">
                             <h3 class="font-bold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors">Pengaturan Faktur</h3>
-                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Kostumisasi format & tata letak nota</p>
+                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Kustomisasi format & tata letak nota</p>
                         </div>
                     </button>
 
                     <!-- 3. Stock Management -->
-                    <button onclick="switchTab('stock')" class="group p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 hover:from-zinc-800/80 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
+                    <button onclick="switchTab('stock')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-800 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
                         <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="boxes" class="w-6 h-6"></i>
                         </div>
                         <div class="mt-4">
                             <h3 class="font-bold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors">Stok Barang</h3>
-                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Data katalog, barcode, & minimal stok</p>
+                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Manajemen data katalog, barcode & stok</p>
                         </div>
                     </button>
 
                     <!-- 4. Budget Projection -->
-                    <button onclick="switchTab('projection')" class="group p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 hover:from-zinc-800/80 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
+                    <button onclick="switchTab('projection')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-800 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
                         <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="trending-up" class="w-6 h-6"></i>
                         </div>
                         <div class="mt-4">
                             <h3 class="font-bold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors">Perkiraan Belanja</h3>
-                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Kebutuhan stok yang harus dibeli</p>
+                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Kebutuhan restock barang dari pemasok</p>
                         </div>
                     </button>
 
                     <!-- 5. Profit Analysis -->
-                    <button onclick="switchTab('profit')" class="group p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 hover:from-zinc-800/80 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
+                    <button onclick="switchTab('profit')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-800 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
                         <div class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="wallet" class="w-6 h-6"></i>
                         </div>
                         <div class="mt-4">
                             <h3 class="font-bold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors">Keuntungan</h3>
-                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Laba bersih harian, bulanan & grafik</p>
+                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Laporan laba bersih & grafik diagram</p>
                         </div>
                     </button>
 
                     <!-- 6. Expense Ledger -->
-                    <button onclick="switchTab('expenses')" class="group p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 hover:from-zinc-800/80 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
+                    <button onclick="switchTab('expenses')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-800 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
                         <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="receipt-text" class="w-6 h-6"></i>
                         </div>
                         <div class="mt-4">
                             <h3 class="font-bold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors">Pengeluaran Lain</h3>
-                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Catatan biaya & pengeluaran operasional</p>
+                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Input biaya operasional non-barang</p>
                         </div>
                     </button>
 
                     <!-- 7. Buy Inventory (Belanja) -->
-                    <button onclick="switchTab('purchase_history')" class="group p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 hover:from-zinc-800/80 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
+                    <button onclick="switchTab('purchase_history')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-800 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
                         <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                         </div>
                         <div class="mt-4">
                             <h3 class="font-bold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors">Belanja Barang</h3>
-                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Input kulakan & update stok otomatis</p>
+                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Riwayat & input kulakan stock</p>
                         </div>
                     </button>
 
                     <!-- 8. Cashier Sales -->
-                    <button onclick="switchTab('sales_history')" class="group p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 hover:from-zinc-800/80 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
+                    <button onclick="switchTab('sales_history')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-800 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-2xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between aspect-square md:aspect-auto md:h-40">
                         <div class="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="shopping-cart" class="w-6 h-6"></i>
                         </div>
                         <div class="mt-4">
                             <h3 class="font-bold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors">Penjualan (Kasir)</h3>
-                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Transaksi, struk lunas & kirim WA</p>
+                            <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Transaksi kasir & cetak struk</p>
                         </div>
                     </button>
                 </div>
@@ -246,11 +242,11 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Configuration Form -->
-                    <div class="lg:col-span-1 bg-zinc-900 border border-zinc-800 rounded-3xl p-6 space-y-4">
+                    <div class="lg:col-span-1 bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-4">
                         <h3 class="font-bold font-poppins text-amber-400 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5"></i> Pengaturan Web App</h3>
                         <div>
                             <label class="block text-xs font-semibold text-zinc-400 mb-2">Google Apps Script Web App URL</label>
-                            <input type="url" id="sync-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500 text-xs font-mono">
+                            <input type="url" id="sync-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500 text-xs font-mono">
                         </div>
                         <button onclick="saveSyncSettings()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] transition-all text-black font-bold rounded-xl text-sm shadow-lg shadow-amber-500/10">
                             Simpan Pengaturan
@@ -263,7 +259,7 @@
                             <button onclick="syncPull()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/10">
                                 <i data-lucide="download-cloud" class="w-4 h-4"></i> Tarik Data dari Spreadsheet
                             </button>
-                            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800">
+                            <div class="p-3 bg-zinc-950 rounded-xl border border-zinc-800">
                                 <p class="text-[11px] text-zinc-400 leading-relaxed">
                                     <span class="font-bold text-amber-500">Auto-Backup Aktif:</span> Setiap jam <span class="font-bold text-zinc-200">23:00</span> sistem akan mencadangkan seluruh data secara otomatis apabila browser ini terbuka.
                                 </p>
@@ -272,17 +268,22 @@
                     </div>
 
                     <!-- Setup Instructions & Script Code -->
-                    <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-6 space-y-6">
+                    <div class="lg:col-span-2 bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-6">
                         <div>
                             <h3 class="font-bold font-poppins text-zinc-100 mb-2">Panduan Pengaturan Google Sheets</h3>
                             <ol class="list-decimal list-inside text-sm text-zinc-400 space-y-2 leading-relaxed">
                                 <li>Buat Spreadsheet baru di Google Sheets.</li>
+                                <li>Pastikan untuk membuat sheet/tab dengan nama berikut:
+                                    <span class="text-amber-400 font-mono text-xs">STOCK_LIST</span>, 
+                                    <span class="text-amber-400 font-mono text-xs">PROJECTION</span>, 
+                                    <span class="text-amber-400 font-mono text-xs">PROFIT</span>, 
+                                    <span class="text-amber-400 font-mono text-xs">EXPENSES</span>, 
+                                    <span class="text-amber-400 font-mono text-xs">PURCHASES</span>, 
+                                    dan <span class="text-amber-400 font-mono text-xs">SALES</span>.
+                                </li>
                                 <li>Klik menu <span class="font-semibold text-zinc-200">Ekstensi &gt; Apps Script</span>.</li>
                                 <li>Hapus semua kode bawaan lalu tempel kode script di bawah ini.</li>
-                                <li>Klik tombol Simpan (ikon disket).</li>
-                                <li>Klik <span class="font-semibold text-zinc-200">Terapkan &gt; Penerapan Baru</span>. Pilih jenis <span class="font-semibold text-zinc-200">Aplikasi Web</span>.</li>
-                                <li>Isi Deskripsi, setel <span class="font-semibold text-zinc-200">Akses sebagai: Anda</span> dan <span class="font-semibold text-zinc-200">Siapa saja yang memiliki akses: Siapa Saja</span>.</li>
-                                <li>Klik Terapkan, beri otorisasi, lalu salin URL Web App yang dihasilkan ke form di sebelah kiri.</li>
+                                <li>Klik tombol Simpan (ikon disket), lalu terapkan sebagai Aplikasi Web untuk semua orang.</li>
                             </ol>
                         </div>
 
@@ -293,8 +294,8 @@
                                     <i data-lucide="copy" class="w-3.5 h-3.5"></i> Salin Kode
                                 </button>
                             </div>
-                            <pre class="bg-zinc-950 p-4 rounded-2xl text-xs text-zinc-300 font-mono overflow-x-auto max-h-64 border border-zinc-800 leading-relaxed" id="apps-script-container">
-/* KODE GOOGLE APPS SCRIPT DATABASE ARYA GROSIR */
+                            <pre class="bg-black p-4 rounded-2xl text-xs text-zinc-300 font-mono overflow-x-auto max-h-64 border border-zinc-800 leading-relaxed" id="apps-script-container">
+/* KODE GOOGLE APPS SCRIPT DATABASE ARYA GROSIR - SINKRONISASI 2 ARAH */
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.tryLock(10000);
@@ -305,43 +306,65 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     
     if (action === "backup") {
-      // Backup Catalog (Product Stock)
+      // 1. Backup Catalog (Product Stock)
       var sheetStock = ss.getSheetByName("STOCK_LIST") || ss.insertSheet("STOCK_LIST");
       sheetStock.clear();
-      sheetStock.appendRow(["ID", "Barcode", "Nama Barang", "Stock", "Unit", "Min Stock", "Cost Price", "Sell Price"]);
+      sheetStock.appendRow(["KODE/BARCODE", "NAMA BARANG", "STOCK", "SATUAN", "TARGET MINIMAL BARANG", "HARGA POKOK", "HARGA JUAL"]);
       if (data.products && data.products.length > 0) {
         data.products.forEach(function(p) {
-          sheetStock.appendRow([p.id, p.barcode, p.name, p.stock, p.unit, p.minStock, p.costPrice, p.sellPrice]);
+          sheetStock.appendRow([p.barcode, p.name, p.stock, p.unit, p.minStock, p.costPrice, p.sellPrice]);
         });
       }
 
-      // Backup Expenses
+      // 2. Backup Projection (Perkiraan Belanja)
+      var sheetProj = ss.getSheetByName("PROJECTION") || ss.insertSheet("PROJECTION");
+      sheetProj.clear();
+      sheetProj.appendRow(["NAMA BARANG", "STOCK SAAT INI", "TARGET STOCK", "HARUS DI BELI", "SATUAN", "HARGA POKOK", "SUB TOTAL BELANJA", "TOTAL ANGGARANG BELANJA"]);
+      if (data.projections && data.projections.length > 0) {
+        data.projections.forEach(function(pr) {
+          sheetProj.appendRow([pr.name, pr.stock, pr.minStock, pr.qtyToBuy, pr.unit, pr.costPrice, pr.subtotal, data.projectionTotal]);
+        });
+      }
+
+      // 3. Backup Profit (Keuntungan)
+      var sheetProfit = ss.getSheetByName("PROFIT") || ss.insertSheet("PROFIT");
+      sheetProfit.clear();
+      sheetProfit.appendRow(["LABA HARI INI", "LABA BULAN INI", "PENGELUARAN PERHARI", "PENGELUARAN PER BULAN", "LABA KOTOR"]);
+      if (data.profit) {
+        sheetProfit.appendRow([data.profit.labaHariIni, data.profit.labaBulanIni, data.profit.expHariIni, data.profit.expBulanIni, data.profit.labaKotor]);
+      }
+
+      // 4. Backup Expenses (Pengeluaran Lain)
       var sheetExp = ss.getSheetByName("EXPENSES") || ss.insertSheet("EXPENSES");
       sheetExp.clear();
-      sheetExp.appendRow(["ID", "Tanggal", "Keterangan", "Nominal"]);
+      sheetExp.appendRow(["TANGGAL", "NOMINAL PENGELUARAN", "KETERANGAN"]);
       if (data.expenses && data.expenses.length > 0) {
         data.expenses.forEach(function(ex) {
-          sheetExp.appendRow([ex.id, ex.date, ex.desc, ex.amount]);
+          sheetExp.appendRow([ex.date, ex.amount, ex.desc]);
         });
       }
 
-      // Backup Sales
-      var sheetSales = ss.getSheetByName("SALES") || ss.insertSheet("SALES");
-      sheetSales.clear();
-      sheetSales.appendRow(["ID Transaksi", "Tanggal", "Pembeli", "Item Terjual", "Total", "Dibayar", "Kembalian"]);
-      if (data.sales && data.sales.length > 0) {
-        data.sales.forEach(function(s) {
-          sheetSales.appendRow([s.id, s.date, s.buyer, JSON.stringify(s.items), s.total, s.paid, s.change]);
-        });
-      }
-      
-      // Backup Purchases (Belanja)
+      // 5. Backup Purchases (Belanja Barang)
       var sheetPurchases = ss.getSheetByName("PURCHASES") || ss.insertSheet("PURCHASES");
       sheetPurchases.clear();
-      sheetPurchases.appendRow(["ID Belanja", "Tanggal", "Item Dibeli", "Total"]);
+      sheetPurchases.appendRow(["ID TRANSAKSI", "TANGGAL BELANJA", "KODE/BARCODE", "NAMA BARANG", "HARGA PER ITEM", "TOTAL HARAGA"]);
       if (data.purchases && data.purchases.length > 0) {
         data.purchases.forEach(function(pu) {
-          sheetPurchases.appendRow([pu.id, pu.date, JSON.stringify(pu.items), pu.total]);
+          pu.items.forEach(function(item) {
+            sheetPurchases.appendRow([pu.id, pu.date, item.barcode, item.name, item.costPrice, pu.total]);
+          });
+        });
+      }
+
+      // 6. Backup Sales (Penjualan)
+      var sheetSales = ss.getSheetByName("SALES") || ss.insertSheet("SALES");
+      sheetSales.clear();
+      sheetSales.appendRow(["ID TRANSAKSI", "NAMA PEMBELI", "TANGGAL", "KODE/BARCODE", "NAMA BARANG", "HARGA PER ITEM", "TOTAL HARAGA", "DIBAYAR", "KEMBALIAN"]);
+      if (data.sales && data.sales.length > 0) {
+        data.sales.forEach(function(s) {
+          s.items.forEach(function(item) {
+            sheetSales.appendRow([s.id, s.buyer, s.date, item.barcode, item.name, item.sellPrice, s.total, s.paid, s.change]);
+          });
         });
       }
 
@@ -359,19 +382,24 @@ function doGet(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheetStock = ss.getSheetByName("STOCK_LIST");
     var sheetExp = ss.getSheetByName("EXPENSES");
-    var sheetSales = ss.getSheetByName("SALES");
     var sheetPurchases = ss.getSheetByName("PURCHASES");
+    var sheetSales = ss.getSheetByName("SALES");
     
-    var output = { products: [], expenses: [], sales: [], purchases: [] };
+    var output = { products: [], expenses: [], purchases: [], sales: [] };
     
     // Read Stock
     if (sheetStock) {
       var rows = sheetStock.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         output.products.push({
-          id: rows[i][0], barcode: rows[i][1], name: rows[i][2],
-          stock: Number(rows[i][3]), unit: rows[i][4], minStock: Number(rows[i][5]),
-          costPrice: Number(rows[i][6]), sellPrice: Number(rows[i][7])
+          id: "PROD-" + i,
+          barcode: String(rows[i][0]),
+          name: String(rows[i][1]),
+          stock: Number(rows[i][2]),
+          unit: String(rows[i][3]),
+          minStock: Number(rows[i][4]),
+          costPrice: Number(rows[i][5]),
+          sellPrice: Number(rows[i][6])
         });
       }
     }
@@ -380,30 +408,59 @@ function doGet(e) {
     if (sheetExp) {
       var rowsExp = sheetExp.getDataRange().getValues();
       for (var i = 1; i < rowsExp.length; i++) {
-        output.expenses.push({ id: rowsExp[i][0], date: rowsExp[i][1], desc: rowsExp[i][2], amount: Number(rowsExp[i][3]) });
+        output.expenses.push({
+          id: "EXP-" + i,
+          date: String(rowsExp[i][0]),
+          amount: Number(rowsExp[i][1]),
+          desc: String(rowsExp[i][2])
+        });
       }
     }
 
-    // Read Sales
-    if (sheetSales) {
-      var rowsSales = sheetSales.getDataRange().getValues();
-      for (var i = 1; i < rowsSales.length; i++) {
-        output.sales.push({
-          id: rowsSales[i][0], date: rowsSales[i][1], buyer: rowsSales[i][2],
-          items: JSON.parse(rowsSales[i][3] || "[]"), total: Number(rowsSales[i][4]),
-          paid: Number(rowsSales[i][5]), change: Number(rowsSales[i][6])
-        });
+    // Read Purchases (grouped by ID)
+    if (sheetPurchases) {
+      var rowsPu = sheetPurchases.getDataRange().getValues();
+      var purchaseMap = {};
+      for (var i = 1; i < rowsPu.length; i++) {
+        var id = String(rowsPu[i][0]);
+        var date = String(rowsPu[i][1]);
+        var barcode = String(rowsPu[i][2]);
+        var name = String(rowsPu[i][3]);
+        var cost = Number(rowsPu[i][4]);
+        var total = Number(rowsPu[i][5]);
+        
+        if (!purchaseMap[id]) {
+          purchaseMap[id] = { id: id, date: date, total: total, items: [] };
+        }
+        purchaseMap[id].items.push({ barcode: barcode, name: name, qty: 1, unit: "pcs", costPrice: cost });
+      }
+      for (var key in purchaseMap) {
+        output.purchases.push(purchaseMap[key]);
       }
     }
     
-    // Read Purchases
-    if (sheetPurchases) {
-      var rowsPu = sheetPurchases.getDataRange().getValues();
-      for (var i = 1; i < rowsPu.length; i++) {
-        output.purchases.push({
-          id: rowsPu[i][0], date: rowsPu[i][1],
-          items: JSON.parse(rowsPu[i][2] || "[]"), total: Number(rowsPu[i][3])
-        });
+    // Read Sales (grouped by ID)
+    if (sheetSales) {
+      var rowsSales = sheetSales.getDataRange().getValues();
+      var salesMap = {};
+      for (var i = 1; i < rowsSales.length; i++) {
+        var id = String(rowsSales[i][0]);
+        var buyer = String(rowsSales[i][1]);
+        var date = String(rowsSales[i][2]);
+        var barcode = String(rowsSales[i][3]);
+        var name = String(rowsSales[i][4]);
+        var price = Number(rowsSales[i][5]);
+        var total = Number(rowsSales[i][6]);
+        var paid = Number(rowsSales[i][7]);
+        var change = Number(rowsSales[i][8]);
+        
+        if (!salesMap[id]) {
+          salesMap[id] = { id: id, buyer: buyer, date: date, total: total, paid: paid, change: change, items: [] };
+        }
+        salesMap[id].items.push({ barcode: barcode, name: name, qty: 1, unit: "pcs", sellPrice: price });
+      }
+      for (var key in salesMap) {
+        output.sales.push(salesMap[key]);
       }
     }
     
@@ -426,13 +483,13 @@ function doGet(e) {
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Config Panel -->
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 space-y-4">
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-4">
                         <h3 class="font-bold text-amber-500 font-poppins">Konfigurasi Desain Faktur</h3>
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Ukuran Kertas</label>
-                                <select id="inv-size" onchange="renderInvoicePreview()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500">
+                                <select id="inv-size" onchange="renderInvoicePreview()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-sm focus:outline-none">
                                     <option value="58mm">Kertas Thermal (58mm)</option>
                                     <option value="80mm">Kertas Thermal (80mm)</option>
                                     <option value="a5">Ukuran Buku / A5</option>
@@ -440,42 +497,42 @@ function doGet(e) {
                             </div>
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Upload Logo Faktur</label>
-                                <input type="file" id="inv-logo" accept="image/*" onchange="handleLogoUpload(event)" class="w-full text-xs text-zinc-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-zinc-800 file:text-zinc-200 hover:file:bg-zinc-700">
+                                <input type="file" id="inv-logo" accept="image/*" onchange="handleLogoUpload(event)" class="w-full text-xs text-zinc-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-zinc-850 file:text-zinc-200">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs text-zinc-400 mb-1">Judul Faktur / Nama Toko</label>
-                            <input type="text" id="inv-title" oninput="renderInvoicePreview()" value="ARYA GROSIR" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none">
+                            <input type="text" id="inv-title" oninput="renderInvoicePreview()" value="ARYA GROSIR" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none">
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">WhatsApp</label>
-                                <input type="text" id="inv-wa" oninput="renderInvoicePreview()" value="0851-2345-6789" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none">
+                                <input type="text" id="inv-wa" oninput="renderInvoicePreview()" value="0851-2345-6789" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-xs text-zinc-400 mb-1">No. Telp / Telpon Rumah</label>
-                                <input type="text" id="inv-telp" oninput="renderInvoicePreview()" value="0274-987654" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none">
+                                <label class="block text-xs text-zinc-400 mb-1">No. Telp</label>
+                                <input type="text" id="inv-telp" oninput="renderInvoicePreview()" value="0274-987654" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs text-zinc-400 mb-1">Deskripsi Tambahan</label>
-                            <textarea id="inv-desc" oninput="renderInvoicePreview()" rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none">Belanja Hemat & Bersahabat. Terima Kasih atas Kunjungan Anda!</textarea>
+                            <textarea id="inv-desc" oninput="renderInvoicePreview()" rows="2" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none">Belanja Hemat & Bersahabat. Terima Kasih atas Kunjungan Anda!</textarea>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Posisi Tanggal</label>
-                                <select id="inv-date-pos" onchange="renderInvoicePreview()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm focus:outline-none">
+                                <select id="inv-date-pos" onchange="renderInvoicePreview()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-sm focus:outline-none">
                                     <option value="left">Kiri</option>
                                     <option value="right">Kanan</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Posisi No. Faktur</label>
-                                <select id="inv-no-pos" onchange="renderInvoicePreview()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm focus:outline-none">
+                                <select id="inv-no-pos" onchange="renderInvoicePreview()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-sm focus:outline-none">
                                     <option value="left">Kiri</option>
                                     <option value="right">Kanan</option>
                                 </select>
@@ -484,34 +541,32 @@ function doGet(e) {
 
                         <div>
                             <span class="block text-xs text-zinc-400 mb-2">Kolom Tabel Yang Ditampilkan</span>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                <label class="flex items-center gap-2 text-xs bg-zinc-950/60 p-3 rounded-xl border border-zinc-800 cursor-pointer">
-                                    <input type="checkbox" id="col-code" checked onchange="renderInvoicePreview()" class="rounded bg-zinc-900 border-zinc-800 text-amber-500 focus:ring-0"> Kode Barang
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer">
+                                    <input type="checkbox" id="col-code" checked onchange="renderInvoicePreview()" class="rounded bg-black border-zinc-850 text-amber-500 focus:ring-0"> Kode
                                 </label>
-                                <label class="flex items-center gap-2 text-xs bg-zinc-950/60 p-3 rounded-xl border border-zinc-800 cursor-pointer">
-                                    <input type="checkbox" id="col-qty" checked onchange="renderInvoicePreview()" class="rounded bg-zinc-900 border-zinc-800 text-amber-500 focus:ring-0"> Qty
+                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer">
+                                    <input type="checkbox" id="col-qty" checked onchange="renderInvoicePreview()" class="rounded bg-black border-zinc-850 text-amber-500 focus:ring-0"> Qty
                                 </label>
-                                <label class="flex items-center gap-2 text-xs bg-zinc-950/60 p-3 rounded-xl border border-zinc-800 cursor-pointer">
-                                    <input type="checkbox" id="col-unit" checked onchange="renderInvoicePreview()" class="rounded bg-zinc-900 border-zinc-800 text-amber-500 focus:ring-0"> Satuan
+                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer">
+                                    <input type="checkbox" id="col-unit" checked onchange="renderInvoicePreview()" class="rounded bg-black border-zinc-850 text-amber-500 focus:ring-0"> Satuan
                                 </label>
-                                <label class="flex items-center gap-2 text-xs bg-zinc-950/60 p-3 rounded-xl border border-zinc-800 cursor-pointer">
-                                    <input type="checkbox" id="col-price" checked onchange="renderInvoicePreview()" class="rounded bg-zinc-900 border-zinc-800 text-amber-500 focus:ring-0"> Harga Satuan
+                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer">
+                                    <input type="checkbox" id="col-price" checked onchange="renderInvoicePreview()" class="rounded bg-black border-zinc-850 text-amber-500 focus:ring-0"> Harga
                                 </label>
                             </div>
                         </div>
 
-                        <button onclick="saveInvoiceConfig()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 transition-all text-black font-bold rounded-xl text-sm shadow-lg shadow-amber-500/10">
+                        <button onclick="saveInvoiceConfig()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 transition-all text-black font-bold rounded-xl text-sm shadow-lg">
                             Simpan Desain Faktur
                         </button>
                     </div>
 
-                    <!-- Live Real-time Visual Preview Panel -->
+                    <!-- Visual Preview Panel -->
                     <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 flex flex-col items-center">
                         <span class="text-xs font-bold font-mono text-zinc-500 mb-4 self-start">LIVE PREVIEW STRUK:</span>
                         
-                        <!-- Mini Struk Container -->
                         <div id="invoice-preview-container" class="bg-white text-black p-6 rounded-lg shadow-2xl overflow-y-auto max-h-[500px] font-mono text-xs w-full max-w-[320px] relative border-4 border-zinc-800">
-                            <!-- Inside rendered via JS dynamically -->
                         </div>
                     </div>
                 </div>
@@ -524,25 +579,25 @@ function doGet(e) {
                         <button onclick="goBack()" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
                         <h2 class="text-xl font-bold font-poppins">Katalog Stok Barang</h2>
                     </div>
-                    <button onclick="openAddProductForm()" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-bold rounded-xl flex items-center gap-2 text-sm shadow-lg shadow-amber-500/10 self-start sm:self-auto">
+                    <button onclick="openAddProductForm()" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-bold rounded-xl flex items-center gap-2 text-sm shadow-lg">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah Barang Baru
                     </button>
                 </div>
 
-                <!-- Product List Card & Filters -->
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 space-y-6">
-                    <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                        <!-- Search Box -->
-                        <div class="relative w-full md:max-w-md">
-                            <input type="text" id="stock-search" oninput="renderStockTable()" placeholder="Cari berdasarkan nama barang / barcode..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500">
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-6">
+                    <div class="flex gap-4 items-center justify-between">
+                        <div class="relative w-full">
+                            <input type="text" id="stock-search" oninput="renderStockTable()" placeholder="Cari berdasarkan nama barang / barcode..." class="w-full bg-black border border-zinc-800 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500">
                             <i data-lucide="search" class="w-5 h-5 text-zinc-500 absolute left-4 top-3.5"></i>
                         </div>
                     </div>
 
-                    <!-- Responsive Table -->
-                    <div class="overflow-x-auto rounded-2xl border border-zinc-800">
+                    <p class="text-xs text-amber-500 italic font-semibold">*Tips: Tekan lama (long press) pada list barang untuk edit atau hapus.</p>
+
+                    <!-- Desktop Structure -->
+                    <div class="hidden md:block overflow-x-auto rounded-2xl border border-zinc-800">
                         <table class="w-full border-collapse text-left text-sm text-zinc-300">
-                            <thead class="bg-zinc-950/80 text-zinc-400 uppercase text-[10px] font-bold tracking-wider border-b border-zinc-800">
+                            <thead class="bg-black text-zinc-400 uppercase text-[10px] font-bold tracking-wider border-b border-zinc-800">
                                 <tr>
                                     <th class="px-6 py-4">Kode / Barcode</th>
                                     <th class="px-6 py-4">Nama Barang</th>
@@ -551,64 +606,60 @@ function doGet(e) {
                                     <th class="px-6 py-4 text-amber-500">Target Min</th>
                                     <th class="px-6 py-4">Harga Pokok</th>
                                     <th class="px-6 py-4 text-emerald-400">Harga Jual</th>
-                                    <th class="px-6 py-4 text-right">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="stock-table-body" class="divide-y divide-zinc-800 bg-zinc-900/40">
-                                <!-- Rendered dynamically -->
+                            <tbody id="stock-table-body" class="divide-y divide-zinc-800 bg-zinc-950/40">
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Optimized Android/Mobile Cards with huge elements (Strictly vertical scroll) -->
+                    <div class="md:hidden flex flex-col gap-4" id="stock-mobile-cards">
+                    </div>
                 </div>
 
-                <!-- Inner Tab / Modal-like overlay for adding product -->
-                <div id="product-form-container" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                <!-- Input/Edit dialog popup Overlay -->
+                <div id="product-form-container" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
                         <div class="flex justify-between items-center mb-6">
                             <h3 id="product-form-title" class="text-lg font-bold font-poppins text-zinc-100">Tambah Barang Baru</h3>
-                            <button onclick="closeProductForm()" class="p-1 rounded-full bg-zinc-800 text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                            <button onclick="closeProductForm()" class="p-1 rounded-full bg-zinc-850 text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
                         </div>
 
-                        <!-- Product Form -->
-                        <div class="space-y-4 text-sm" id="product-form">
-                            <!-- Hidden ID -->
+                        <!-- Product Form layout -->
+                        <div class="space-y-4 text-sm font-poppins" id="product-form">
                             <input type="hidden" id="prod-id">
 
-                            <!-- Barcode field with Scan button -->
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Barcode / Kode Barang (Enter untuk lanjut)</label>
                                 <div class="flex gap-2">
-                                    <input type="text" id="prod-barcode" class="prod-input flex-grow bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 font-mono focus:outline-none" placeholder="Pindai atau ketik manual...">
-                                    <button onclick="openScanner('prod-barcode')" class="px-4 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-black rounded-xl transition-all border border-amber-500/30 flex items-center gap-1">
+                                    <input type="text" id="prod-barcode" class="prod-input flex-grow bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 font-mono focus:outline-none" placeholder="Pindai atau ketik manual...">
+                                    <button onclick="openScanner('prod-barcode')" class="px-4 bg-amber-500/10 text-amber-500 border border-amber-500/30 rounded-xl flex items-center gap-1">
                                         <i data-lucide="scan" class="w-4 h-4"></i> Scan
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- Name field (Uppercase) -->
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Nama Barang (Huruf Kapital Otomatis)</label>
-                                <input type="text" id="prod-name" oninput="this.value = this.value.toUpperCase()" class="prod-input w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none" placeholder="Contoh: INDOMIE GORENG ACEH">
+                                <input type="text" id="prod-name" oninput="this.value = this.value.toUpperCase()" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none uppercase" placeholder="CONTOH: INDOMIE GORENG SPESIAL">
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
-                                <!-- Qty / Stok -->
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Stok Awal</label>
-                                    <input type="text" id="prod-stock" oninput="formatNumberInput(this)" class="prod-input w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none" placeholder="0">
+                                    <input type="text" id="prod-stock" oninput="formatNumberInput(this)" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="0">
                                 </div>
-                                <!-- Target Minimal -->
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Target Minimal Stok</label>
-                                    <input type="text" id="prod-min-stock" oninput="formatNumberInput(this)" class="prod-input w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none" placeholder="0">
+                                    <input type="text" id="prod-min-stock" oninput="formatNumberInput(this)" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="0">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
-                                <!-- Satuan / Unit -->
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Satuan</label>
-                                    <select id="prod-unit" class="prod-input w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none">
+                                    <select id="prod-unit" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none uppercase">
                                         <option value="pcs">pcs</option>
                                         <option value="pac">pac</option>
                                         <option value="box">box</option>
@@ -617,30 +668,27 @@ function doGet(e) {
                                         <option value="kg">kg</option>
                                     </select>
                                 </div>
-                                <!-- Custom Unit Addition -->
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Tambah Satuan Kustom</label>
                                     <div class="flex gap-2">
-                                        <input type="text" id="custom-unit-input" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 focus:outline-none text-xs" placeholder="cth: sachet">
-                                        <button onclick="addCustomUnit()" class="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl border border-zinc-700 text-amber-500"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                                        <input type="text" id="custom-unit-input" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 focus:outline-none text-xs" placeholder="cth: sachet">
+                                        <button onclick="addCustomUnit()" class="p-2 bg-zinc-900 border border-zinc-800 rounded-xl text-amber-500"><i data-lucide="plus" class="w-4 h-4"></i></button>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
-                                <!-- Cost Price -->
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Harga Pokok (Beli)</label>
-                                    <input type="text" id="prod-cost" oninput="formatNumberInput(this)" class="prod-input w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none" placeholder="Rp 0">
+                                    <input type="text" id="prod-cost" oninput="formatNumberInput(this)" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="0">
                                 </div>
-                                <!-- Selling Price -->
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Harga Jual (Eceran)</label>
-                                    <input type="text" id="prod-sell" oninput="formatNumberInput(this)" class="prod-input w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none" placeholder="Rp 0">
+                                    <input type="text" id="prod-sell" oninput="formatNumberInput(this)" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="0">
                                 </div>
                             </div>
 
-                            <button onclick="saveProductCatalog()" class="w-full py-4 mt-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-extrabold rounded-xl shadow-lg transition-all text-sm">
+                            <button onclick="saveProductCatalog()" class="w-full py-4 bg-amber-500 hover:bg-amber-600 text-black font-extrabold rounded-xl shadow-lg transition-all text-sm uppercase">
                                 Simpan ke Katalog
                             </button>
                         </div>
@@ -655,33 +703,37 @@ function doGet(e) {
                     <h2 class="text-xl font-bold font-poppins">Perkiraan Belanja Restock</h2>
                 </div>
 
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 space-y-6">
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-6">
                     <p class="text-sm text-zinc-400">Daftar barang dengan stok di bawah target minimal yang harus segera dibeli dari pemasok.</p>
                     
-                    <div class="overflow-x-auto rounded-2xl border border-zinc-800">
+                    <!-- Desktop Table view -->
+                    <div class="hidden md:block overflow-x-auto rounded-2xl border border-zinc-800">
                         <table class="w-full border-collapse text-left text-sm text-zinc-300">
-                            <thead class="bg-zinc-950 text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
+                            <thead class="bg-black text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
                                 <tr>
                                     <th class="px-6 py-4">Nama Barang</th>
                                     <th class="px-6 py-4">Stok Saat Ini</th>
                                     <th class="px-6 py-4 text-amber-500">Target Stok</th>
                                     <th class="px-6 py-4 text-emerald-400 font-extrabold">Harus Dibeli</th>
                                     <th class="px-6 py-4">Satuan</th>
-                                    <th class="px-6 py-4">Harga Pokok (Pcs)</th>
+                                    <th class="px-6 py-4">Harga Pokok</th>
                                     <th class="px-6 py-4 text-right">Subtotal Belanja</th>
                                 </tr>
                             </thead>
-                            <tbody id="projection-table-body" class="divide-y divide-zinc-800 bg-zinc-900/40">
-                                <!-- Filled dynamically via JS -->
+                            <tbody id="projection-table-body" class="divide-y divide-zinc-800 bg-zinc-950/40">
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Cards: Extra large item names and Harus Beli quantities -->
+                    <div class="md:hidden flex flex-col gap-4" id="projection-mobile-cards">
                     </div>
 
                     <!-- Bottom totals -->
                     <div class="flex justify-end pt-4 border-t border-zinc-800">
                         <div class="text-right">
-                            <span class="text-xs text-zinc-400">Total Proyeksi Anggaran Belanja:</span>
-                            <div class="text-2xl font-black font-poppins text-emerald-400 mt-1" id="projection-grand-total">Rp 0</div>
+                            <span class="text-xs text-zinc-400 uppercase tracking-wider">Total Anggaran Belanja:</span>
+                            <div class="text-3xl font-black font-poppins text-emerald-400 mt-1" id="projection-grand-total">Rp 0</div>
                         </div>
                     </div>
                 </div>
@@ -691,30 +743,30 @@ function doGet(e) {
             <div id="tab-profit" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex items-center gap-2 mb-4">
                     <button onclick="goBack()" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-                    <h2 class="text-xl font-bold font-poppins">Analisis Keuntungan & Laporan Keuangan</h2>
+                    <h2 class="text-xl font-bold font-poppins">Laporan Keuangan & Laba</h2>
                 </div>
 
                 <!-- Financial Structure Metrics Grid -->
                 <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
+                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
                         <span class="text-xs text-zinc-400">Laba Hari Ini</span>
                         <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-emerald-400" id="laba-hari-ini">Rp 0</div>
                     </div>
-                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
+                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
                         <span class="text-xs text-zinc-400">Laba Bulan Ini</span>
                         <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-emerald-400" id="laba-bulan-ini">Rp 0</div>
                     </div>
-                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                        <span class="text-xs text-zinc-400">Pendapatan Kotor</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-amber-500" id="pendapatan-kotor">Rp 0</div>
+                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
+                        <span class="text-xs text-zinc-400">Pengeluaran Hari Ini</span>
+                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-rose-400" id="exp-hari-ini">Rp 0</div>
                     </div>
-                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                        <span class="text-xs text-zinc-400">Modal Pokok (COGS)</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-zinc-200" id="modal-pokok">Rp 0</div>
+                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
+                        <span class="text-xs text-zinc-400">Pengeluaran Bulan Ini</span>
+                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-rose-400" id="exp-bulan-ini">Rp 0</div>
                     </div>
-                    <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl col-span-2 lg:col-span-1">
-                        <span class="text-xs text-zinc-400">Total Pengeluaran Lain</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-rose-400" id="total-pengeluaran">Rp 0</div>
+                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl col-span-2 lg:col-span-1">
+                        <span class="text-xs text-zinc-400">Laba Kotor</span>
+                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-amber-500" id="laba-kotor">Rp 0</div>
                     </div>
                 </div>
 
@@ -723,23 +775,22 @@ function doGet(e) {
                     <!-- Net Profit Summary Card -->
                     <div class="bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 rounded-3xl p-6 flex flex-col justify-between">
                         <div>
-                            <h3 class="font-bold text-zinc-400 text-sm mb-2 uppercase tracking-wider">STRUKTUR KEUANGAN (Laba Bersih Akhir)</h3>
-                            <p class="text-xs text-zinc-500 leading-relaxed">Dihitung dari keuntungan kotor penjualan setelah dikurangi semua modal pokok dan pengeluaran lain-lain operasional.</p>
+                            <h3 class="font-bold text-zinc-400 text-sm mb-2 uppercase tracking-wider">Laba Bersih Akhir</h3>
+                            <p class="text-xs text-zinc-500 leading-relaxed">Keuntungan bersih terakumulasi dari total pendapatan kotor dikurangi biaya modal (COGS) dan pengeluaran operasional lain-lain.</p>
                         </div>
                         <div class="my-6 py-6 border-y border-zinc-800/60">
                             <span class="text-xs text-zinc-400">Laba Bersih Akhir:</span>
                             <div class="text-3xl font-black font-poppins mt-2" id="laba-bersih-akhir">Rp 0</div>
                         </div>
                         <p class="text-xs text-amber-500 font-semibold flex items-center gap-1">
-                            <i data-lucide="info" class="w-4 h-4"></i> Data real-time berdasarkan total akumulasi transaksi
+                            <i data-lucide="info" class="w-4 h-4"></i> Sinkronisasi 2 arah aktif
                         </p>
                     </div>
 
                     <!-- Custom Visual Monthly Bar Chart -->
-                    <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+                    <div class="lg:col-span-2 bg-zinc-950 border border-zinc-800 rounded-3xl p-6">
                         <h3 class="font-bold font-poppins text-zinc-100 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-5 h-5 text-amber-500"></i> Diagram Rekap Keuntungan Bulanan (Tahun Ini)</h3>
                         <div class="h-64 flex items-end justify-between gap-2 pt-6" id="profit-chart-container">
-                            <!-- Dynamically generated SVG bars based on month sales -->
                         </div>
                     </div>
                 </div>
@@ -752,16 +803,17 @@ function doGet(e) {
                         <button onclick="goBack()" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
                         <h2 class="text-xl font-bold font-poppins">Buku Pengeluaran Lain-lain</h2>
                     </div>
-                    <button onclick="openAddExpenseForm()" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-bold rounded-xl flex items-center gap-2 text-sm shadow-lg shadow-amber-500/10 self-start sm:self-auto">
+                    <button onclick="openAddExpenseForm()" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-bold rounded-xl flex items-center gap-2 text-sm shadow-lg">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i> Input Pengeluaran Baru
                     </button>
                 </div>
 
                 <!-- Expenses list table -->
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-                    <div class="overflow-x-auto rounded-2xl border border-zinc-800">
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6">
+                    <!-- Desktop Table view -->
+                    <div class="hidden md:block overflow-x-auto rounded-2xl border border-zinc-800">
                         <table class="w-full border-collapse text-left text-sm text-zinc-300">
-                            <thead class="bg-zinc-950 text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
+                            <thead class="bg-black text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
                                 <tr>
                                     <th class="px-6 py-4">Tanggal</th>
                                     <th class="px-6 py-4">Keterangan Biaya / Pengeluaran</th>
@@ -769,36 +821,39 @@ function doGet(e) {
                                     <th class="px-6 py-4 text-right">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="expenses-table-body" class="divide-y divide-zinc-800 bg-zinc-900/40">
-                                <!-- Filled via JS -->
+                            <tbody id="expenses-table-body" class="divide-y divide-zinc-800 bg-zinc-950/40">
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile cards -->
+                    <div class="md:hidden flex flex-col gap-4" id="expenses-mobile-cards">
                     </div>
                 </div>
 
                 <!-- Input Expense Overlay Form -->
-                <div id="expense-form-container" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-md w-full p-6 shadow-2xl">
+                <div id="expense-form-container" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-3xl max-w-md w-full p-6 shadow-2xl">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-lg font-bold font-poppins text-zinc-100">Catat Pengeluaran Baru</h3>
-                            <button onclick="closeExpenseForm()" class="p-1 rounded-full bg-zinc-800 text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                            <button onclick="closeExpenseForm()" class="p-1 rounded-full bg-zinc-850 text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
                         </div>
 
                         <div class="space-y-4 text-sm" id="expense-form">
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Tanggal</label>
-                                <input type="date" id="exp-date" class="exp-input w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none">
+                                <input type="date" id="exp-date" class="exp-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Keterangan Biaya (Enter untuk lanjut)</label>
-                                <input type="text" id="exp-desc" class="exp-input w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none" placeholder="Contoh: Bayar listrik bulanan">
+                                <input type="text" id="exp-desc" class="exp-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none" placeholder="Contoh: Bayar listrik bulanan">
                             </div>
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Nominal Pengeluaran (Rupiah)</label>
-                                <input type="text" id="exp-amount" oninput="formatNumberInput(this)" class="exp-input w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none" placeholder="Rp 0">
+                                <input type="text" id="exp-amount" oninput="formatNumberInput(this)" class="exp-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="Rp 0">
                             </div>
 
-                            <button onclick="saveExpense()" class="w-full py-4 mt-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-extrabold rounded-xl shadow-lg transition-all text-sm">
+                            <button onclick="saveExpense()" class="w-full py-4 mt-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-extrabold rounded-xl shadow-lg text-sm">
                                 Simpan Pengeluaran
                             </button>
                         </div>
@@ -813,15 +868,16 @@ function doGet(e) {
                         <button onclick="goBack()" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
                         <h2 class="text-xl font-bold font-poppins">Riwayat Belanja Barang (Kulakan)</h2>
                     </div>
-                    <button onclick="openNewPurchaseForm()" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-bold rounded-xl flex items-center gap-2 text-sm shadow-lg shadow-amber-500/10 self-start sm:self-auto">
+                    <button onclick="openNewPurchaseForm()" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-bold rounded-xl flex items-center gap-2 text-sm shadow-lg">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i> Input Belanja Baru
                     </button>
                 </div>
 
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-                    <div class="overflow-x-auto rounded-2xl border border-zinc-800">
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6">
+                    <!-- Desktop view -->
+                    <div class="hidden md:block overflow-x-auto rounded-2xl border border-zinc-800">
                         <table class="w-full border-collapse text-left text-sm text-zinc-300">
-                            <thead class="bg-zinc-950 text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
+                            <thead class="bg-black text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
                                 <tr>
                                     <th class="px-6 py-4">ID Transaksi</th>
                                     <th class="px-6 py-4">Tanggal Belanja</th>
@@ -829,10 +885,13 @@ function doGet(e) {
                                     <th class="px-6 py-4 text-right">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="purchase-history-table" class="divide-y divide-zinc-800 bg-zinc-900/40">
-                                <!-- Filled via JS -->
+                            <tbody id="purchase-history-table" class="divide-y divide-zinc-800 bg-zinc-950/40">
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile view -->
+                    <div class="md:hidden flex flex-col gap-4" id="purchase-history-mobile-cards">
                     </div>
                 </div>
             </div>
@@ -846,59 +905,56 @@ function doGet(e) {
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Left: Input Form Item -->
-                    <div class="lg:col-span-1 bg-zinc-900 border border-zinc-800 rounded-3xl p-6 space-y-4">
+                    <div class="lg:col-span-1 bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-4">
                         <h3 class="font-bold text-amber-500 font-poppins">Pilih Barang</h3>
                         
                         <div class="space-y-3 text-sm">
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">ID Belanja (Otomatis)</label>
-                                    <input type="text" id="pform-id" class="w-full bg-zinc-950/60 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none" readonly>
+                                    <input type="text" id="pform-id" class="w-full bg-zinc-900 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none" readonly>
                                 </div>
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Tanggal Transaksi</label>
-                                    <input type="date" id="pform-date" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-zinc-200">
+                                    <input type="date" id="pform-date" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-zinc-200">
                                 </div>
                             </div>
 
-                            <!-- Scan Barcode in purchase form -->
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Scan Barcode / Kode</label>
                                 <div class="flex gap-2">
-                                    <input type="text" id="pform-barcode" oninput="handlePurchaseBarcodeChange()" class="flex-grow bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-mono text-zinc-200 focus:outline-none" placeholder="Scan barcode barang...">
-                                    <button onclick="openScanner('pform-barcode')" class="px-3 bg-zinc-800 hover:bg-zinc-700 text-amber-500 border border-zinc-700 rounded-xl transition-all flex items-center">
+                                    <input type="text" id="pform-barcode" oninput="handlePurchaseBarcodeChange()" class="flex-grow bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs font-mono text-zinc-200 focus:outline-none" placeholder="Scan barcode barang...">
+                                    <button onclick="openScanner('pform-barcode')" class="px-3 bg-zinc-900 hover:bg-zinc-800 text-amber-500 border border-zinc-700 rounded-xl transition-all flex items-center">
                                         <i data-lucide="scan" class="w-4 h-4"></i>
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- Autocomplete input for product names -->
                             <div class="relative">
                                 <label class="block text-xs text-zinc-400 mb-1">Nama Barang (Ketik untuk referensi)</label>
-                                <input type="text" id="pform-name" oninput="handlePurchaseNameChange()" onfocus="showPurchaseNameSuggestions()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 uppercase focus:outline-none" placeholder="Cari nama barang...">
-                                <!-- Dropdown autocomplete list -->
-                                <div id="pform-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden z-50 hidden max-h-40 overflow-y-auto"></div>
+                                <input type="text" id="pform-name" oninput="handlePurchaseNameChange()" onfocus="showPurchaseNameSuggestions()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 uppercase focus:outline-none" placeholder="Cari nama barang...">
+                                <div id="pform-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-zinc-950 border border-zinc-850 rounded-xl overflow-hidden z-50 hidden max-h-40 overflow-y-auto shadow-2xl"></div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Jumlah (Qty)</label>
-                                    <input type="text" id="pform-qty" oninput="formatNumberInput(this); updatePurchaseSubtotal()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
+                                    <input type="text" id="pform-qty" oninput="formatNumberInput(this); updatePurchaseSubtotal()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
                                 </div>
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Satuan</label>
-                                    <input type="text" id="pform-unit" class="w-full bg-zinc-950/60 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none" readonly placeholder="Satuan">
+                                    <input type="text" id="pform-unit" class="w-full bg-zinc-900 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none uppercase" readonly placeholder="Satuan">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Harga Beli Per Item</label>
-                                <input type="text" id="pform-cost" oninput="formatNumberInput(this); updatePurchaseSubtotal()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
+                                <input type="text" id="pform-cost" oninput="formatNumberInput(this); updatePurchaseSubtotal()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
                             </div>
 
-                            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800 flex justify-between items-center">
-                                <span class="text-xs text-zinc-400">Total Beli Item:</span>
-                                <span class="font-bold text-amber-500 text-sm" id="pform-subtotal">Rp 0</span>
+                            <div class="p-3 bg-black rounded-xl border border-zinc-800 flex justify-between items-center">
+                                <span class="text-xs text-zinc-400 font-bold">Total Beli Item:</span>
+                                <span class="font-extrabold text-amber-400 text-sm" id="pform-subtotal">Rp 0</span>
                             </div>
 
                             <button onclick="addPurchaseCartItem()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-black font-extrabold rounded-xl text-xs transition-transform active:scale-95">
@@ -908,12 +964,12 @@ function doGet(e) {
                     </div>
 
                     <!-- Right: Cart list of purchase -->
-                    <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col justify-between">
+                    <div class="lg:col-span-2 bg-zinc-950 border border-zinc-800 rounded-3xl p-6 flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-zinc-100 font-poppins mb-4">Daftar Belanjaan</h3>
-                            <div class="overflow-y-auto max-h-80 rounded-2xl border border-zinc-800 mb-6 bg-zinc-950/60">
+                            <div class="overflow-y-auto max-h-80 rounded-2xl border border-zinc-800 mb-6 bg-black">
                                 <table class="w-full text-left text-xs text-zinc-300">
-                                    <thead class="bg-zinc-950 text-zinc-400 uppercase text-[10px] font-bold">
+                                    <thead class="bg-zinc-900 text-zinc-400 uppercase text-[10px] font-bold">
                                         <tr>
                                             <th class="px-4 py-3">Nama Barang</th>
                                             <th class="px-4 py-3 text-center">Jumlah</th>
@@ -924,7 +980,6 @@ function doGet(e) {
                                         </tr>
                                     </thead>
                                     <tbody id="purchase-cart-body" class="divide-y divide-zinc-800">
-                                        <!-- Items filled dynamic -->
                                     </tbody>
                                 </table>
                             </div>
@@ -932,10 +987,10 @@ function doGet(e) {
 
                         <div class="border-t border-zinc-800 pt-4 flex justify-between items-end">
                             <div>
-                                <span class="text-xs text-zinc-400">Total Belanja:</span>
+                                <span class="text-xs text-zinc-400 uppercase">Total Belanja:</span>
                                 <div class="text-2xl font-black font-poppins text-emerald-400 mt-1" id="purchase-cart-total">Rp 0</div>
                             </div>
-                            <button onclick="saveAndPostPurchase()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl transition-all shadow-lg shadow-emerald-500/10 active:scale-95">
+                            <button onclick="saveAndPostPurchase()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-lg transition-all active:scale-95">
                                 Simpan &amp; Update Stok
                             </button>
                         </div>
@@ -950,15 +1005,16 @@ function doGet(e) {
                         <button onclick="goBack()" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
                         <h2 class="text-xl font-bold font-poppins">Riwayat Penjualan Barang</h2>
                     </div>
-                    <button onclick="openNewSalesForm()" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-bold rounded-xl flex items-center gap-2 text-sm shadow-lg shadow-amber-500/10 self-start sm:self-auto">
+                    <button onclick="openNewSalesForm()" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-bold rounded-xl flex items-center gap-2 text-sm shadow-lg">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i> Input Penjualan Baru
                     </button>
                 </div>
 
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-                    <div class="overflow-x-auto rounded-2xl border border-zinc-800">
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6">
+                    <!-- Desktop view -->
+                    <div class="hidden md:block overflow-x-auto rounded-2xl border border-zinc-800">
                         <table class="w-full border-collapse text-left text-sm text-zinc-300">
-                            <thead class="bg-zinc-950 text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
+                            <thead class="bg-black text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
                                 <tr>
                                     <th class="px-6 py-4">ID Transaksi</th>
                                     <th class="px-6 py-4">Nama Pembeli</th>
@@ -967,10 +1023,13 @@ function doGet(e) {
                                     <th class="px-6 py-4 text-right">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="sales-history-table" class="divide-y divide-zinc-800 bg-zinc-900/40">
-                                <!-- Filled via JS -->
+                            <tbody id="sales-history-table" class="divide-y divide-zinc-800 bg-zinc-950/40">
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Cards -->
+                    <div class="md:hidden flex flex-col gap-4" id="sales-history-mobile-cards">
                     </div>
                 </div>
             </div>
@@ -984,64 +1043,61 @@ function doGet(e) {
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Left: Form items selection -->
-                    <div class="lg:col-span-1 bg-zinc-900 border border-zinc-800 rounded-3xl p-6 space-y-4">
+                    <div class="lg:col-span-1 bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-4">
                         <h3 class="font-bold text-amber-500 font-poppins">Form Transaksi</h3>
                         
                         <div class="space-y-3 text-sm">
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">ID Penjualan (Otomatis)</label>
-                                    <input type="text" id="sform-id" class="w-full bg-zinc-950/60 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none" readonly>
+                                    <input type="text" id="sform-id" class="w-full bg-zinc-900 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none" readonly>
                                 </div>
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Tanggal Penjualan</label>
-                                    <input type="date" id="sform-date" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-zinc-200">
+                                    <input type="date" id="sform-date" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-zinc-200">
                                 </div>
                             </div>
 
                             <div>
-                                <label class="block text-xs text-zinc-400 mb-1">Nama Pembeli</label>
-                                <input type="text" id="sform-buyer" oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none uppercase" placeholder="UMUM">
+                                <label class="block text-xs text-zinc-400 mb-1">Nama Pembeli (Huruf Kapital)</label>
+                                <input type="text" id="sform-buyer" oninput="this.value = this.value.toUpperCase()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none uppercase font-bold" placeholder="UMUM">
                             </div>
 
-                            <!-- Scan Barcode in sales form -->
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Scan Barcode / Kode Jual</label>
                                 <div class="flex gap-2">
-                                    <input type="text" id="sform-barcode" oninput="handleSalesBarcodeChange()" class="flex-grow bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-mono text-zinc-200 focus:outline-none" placeholder="Scan barcode barang...">
-                                    <button onclick="openScanner('sform-barcode')" class="px-3 bg-zinc-800 hover:bg-zinc-700 text-amber-500 border border-zinc-700 rounded-xl transition-all flex items-center">
+                                    <input type="text" id="sform-barcode" oninput="handleSalesBarcodeChange()" class="flex-grow bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs font-mono text-zinc-200 focus:outline-none" placeholder="Scan barcode barang...">
+                                    <button onclick="openScanner('sform-barcode')" class="px-3 bg-zinc-900 hover:bg-zinc-800 text-amber-500 border border-zinc-700 rounded-xl transition-all flex items-center">
                                         <i data-lucide="scan" class="w-4 h-4"></i>
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- Autocomplete input for product names -->
                             <div class="relative">
                                 <label class="block text-xs text-zinc-400 mb-1">Nama Barang (Ketik untuk referensi)</label>
-                                <input type="text" id="sform-name" oninput="handleSalesNameChange()" onfocus="showSalesNameSuggestions()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 uppercase focus:outline-none" placeholder="Cari nama barang...">
-                                <!-- Dropdown autocomplete list -->
-                                <div id="sform-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden z-50 hidden max-h-40 overflow-y-auto"></div>
+                                <input type="text" id="sform-name" oninput="handleSalesNameChange()" onfocus="showSalesNameSuggestions()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 uppercase focus:outline-none" placeholder="Cari nama barang...">
+                                <div id="sform-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-zinc-950 border border-zinc-850 rounded-xl overflow-hidden z-50 hidden max-h-40 overflow-y-auto shadow-2xl"></div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Jumlah (Qty)</label>
-                                    <input type="text" id="sform-qty" oninput="formatNumberInput(this); updateSalesSubtotal()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
+                                    <input type="text" id="sform-qty" oninput="formatNumberInput(this); updateSalesSubtotal()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
                                 </div>
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Satuan</label>
-                                    <input type="text" id="sform-unit" class="w-full bg-zinc-950/60 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none" readonly placeholder="Satuan">
+                                    <input type="text" id="sform-unit" class="w-full bg-zinc-900 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none uppercase font-bold" readonly placeholder="Satuan">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Harga Jual Per Item</label>
-                                <input type="text" id="sform-sell" oninput="formatNumberInput(this); updateSalesSubtotal()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
+                                <input type="text" id="sform-sell" oninput="formatNumberInput(this); updateSalesSubtotal()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
                             </div>
 
-                            <div class="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800 flex justify-between items-center">
-                                <span class="text-xs text-zinc-400">Subtotal Item:</span>
-                                <span class="font-bold text-amber-500 text-sm" id="sform-subtotal">Rp 0</span>
+                            <div class="p-3 bg-black rounded-xl border border-zinc-800 flex justify-between items-center">
+                                <span class="text-xs text-zinc-400 font-bold">Subtotal Item:</span>
+                                <span class="font-extrabold text-amber-400 text-sm" id="sform-subtotal">Rp 0</span>
                             </div>
 
                             <button onclick="addSalesCartItem()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-black font-extrabold rounded-xl text-xs transition-transform active:scale-95">
@@ -1051,12 +1107,12 @@ function doGet(e) {
                     </div>
 
                     <!-- Right: Cart sales list and checkout values -->
-                    <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col justify-between">
+                    <div class="lg:col-span-2 bg-zinc-950 border border-zinc-800 rounded-3xl p-6 flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-zinc-100 font-poppins mb-4">Keranjang Penjualan</h3>
-                            <div class="overflow-y-auto max-h-56 rounded-2xl border border-zinc-800 mb-4 bg-zinc-950/60">
+                            <div class="overflow-y-auto max-h-56 rounded-2xl border border-zinc-800 mb-4 bg-black">
                                 <table class="w-full text-left text-xs text-zinc-300 font-mono">
-                                    <thead class="bg-zinc-950 text-zinc-400 uppercase text-[10px] font-bold">
+                                    <thead class="bg-zinc-900 text-zinc-400 uppercase text-[10px] font-bold">
                                         <tr>
                                             <th class="px-4 py-3">Nama Barang</th>
                                             <th class="px-4 py-3 text-center">Qty</th>
@@ -1067,7 +1123,6 @@ function doGet(e) {
                                         </tr>
                                     </thead>
                                     <tbody id="sales-cart-body" class="divide-y divide-zinc-800">
-                                        <!-- Items filled dynamic -->
                                     </tbody>
                                 </table>
                             </div>
@@ -1083,15 +1138,15 @@ function doGet(e) {
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Jumlah Bayar (Rupiah)</label>
-                                    <input type="text" id="sform-payment" oninput="formatNumberInput(this); calculateChange()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 text-zinc-100" placeholder="Rp 0">
+                                    <input type="text" id="sform-payment" oninput="formatNumberInput(this); calculateChange()" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 text-zinc-100" placeholder="Rp 0">
                                 </div>
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Kembalian</label>
-                                    <div class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono text-zinc-400 font-bold" id="sform-change">Rp 0</div>
+                                    <div class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono text-zinc-400 font-bold" id="sform-change">Rp 0</div>
                                 </div>
                             </div>
 
-                            <button onclick="saveAndPostSales()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl transition-all shadow-lg shadow-emerald-500/10 active:scale-95">
+                            <button onclick="saveAndPostSales()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl transition-all active:scale-95">
                                 Simpan &amp; Potong Stok
                             </button>
                         </div>
@@ -1101,29 +1156,10 @@ function doGet(e) {
         </main>
     </div>
 
-    <!-- Floating Simulated Navigation Controller for Handsets & All Screens -->
-    <nav class="fixed bottom-0 inset-x-0 bg-zinc-950 border-t border-zinc-900 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] py-3 px-6 z-40">
-        <div class="max-w-md mx-auto flex items-center justify-around">
-            <button onclick="handleNavigationBack()" class="flex flex-col items-center gap-1 group text-zinc-500 hover:text-amber-500 transition-colors">
-                <i data-lucide="chevron-left" class="w-6 h-6 group-hover:-translate-x-1 transition-transform"></i>
-                <span class="text-[10px] uppercase font-bold tracking-widest">Back</span>
-            </button>
-            <button onclick="goHome()" class="flex flex-col items-center gap-1 group text-zinc-500 hover:text-amber-500 transition-colors">
-                <i data-lucide="home" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
-                <span class="text-[10px] uppercase font-bold tracking-widest">Home</span>
-            </button>
-            <div class="text-[9px] text-zinc-600 font-mono text-center select-none">
-                ARYA GROSIR POS<br>
-                <span class="text-zinc-500 font-bold" id="connection-status">LOCAL DB</span>
-            </div>
-        </div>
-    </nav>
-
     <script>
-        /* APPLICATION DATABASE STATE DEFINITIONS */
+        /* CORE APPLICATION DATABASE STATE */
         let state = {
             activeTab: 'main',
-            previousTabs: ['main'],
             syncSettings: {
                 scriptUrl: ''
             },
@@ -1147,14 +1183,14 @@ function doGet(e) {
             expenses: [],
             purchases: [],
             sales: [],
-            // Cart systems
             purchaseCart: [],
             salesCart: [],
             customUnits: ['pcs', 'pac', 'box', 'lusin', 'renceng', 'kg'],
-            currentScannerTargetId: null
+            currentScannerTargetId: null,
+            selectedProductIdForContext: null
         };
 
-        // Rich mock dataset to instantly visualize a working marketplace
+        // Rich default dataset to allow immediate simulation of features
         const defaultProducts = [
             { id: "PROD1", barcode: "8991234567890", name: "INDOMIE GORENG SPESIAL", stock: 120, unit: "pcs", minStock: 40, costPrice: 2800, sellPrice: 3500 },
             { id: "PROD2", barcode: "8992345678901", name: "TEH BOTOL SOSRO 350ML", stock: 15, unit: "pcs", minStock: 30, costPrice: 3200, sellPrice: 4000 },
@@ -1178,8 +1214,8 @@ function doGet(e) {
 
         function initLocalStorage() {
             try {
-                if (localStorage.getItem('arya_grosir_state')) {
-                    state = JSON.parse(localStorage.getItem('arya_grosir_state'));
+                if (localStorage.getItem('arya_grosir_state_v2')) {
+                    state = JSON.parse(localStorage.getItem('arya_grosir_state_v2'));
                 } else {
                     state.products = defaultProducts;
                     state.expenses = defaultExpenses;
@@ -1188,15 +1224,15 @@ function doGet(e) {
                     saveStateToLocalStorage();
                 }
             } catch (err) {
-                console.warn("Local storage blocked or unavailable, using in-memory state.", err);
+                console.warn("Storage restricted, maintaining state in active RAM.", err);
             }
         }
 
         function saveStateToLocalStorage() {
             try {
-                localStorage.setItem('arya_grosir_state', JSON.stringify(state));
+                localStorage.setItem('arya_grosir_state_v2', JSON.stringify(state));
             } catch (err) {
-                console.error("Failed to persist state", err);
+                console.error("Failed to write to persistent local database", err);
             }
         }
 
@@ -1204,35 +1240,40 @@ function doGet(e) {
             initLocalStorage();
             lucide.createIcons();
             
-            // Start Clock
+            // Set up real-time digital clock
             setInterval(() => {
                 const now = new Date();
                 document.getElementById('realtime-clock').innerText = now.toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'medium' });
                 
-                // Automatic hourly 23:00 Backup triggers
+                // Automated background sync at exact 23:00 (11:00 PM) as requested
                 if (now.getHours() === 23 && now.getMinutes() === 0 && now.getSeconds() === 0) {
                     autoBackupAtEleven();
                 }
             }, 1000);
 
-            // Set default date values on forms
+            // Default form calendar entries to today
             const todayStr = new Date().toISOString().split('T')[0];
             document.getElementById('exp-date').value = todayStr;
             document.getElementById('pform-date').value = todayStr;
             document.getElementById('sform-date').value = todayStr;
 
-            // Pre-render visuals
+            // Pre-compile design previews
             renderStockTable();
             renderInvoicePreview();
-            
-            // Listen for window hardware Keypress Event back interception / Escape exit modal
-            window.addEventListener('keydown', function(event) {
-                if (event.key === "Escape") {
-                    if (!document.getElementById('exit-modal').classList.contains('hidden')) {
-                        closeExitModal(false);
-                    } else if (!document.getElementById('scanner-modal').classList.contains('hidden')) {
-                        closeScanner();
-                    }
+
+            // Set state management in the browser history to intercept native back-button actions
+            history.replaceState({ tab: 'main' }, '');
+
+            window.addEventListener('popstate', function(event) {
+                if (event.state && event.state.tab) {
+                    // Navigate visually to previous tab without modifying history again
+                    switchTabVisual(event.state.tab);
+                } else {
+                    // No history state left: meaning we popped out of main dashboard menu
+                    switchTabVisual('main');
+                    document.getElementById('exit-modal').classList.remove('hidden');
+                    // Push a protective history state back so the next Back-press doesn't instantly escape the page
+                    history.pushState({ tab: 'main' }, '');
                 }
             });
         };
@@ -1241,13 +1282,13 @@ function doGet(e) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             
-            let bgClass = "bg-zinc-900 border-emerald-500/50 text-emerald-400";
+            let bgClass = "bg-zinc-950 border-emerald-500/50 text-emerald-400";
             let icon = "check-circle";
             if (type === 'error') {
-                bgClass = "bg-zinc-900 border-rose-500/50 text-rose-400";
+                bgClass = "bg-zinc-950 border-rose-500/50 text-rose-400";
                 icon = "alert-circle";
             } else if (type === 'info') {
-                bgClass = "bg-zinc-900 border-amber-500/50 text-amber-400";
+                bgClass = "bg-zinc-950 border-amber-500/50 text-amber-400";
                 icon = "info";
             }
 
@@ -1257,13 +1298,12 @@ function doGet(e) {
             container.appendChild(toast);
             lucide.createIcons({attrs: {class: 'w-4 h-4'}});
 
-            // Trigger Animation
             setTimeout(() => {
                 toast.classList.remove('scale-90', 'translate-y-2', 'opacity-0');
                 toast.classList.add('scale-100', 'translate-y-0', 'opacity-100');
             }, 10);
 
-            // Clear after exactly 1 second (1000ms)
+            // Strict 1 second (1000ms) fadeout rule as specified
             setTimeout(() => {
                 toast.classList.add('scale-95', '-translate-y-2', 'opacity-0');
                 setTimeout(() => {
@@ -1300,13 +1340,16 @@ function doGet(e) {
             inputElement.setSelectionRange(cursorPosition + (newLength - originalLength), cursorPosition + (newLength - originalLength));
         }
 
+        // Switch tabs including push history state for native Android Back interception
         function switchTab(tabId) {
             if (state.activeTab === tabId) return;
 
-            // Handle Navigation memory for backtrack
-            state.previousTabs.push(state.activeTab);
-            
-            // Toggle HTML blocks
+            history.pushState({ tab: tabId }, '');
+            switchTabVisual(tabId);
+        }
+
+        // Pure visual layout selector
+        function switchTabVisual(tabId) {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
             const destination = document.getElementById(`tab-${tabId}`);
             if (destination) {
@@ -1315,8 +1358,10 @@ function doGet(e) {
             
             state.activeTab = tabId;
 
-            // Trigger visual computations based on screen active
-            if (tabId === 'projection') {
+            // Re-render calculations dynamically
+            if (tabId === 'stock') {
+                renderStockTable();
+            } else if (tabId === 'projection') {
                 renderProjectionTable();
             } else if (tabId === 'profit') {
                 calculateFinancials();
@@ -1332,39 +1377,17 @@ function doGet(e) {
         }
 
         function goBack() {
-            if (state.previousTabs.length > 0) {
-                const prev = state.previousTabs.pop();
-                document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
-                const destination = document.getElementById(`tab-${prev}`);
-                if (destination) {
-                    destination.classList.remove('hidden');
-                }
-                state.activeTab = prev;
-            } else {
-                switchTab('main');
-            }
+            window.history.back(); // Triggers the popstate flow seamlessly
         }
 
         function goHome() {
-            state.previousTabs = ['main'];
             switchTab('main');
-        }
-
-        // Custom Simulated Hardware Controller Handler
-        function handleNavigationBack() {
-            if (state.activeTab === 'main') {
-                // Main Menu exit trigger modal
-                document.getElementById('exit-modal').classList.remove('hidden');
-            } else {
-                goBack();
-            }
         }
 
         function closeExitModal(exitConfirm) {
             document.getElementById('exit-modal').classList.add('hidden');
             if (exitConfirm) {
-                showNotification("Aplikasi Arya Grosir Ditutup", "info");
-                // Mock native Android close
+                showNotification("Aplikasi Arya Grosir ditutup.", "info");
                 setTimeout(() => {
                     window.close();
                 }, 1000);
@@ -1375,7 +1398,7 @@ function doGet(e) {
             const urlInput = document.getElementById('sync-url-input').value.trim();
             state.syncSettings.scriptUrl = urlInput;
             saveStateToLocalStorage();
-            showNotification("Pengaturan Web App disimpan!");
+            showNotification("Pengaturan disimpan!");
         }
 
         function copyAppsScriptCode() {
@@ -1393,55 +1416,94 @@ function doGet(e) {
             window.getSelection().removeAllRanges();
         }
 
-        // POST Payload to Apps Script (Backup)
+        // Post Backup package to Apps Script matching the specific schema columns
         async function syncBackup() {
             if (!state.syncSettings.scriptUrl) {
-                showNotification("Silakan isi URL Web App terlebih dahulu!", "error");
+                showNotification("Masukan URL Web App terlebih dahulu!", "error");
                 switchTab('sync');
                 return;
             }
 
-            showNotification("Mencadangkan data ke Google Sheets...", "info");
-            document.getElementById('connection-status').innerText = "SYNC BACKUP...";
+            showNotification("Mengirim backup ke Spreadsheet...", "info");
+            document.getElementById('connection-status').innerText = "MENYIMPAN...";
+
+            // Prepare projection dataset to send structured
+            const projectionsData = state.products.filter(p => p.stock < p.minStock).map(p => {
+                const qtyToBuy = p.minStock - p.stock;
+                return {
+                    name: p.name,
+                    stock: p.stock,
+                    minStock: p.minStock,
+                    qtyToBuy: qtyToBuy,
+                    unit: p.unit,
+                    costPrice: p.costPrice,
+                    subtotal: qtyToBuy * p.costPrice
+                };
+            });
+            const projTotal = projectionsData.reduce((sum, item) => sum + item.subtotal, 0);
+
+            // Compile core profit analytics fields
+            let labaHariIni = 0; let labaBulanIni = 0; let expHariIni = 0; let expBulanIni = 0; let labaKotor = 0;
+            const today = new Date().toISOString().split('T')[0];
+            const currentMonth = today.substring(0, 7);
+
+            state.sales.forEach(s => {
+                labaKotor += s.total;
+                let cogs = s.items.reduce((sum, item) => {
+                    const catalogItem = state.products.find(p => p.barcode === item.barcode);
+                    return sum + ((catalogItem ? catalogItem.costPrice : item.sellPrice * 0.8) * item.qty);
+                }, 0);
+
+                let profit = s.total - cogs;
+                if (s.date === today) labaHariIni += profit;
+                if (s.date.startsWith(currentMonth)) labaBulanIni += profit;
+            });
+
+            state.expenses.forEach(ex => {
+                if (ex.date === today) expHariIni += ex.amount;
+                if (ex.date.startsWith(currentMonth)) expBulanIni += ex.amount;
+            });
 
             const payload = {
                 action: "backup",
                 data: {
                     products: state.products,
+                    projections: projectionsData,
+                    projectionTotal: projTotal,
+                    profit: { labaHariIni, labaBulanIni, expHariIni, expBulanIni, labaKotor },
                     expenses: state.expenses,
-                    sales: state.sales,
-                    purchases: state.purchases
+                    purchases: state.purchases,
+                    sales: state.sales
                 }
             };
 
             try {
-                const response = await fetch(state.syncSettings.scriptUrl, {
+                await fetch(state.syncSettings.scriptUrl, {
                     method: 'POST',
-                    mode: 'no-cors', // standard bypass for cross-origin app script
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                // Since 'no-cors' doesn't return body data safely, we assume trigger was sent.
-                document.getElementById('connection-status').innerText = "SPREDSHEET CONNECTED";
-                showNotification("Selesai! Data terkirim ke Spreadsheet.");
+                document.getElementById('connection-status').innerText = "SPREADSHEET CONNECTED";
+                showNotification("Backup berhasil diunggah!");
             } catch (error) {
                 console.error("Sync Error:", error);
                 document.getElementById('connection-status').innerText = "SYNC ERROR";
-                showNotification("Gagal Sinkronisasi. Periksa URL / Jaringan.", "error");
+                showNotification("Gagal upload backup data.", "error");
             }
         }
 
-        // GET pull from Apps Script (Tarik data)
+        // GET pull parser (2-way sync retrieval)
         async function syncPull() {
             if (!state.syncSettings.scriptUrl) {
-                showNotification("Silakan isi URL Web App terlebih dahulu!", "error");
+                showNotification("Masukan URL Web App terlebih dahulu!", "error");
                 switchTab('sync');
                 return;
             }
 
-            showNotification("Menarik data terbaru...", "info");
-            document.getElementById('connection-status').innerText = "PULLING DATA...";
+            showNotification("Menarik data terbaru dari Spreadsheet...", "info");
+            document.getElementById('connection-status').innerText = "SINKRONISASI...";
 
             try {
                 const response = await fetch(state.syncSettings.scriptUrl);
@@ -1452,30 +1514,26 @@ function doGet(e) {
                     
                     if (fresh.products && fresh.products.length > 0) state.products = fresh.products;
                     if (fresh.expenses && fresh.expenses.length > 0) state.expenses = fresh.expenses;
-                    if (fresh.sales && fresh.sales.length > 0) state.sales = fresh.sales;
                     if (fresh.purchases && fresh.purchases.length > 0) state.purchases = fresh.purchases;
+                    if (fresh.sales && fresh.sales.length > 0) state.sales = fresh.sales;
                     
                     saveStateToLocalStorage();
                     renderStockTable();
-                    document.getElementById('connection-status').innerText = "SPREDSHEET CONNECTED";
-                    showNotification("Data lokal berhasil disinkronkan dari Sheet!");
+                    document.getElementById('connection-status').innerText = "SPREADSHEET CONNECTED";
+                    showNotification("Data berhasil disinkronkan!");
                 } else {
-                    showNotification("Format data Sheet salah / Kosong.", "error");
+                    showNotification("Format response tidak dikenal.", "error");
                 }
             } catch (error) {
                 console.error("Pull Error:", error);
                 document.getElementById('connection-status').innerText = "SYNC ERROR";
-                showNotification("Gagal menarik data. Periksa pengaturan script Anda.", "error");
+                showNotification("Gagal menarik data dari Google Sheet.", "error");
             }
         }
 
-        // background Auto Backup routine (daily 23:00)
         function autoBackupAtEleven() {
-            console.log("Auto-backup triggered at 23:00");
             if (state.syncSettings.scriptUrl) {
                 syncBackup();
-            } else {
-                showNotification("Auto-backup batal: URL Spreadsheet tidak diset.", "info");
             }
         }
 
@@ -1494,7 +1552,7 @@ function doGet(e) {
             state.invoiceConfig.columns.price = document.getElementById('col-price').checked;
 
             saveStateToLocalStorage();
-            showNotification("Pengaturan faktur disimpan!");
+            showNotification("Desain struk disimpan!");
             renderInvoicePreview();
         }
 
@@ -1505,18 +1563,18 @@ function doGet(e) {
                 reader.onload = function(e) {
                     state.invoiceConfig.logo = e.target.result;
                     renderInvoicePreview();
-                    showNotification("Logo Nota diperbarui!");
+                    showNotification("Logo struk diperbarui!");
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // Live Dynamic Invoice Simulator
+        // Live Dynamic Invoice Simulator with customized Bold fields
         function renderInvoicePreview(transactionData = null) {
             const previewContainer = document.getElementById('invoice-preview-container');
+            if (!previewContainer) return;
             const config = state.invoiceConfig;
 
-            // Generate Mock details if no transaction provided
             const transaction = transactionData || {
                 id: "S-MOCK",
                 date: new Date().toISOString().split('T')[0],
@@ -1536,25 +1594,28 @@ function doGet(e) {
                 <div class="flex flex-col items-center text-center space-y-1 pb-4 border-b border-dashed border-zinc-300">
                     ${config.logo ? `<img src="${config.logo}" class="max-h-12 w-auto object-contain mb-2">` : `<img src="logo web arya.png" alt="Arya Logo" class="max-h-10 w-auto object-contain mb-1" onerror="this.remove()">`}
                     <h4 class="font-extrabold text-sm tracking-wide leading-tight uppercase text-zinc-900">${config.title}</h4>
-                    <p class="text-[9px] text-zinc-600 leading-tight">WA: ${config.wa} | Telp: ${config.telp}</p>
+                    <!-- WhatsApp and Phone set to Bold (Tebal) as requested -->
+                    <p class="text-[9px] text-zinc-850 leading-tight"><b>WA: ${config.wa}</b> | <b>Telp: ${config.telp}</b></p>
                     <p class="text-[9px] italic text-zinc-600 leading-tight mt-1">${config.desc}</p>
                 </div>
                 
-                <div class="py-3 border-b border-dashed border-zinc-300 space-y-1 text-[9px] text-zinc-700">
+                <div class="py-3 border-b border-dashed border-zinc-300 space-y-1 text-[9px] text-zinc-800">
                     <div class="flex justify-between">
-                        ${config.datePos === 'left' ? `<span>TGL: ${transaction.date}</span>` : ''}
-                        ${config.noPos === 'left' ? `<span>NO: ${transaction.id}</span>` : ''}
-                        ${config.datePos === 'right' ? `<span>TGL: ${transaction.date}</span>` : ''}
-                        ${config.noPos === 'right' ? `<span>NO: ${transaction.id}</span>` : ''}
+                        <!-- Date and Transaction ID positions set to Bold (Tebal) -->
+                        ${config.datePos === 'left' ? `<span><b>TGL: ${transaction.date}</b></span>` : ''}
+                        ${config.noPos === 'left' ? `<span><b>NO: ${transaction.id}</b></span>` : ''}
+                        ${config.datePos === 'right' ? `<span><b>TGL: ${transaction.date}</b></span>` : ''}
+                        ${config.noPos === 'right' ? `<span><b>NO: ${transaction.id}</b></span>` : ''}
                     </div>
                     <div class="flex justify-between">
-                        <span>PEMBELI: ${transaction.buyer || "UMUM"}</span>
+                        <!-- Buyer Name set to Bold (Tebal) -->
+                        <span><b>PEMBELI: ${transaction.buyer || "UMUM"}</b></span>
                     </div>
                 </div>
 
                 <table class="w-full text-left text-[9px] text-zinc-800 my-3">
                     <thead>
-                        <tr class="border-b border-zinc-300">
+                        <tr class="border-b border-zinc-300 font-bold">
                             ${config.columns.code ? `<th class="py-1">Kode</th>` : ''}
                             <th class="py-1">Barang</th>
                             ${config.columns.qty ? `<th class="py-1 text-center">Qty</th>` : ''}
@@ -1568,8 +1629,8 @@ function doGet(e) {
                             <tr>
                                 ${config.columns.code ? `<td class="py-1 font-mono">${item.barcode.substring(0, 6)}</td>` : ''}
                                 <td class="py-1 uppercase">${item.name}</td>
-                                ${config.columns.qty ? `<td class="py-1 text-center font-bold">${item.qty}</td>` : ''}
-                                ${config.columns.unit ? `<td class="py-1">${item.unit}</td>` : ''}
+                                ${config.columns.qty ? `<td class="py-1 text-center">${item.qty}</td>` : ''}
+                                ${config.columns.unit ? `<td class="py-1 uppercase">${item.unit}</td>` : ''}
                                 ${config.columns.price ? `<td class="py-1 text-right">${new Intl.NumberFormat('id-ID').format(item.sellPrice)}</td>` : ''}
                                 <td class="py-1 text-right font-bold">${new Intl.NumberFormat('id-ID').format(item.qty * item.sellPrice)}</td>
                             </tr>
@@ -1594,7 +1655,7 @@ function doGet(e) {
 
                 ${isLunas ? `
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
-                        <div class="watermark-lunas border-4 border-emerald-500 text-emerald-500 font-black text-3xl tracking-widest uppercase py-2 px-6 rounded-2xl border-double -rotate-12 transform opacity-20">
+                        <div class="watermark-lunas border-4 border-emerald-500 text-emerald-500 font-black text-3xl tracking-widest uppercase py-2 px-6 rounded-2xl border-double -rotate-12 transform opacity-30">
                             LUNAS
                         </div>
                     </div>
@@ -1604,43 +1665,111 @@ function doGet(e) {
             previewContainer.innerHTML = invoiceHtml;
         }
 
+        /* LONG-PRESS AND GESTURES FOR MOBILE-OPTIMIZED EDIT/DELETE */
+        let touchTimer = null;
+        function registerLongPress(element, productId, productName) {
+            // Mobile Tap and Hold
+            element.addEventListener('touchstart', function(e) {
+                touchTimer = setTimeout(() => {
+                    openContextMenu(productId, productName);
+                }, 600); // 600ms long press duration
+            }, { passive: true });
+
+            element.addEventListener('touchend', function() {
+                if (touchTimer) clearTimeout(touchTimer);
+            });
+
+            // Desktop click/double-click fallback
+            element.addEventListener('dblclick', function() {
+                openContextMenu(productId, productName);
+            });
+        }
+
+        function openContextMenu(productId, productName) {
+            state.selectedProductIdForContext = productId;
+            document.getElementById('context-title').innerText = productName;
+            document.getElementById('context-subtitle').innerText = "ID: " + productId;
+            
+            // Map actions
+            document.getElementById('context-edit-btn').onclick = function() {
+                closeContextMenu();
+                editProductCatalog(productId);
+            };
+            document.getElementById('context-delete-btn').onclick = function() {
+                closeContextMenu();
+                deleteProductCatalog(productId);
+            };
+
+            document.getElementById('context-modal').classList.remove('hidden');
+        }
+
+        function closeContextMenu() {
+            document.getElementById('context-modal').classList.add('hidden');
+            state.selectedProductIdForContext = null;
+        }
+
+        // Render stock database targeting high-contrast layouts for all screens
         function renderStockTable() {
             const tableBody = document.getElementById('stock-table-body');
+            const mobileContainer = document.getElementById('stock-mobile-cards');
             const query = document.getElementById('stock-search').value.toLowerCase().trim();
+            
             tableBody.innerHTML = "";
+            mobileContainer.innerHTML = "";
 
             const filtered = state.products.filter(p => 
                 p.name.toLowerCase().includes(query) || p.barcode.toLowerCase().includes(query)
             );
 
             if (filtered.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-zinc-500">Barang tidak ditemukan / kosong.</td></tr>`;
+                const emptyRow = `<tr><td colspan="7" class="text-center py-8 text-zinc-500">Barang tidak ditemukan / kosong.</td></tr>`;
+                tableBody.innerHTML = emptyRow;
+                mobileContainer.innerHTML = `<p class="text-center text-zinc-500 text-sm py-8">Barang tidak ditemukan.</p>`;
                 return;
             }
 
             filtered.forEach(p => {
-                const stockWarningClass = p.stock <= p.minStock ? 'text-rose-400 font-extrabold bg-rose-500/10 px-2.5 py-1 rounded-full' : 'text-zinc-200';
-                tableBody.innerHTML += `
-                    <tr class="hover:bg-zinc-950/60 transition-colors">
-                        <td class="px-6 py-4 font-mono text-zinc-400 text-xs">${p.barcode}</td>
-                        <td class="px-6 py-4 font-semibold text-zinc-100 uppercase">${p.name}</td>
-                        <td class="px-6 py-4"><span class="${stockWarningClass}">${p.stock}</span></td>
-                        <td class="px-6 py-4 text-xs text-zinc-400 uppercase">${p.unit}</td>
-                        <td class="px-6 py-4 text-amber-500 font-semibold">${p.minStock}</td>
-                        <td class="px-6 py-4 font-mono">${formatRupiah(p.costPrice)}</td>
-                        <td class="px-6 py-4 font-mono text-emerald-400 font-bold">${formatRupiah(p.sellPrice)}</td>
-                        <td class="px-6 py-4 text-right space-x-2">
-                            <button onclick="editProductCatalog('${p.id}')" class="p-2 hover:bg-zinc-800 text-amber-500 hover:text-amber-400 rounded-xl transition-all inline-flex"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="deleteProductCatalog('${p.id}')" class="p-2 hover:bg-zinc-800/80 text-rose-500 hover:text-rose-400 rounded-xl transition-all inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </td>
-                    </tr>
+                const isUnderStock = p.stock <= p.minStock;
+                const stockColor = isUnderStock ? 'text-rose-500 font-extrabold animate-pulse' : 'text-zinc-200';
+                
+                // Render Desktop Table Row
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-zinc-900 cursor-pointer select-none transition-colors";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-mono text-zinc-400 text-xs">${p.barcode}</td>
+                    <td class="px-6 py-4 font-semibold text-zinc-100 uppercase">${p.name}</td>
+                    <td class="px-6 py-4"><span class="${stockColor}">${p.stock}</span></td>
+                    <td class="px-6 py-4 text-xs text-zinc-400 uppercase">${p.unit}</td>
+                    <td class="px-6 py-4 text-amber-500 font-semibold">${p.minStock}</td>
+                    <td class="px-6 py-4 font-mono">${formatRupiah(p.costPrice)}</td>
+                    <td class="px-6 py-4 font-mono text-emerald-400 font-bold">${formatRupiah(p.sellPrice)}</td>
                 `;
+                registerLongPress(tr, p.id, p.name);
+                tableBody.appendChild(tr);
+
+                // Render Mobile optimized block with huge item names and large stock counts
+                const card = document.createElement('div');
+                card.className = `p-5 bg-zinc-950 border ${isUnderStock ? 'border-rose-500/50' : 'border-zinc-800'} rounded-2xl flex justify-between items-center select-none active:bg-zinc-900 transition-colors`;
+                card.innerHTML = `
+                    <div class="space-y-1.5 flex-grow pr-4">
+                        <div class="text-xs font-mono text-zinc-500">${p.barcode}</div>
+                        <!-- Large Name as requested -->
+                        <div class="text-lg md:text-xl font-bold uppercase text-zinc-100 leading-tight">${p.name}</div>
+                        <div class="text-xs text-zinc-400">Harga Jual: <span class="text-emerald-400 font-mono font-bold">${formatRupiah(p.sellPrice)}</span></div>
+                    </div>
+                    <!-- Extremely Large Stock size -->
+                    <div class="text-right flex flex-col items-end shrink-0">
+                        <div class="text-2xl md:text-3xl font-black ${stockColor}">${p.stock}</div>
+                        <div class="text-[10px] uppercase text-zinc-500 tracking-wider">${p.unit}</div>
+                    </div>
+                `;
+                registerLongPress(card, p.id, p.name);
+                mobileContainer.appendChild(card);
             });
 
             lucide.createIcons();
         }
 
-        // Form autofocus & Keyboard Enter handler logic
         function registerFormTabEvents(formSelector, inputClass) {
             const container = document.getElementById(formSelector);
             const inputs = Array.from(container.querySelectorAll(`.${inputClass}`));
@@ -1673,7 +1802,6 @@ function doGet(e) {
             document.getElementById('product-form-container').classList.remove('hidden');
             document.getElementById('prod-barcode').focus();
 
-            // set enter navigation focus
             registerFormTabEvents('product-form', 'prod-input');
         }
 
@@ -1698,7 +1826,7 @@ function doGet(e) {
         }
 
         function deleteProductCatalog(productId) {
-            if (confirm("Hapus barang dari katalog? Tindakan ini tidak dapat dibatalkan.")) {
+            if (confirm("Hapus barang ini dari katalog?")) {
                 state.products = state.products.filter(p => p.id !== productId);
                 saveStateToLocalStorage();
                 renderStockTable();
@@ -1746,7 +1874,6 @@ function doGet(e) {
             }
 
             if (id) {
-                // Update
                 const p = state.products.find(p => p.id === id);
                 if (p) {
                     p.barcode = barcode;
@@ -1759,15 +1886,13 @@ function doGet(e) {
                 }
                 showNotification("Barang berhasil diperbarui!");
             } else {
-                // Check if barcode already exists
                 if (state.products.find(p => p.barcode === barcode)) {
                     showNotification("Barcode sudah digunakan barang lain!", "error");
                     return;
                 }
-                // Insert New
                 const newId = "PROD-" + Date.now();
                 state.products.push({ id: newId, barcode, name, stock, unit, minStock, costPrice, sellPrice });
-                showNotification("Katalog baru tersimpan!");
+                showNotification("Barang baru berhasil disimpan!");
             }
 
             saveStateToLocalStorage();
@@ -1775,15 +1900,20 @@ function doGet(e) {
             renderStockTable();
         }
 
+        // Render projections: display Nama Barang and Harus Beli in massive formats, clean vertical block scrolling
         function renderProjectionTable() {
             const tableBody = document.getElementById('projection-table-body');
+            const mobileContainer = document.getElementById('projection-mobile-cards');
             tableBody.innerHTML = "";
+            mobileContainer.innerHTML = "";
+            
             let grandTotal = 0;
-
             const targets = state.products.filter(p => p.stock < p.minStock);
 
             if (targets.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-zinc-500">Semua stok aman. Tidak ada barang di bawah target minimal.</td></tr>`;
+                const emptyMsg = `<tr><td colspan="7" class="text-center py-8 text-zinc-500">Semua stok aman. Tidak ada barang di bawah target minimal.</td></tr>`;
+                tableBody.innerHTML = emptyMsg;
+                mobileContainer.innerHTML = `<p class="text-center text-zinc-500 text-sm py-8">Semua stok aman.</p>`;
                 document.getElementById('projection-grand-total').innerText = "Rp 0";
                 return;
             }
@@ -1793,8 +1923,9 @@ function doGet(e) {
                 const subtotal = qtyToBuy * p.costPrice;
                 grandTotal += subtotal;
 
+                // Desktop Table View
                 tableBody.innerHTML += `
-                    <tr class="hover:bg-zinc-950/60 transition-colors">
+                    <tr class="hover:bg-zinc-900 transition-colors">
                         <td class="px-6 py-4 font-semibold text-zinc-100 uppercase">${p.name}</td>
                         <td class="px-6 py-4 text-rose-400 font-bold">${p.stock}</td>
                         <td class="px-6 py-4 text-amber-500 font-semibold">${p.minStock}</td>
@@ -1803,6 +1934,24 @@ function doGet(e) {
                         <td class="px-6 py-4 font-mono">${formatRupiah(p.costPrice)}</td>
                         <td class="px-6 py-4 font-mono text-right font-extrabold text-zinc-100">${formatRupiah(subtotal)}</td>
                     </tr>
+                `;
+
+                // Mobile Cards View: Extra Large Product Name and Harus Beli Quantity
+                mobileContainer.innerHTML += `
+                    <div class="p-5 bg-zinc-950 border border-zinc-800 rounded-2xl flex justify-between items-center">
+                        <div class="space-y-1 pr-2">
+                            <!-- Large Name -->
+                            <h4 class="text-lg md:text-xl font-bold uppercase text-zinc-100 leading-tight">${p.name}</h4>
+                            <p class="text-xs text-zinc-500 font-mono">Stok: ${p.stock} / Target: ${p.minStock}</p>
+                            <p class="text-xs text-zinc-400">Pcs: <span class="font-mono font-bold">${formatRupiah(p.costPrice)}</span></p>
+                        </div>
+                        <div class="text-right flex flex-col items-end shrink-0">
+                            <!-- Massive quantity to buy as requested -->
+                            <div class="text-3xl md:text-4xl font-black text-rose-500 animate-pulse">${qtyToBuy}</div>
+                            <span class="text-[10px] text-zinc-500 font-bold uppercase">${p.unit}</span>
+                            <span class="text-xs text-emerald-400 font-bold font-mono mt-1">${formatRupiah(subtotal)}</span>
+                        </div>
+                    </div>
                 `;
             });
 
@@ -1814,18 +1963,19 @@ function doGet(e) {
             let totalModalCost = 0;
             let totalProfitToday = 0;
             let totalProfitMonth = 0;
+            let totalExpensesToday = 0;
+            let totalExpensesMonth = 0;
 
             const today = new Date().toISOString().split('T')[0];
-            const currentMonthStr = today.substring(0, 7); // YYYY-MM
+            const currentMonthStr = today.substring(0, 7);
 
             state.sales.forEach(sale => {
                 totalGrossRev += sale.total;
                 
-                // Calculate original item cost prices for COGS (Modal Pokok)
                 let saleCOGS = 0;
                 sale.items.forEach(item => {
                     const catalogItem = state.products.find(p => p.barcode === item.barcode);
-                    const originalCost = catalogItem ? catalogItem.costPrice : (item.sellPrice * 0.8); // fallback to 80% if not found
+                    const originalCost = catalogItem ? catalogItem.costPrice : (item.sellPrice * 0.8);
                     saleCOGS += (originalCost * item.qty);
                 });
 
@@ -1841,40 +1991,42 @@ function doGet(e) {
                 }
             });
 
-            // Calculate total expenses other ledger
-            let otherExpensesTotal = state.expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            state.expenses.forEach(exp => {
+                if (exp.date === today) {
+                    totalExpensesToday += exp.amount;
+                }
+                if (exp.date.startsWith(currentMonthStr)) {
+                    totalExpensesMonth += exp.amount;
+                }
+            });
 
-            // Compute values
-            const netProfitToday = totalProfitToday; 
-            const netProfitFinal = (totalGrossRev - totalModalCost) - otherExpensesTotal;
+            const netProfitToday = totalProfitToday - totalExpensesToday; 
+            const netProfitFinal = (totalGrossRev - totalModalCost) - (totalExpensesMonth);
 
-            // Fill HTML text values
             document.getElementById('laba-hari-ini').innerText = (netProfitToday < 0 ? "-" : "") + formatRupiah(Math.abs(netProfitToday));
             document.getElementById('laba-bulan-ini').innerText = formatRupiah(totalProfitMonth);
-            document.getElementById('pendapatan-kotor').innerText = formatRupiah(totalGrossRev);
-            document.getElementById('modal-pokok').innerText = formatRupiah(totalModalCost);
-            document.getElementById('total-pengeluaran').innerText = formatRupiah(otherExpensesTotal);
+            document.getElementById('exp-hari-ini').innerText = formatRupiah(totalExpensesToday);
+            document.getElementById('exp-bulan-ini').innerText = formatRupiah(totalExpensesMonth);
+            document.getElementById('laba-kotor').innerText = formatRupiah(totalGrossRev - totalModalCost);
             document.getElementById('laba-bersih-akhir').innerText = (netProfitFinal < 0 ? "-" : "") + formatRupiah(Math.abs(netProfitFinal));
 
-            // Dynamic Chart.js replacement with customized responsive SVG bars
             renderProfitChart(currentMonthStr);
         }
 
         function renderProfitChart(currentYearMonth) {
             const container = document.getElementById('profit-chart-container');
+            if (!container) return;
             container.innerHTML = "";
 
             const months = [
-                { name: "Jan", key: "01" }, { name: "Feb", key: "02" }, { name: "Mar", key: "03" },
-                { name: "Apr", key: "04" }, { name: "Mei", key: "05" }, { name: "Jun", key: "06" },
-                { name: "Jul", key: "07" }, { name: "Agt", key: "08" }, { name: "Sep", key: "09" },
-                { name: "Okt", key: "10" }, { name: "Nov", key: "11" }, { name: "Des", key: "12" }
+                { name: "Jan" }, { name: "Feb" }, { name: "Mar" }, { name: "Apr" }, 
+                { name: "Mei" }, { name: "Jun" }, { name: "Jul" }, { name: "Agt" }, 
+                { name: "Sep" }, { name: "Okt" }, { name: "Nov" }, { name: "Des" }
             ];
 
             const currentYear = new Date().getFullYear();
-            
-            // Map sales data into monthly bins
             let monthlyProfits = Array(12).fill(0);
+
             state.sales.forEach(s => {
                 if (s.date.startsWith(String(currentYear))) {
                     const parts = s.date.split("-");
@@ -1890,16 +2042,15 @@ function doGet(e) {
                 }
             });
 
-            const maxProfit = Math.max(...monthlyProfits, 50000); // dynamic ceiling height
+            const maxProfit = Math.max(...monthlyProfits, 50000);
 
             months.forEach((m, idx) => {
                 const profitVal = monthlyProfits[idx];
                 const pct = (profitVal / maxProfit) * 100;
-                const barHeight = Math.max(pct, 5); // display minimal visual line if 0
+                const barHeight = Math.max(pct, 5);
                 
                 container.innerHTML += `
                     <div class="flex flex-col items-center flex-grow group relative h-full justify-end">
-                        <!-- Pop hover value tooltip -->
                         <div class="absolute -top-10 scale-0 group-hover:scale-100 transition-transform bg-zinc-950 border border-zinc-800 text-[10px] py-1 px-2.5 rounded-lg text-emerald-400 font-bold shadow-2xl z-20 pointer-events-none whitespace-nowrap">
                             Laba: ${formatRupiah(profitVal)}
                         </div>
@@ -1912,23 +2063,42 @@ function doGet(e) {
 
         function renderExpensesTable() {
             const tableBody = document.getElementById('expenses-table-body');
+            const mobileContainer = document.getElementById('expenses-mobile-cards');
             tableBody.innerHTML = "";
+            mobileContainer.innerHTML = "";
 
             if (state.expenses.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-zinc-500">Belum ada data pengeluaran.</td></tr>`;
+                const emptyRow = `<tr><td colspan="4" class="text-center py-8 text-zinc-500">Belum ada data pengeluaran.</td></tr>`;
+                tableBody.innerHTML = emptyRow;
+                mobileContainer.innerHTML = `<p class="text-center text-zinc-500 text-sm py-8">Belum ada data pengeluaran.</p>`;
                 return;
             }
 
             state.expenses.forEach(exp => {
+                // Desktop
                 tableBody.innerHTML += `
-                    <tr class="hover:bg-zinc-950/60 transition-colors text-zinc-100">
+                    <tr class="hover:bg-zinc-900 transition-colors text-zinc-100">
                         <td class="px-6 py-4 text-xs font-mono text-zinc-400">${exp.date}</td>
                         <td class="px-6 py-4 font-semibold text-zinc-200 capitalize">${exp.desc}</td>
                         <td class="px-6 py-4 text-right font-mono font-bold text-rose-400">${formatRupiah(exp.amount)}</td>
                         <td class="px-6 py-4 text-right">
-                            <button onclick="deleteExpense('${exp.id}')" class="p-2 hover:bg-zinc-800 text-rose-500 hover:text-rose-400 rounded-xl transition-all inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="deleteExpense('${exp.id}')" class="p-2 hover:bg-zinc-850 text-rose-500 hover:text-rose-400 rounded-xl transition-all inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </td>
                     </tr>
+                `;
+
+                // Mobile
+                mobileContainer.innerHTML += `
+                    <div class="p-5 bg-zinc-950 border border-zinc-850 rounded-2xl flex justify-between items-center">
+                        <div class="space-y-1">
+                            <h4 class="text-sm font-bold uppercase text-zinc-100 leading-tight">${exp.desc}</h4>
+                            <p class="text-[10px] text-zinc-500 font-mono">${exp.date}</p>
+                        </div>
+                        <div class="text-right flex items-center gap-3 shrink-0">
+                            <span class="text-base font-bold font-mono text-rose-400">${formatRupiah(exp.amount)}</span>
+                            <button onclick="deleteExpense('${exp.id}')" class="p-2 bg-zinc-900 text-rose-500 rounded-xl"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
                 `;
             });
 
@@ -1954,7 +2124,7 @@ function doGet(e) {
             const amount = cleanNumber(document.getElementById('exp-amount').value);
 
             if (!date || !desc || amount <= 0) {
-                showNotification("Silakan isi semua data dengan benar!", "error");
+                showNotification("Lengkapi form isian!", "error");
                 return;
             }
 
@@ -1963,7 +2133,7 @@ function doGet(e) {
             saveStateToLocalStorage();
             closeExpenseForm();
             renderExpensesTable();
-            showNotification("Pengeluaran berhasil dicatat!");
+            showNotification("Pengeluaran disimpan!");
         }
 
         function deleteExpense(expId) {
@@ -1971,30 +2141,50 @@ function doGet(e) {
                 state.expenses = state.expenses.filter(ex => ex.id !== expId);
                 saveStateToLocalStorage();
                 renderExpensesTable();
-                showNotification("Catatan pengeluaran dihapus!", "info");
+                showNotification("Data terhapus!", "info");
             }
         }
 
         function renderPurchaseHistory() {
             const tableBody = document.getElementById('purchase-history-table');
+            const mobileContainer = document.getElementById('purchase-history-mobile-cards');
             tableBody.innerHTML = "";
+            mobileContainer.innerHTML = "";
 
             if (state.purchases.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-zinc-500">Belum ada riwayat belanja barang.</td></tr>`;
+                const emptyRow = `<tr><td colspan="4" class="text-center py-8 text-zinc-500">Belum ada riwayat belanja barang.</td></tr>`;
+                tableBody.innerHTML = emptyRow;
+                mobileContainer.innerHTML = `<p class="text-center text-zinc-500 text-sm py-8">Belum ada riwayat belanja.</p>`;
                 return;
             }
 
             state.purchases.forEach(p => {
+                // Desktop
                 tableBody.innerHTML += `
-                    <tr class="hover:bg-zinc-950/60 transition-colors">
+                    <tr class="hover:bg-zinc-900 transition-colors">
                         <td class="px-6 py-4 font-mono text-zinc-400 text-xs">${p.id}</td>
                         <td class="px-6 py-4">${p.date}</td>
                         <td class="px-6 py-4 font-mono font-bold text-emerald-400">${formatRupiah(p.total)}</td>
                         <td class="px-6 py-4 text-right space-x-2">
-                            <button onclick="editPurchaseTransaction('${p.id}')" class="p-2 hover:bg-zinc-800 text-amber-500 hover:text-amber-400 rounded-xl transition-all inline-flex"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="deletePurchaseTransaction('${p.id}')" class="p-2 hover:bg-zinc-800 text-rose-500 hover:text-rose-400 rounded-xl transition-all inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="editPurchaseTransaction('${p.id}')" class="p-2 hover:bg-zinc-850 text-amber-500 rounded-xl inline-flex"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deletePurchaseTransaction('${p.id}')" class="p-2 hover:bg-zinc-850 text-rose-500 rounded-xl inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </td>
                     </tr>
+                `;
+
+                // Mobile
+                mobileContainer.innerHTML += `
+                    <div class="p-5 bg-zinc-950 border border-zinc-850 rounded-2xl flex justify-between items-center">
+                        <div class="space-y-1">
+                            <h4 class="text-sm font-mono font-bold text-zinc-300">${p.id}</h4>
+                            <p class="text-[10px] text-zinc-500">${p.date}</p>
+                            <p class="text-xs text-emerald-400 font-bold font-mono">${formatRupiah(p.total)}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editPurchaseTransaction('${p.id}')" class="p-2.5 bg-zinc-900 text-amber-500 rounded-xl"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deletePurchaseTransaction('${p.id}')" class="p-2.5 bg-zinc-900 text-rose-500 rounded-xl"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
                 `;
             });
 
@@ -2043,7 +2233,7 @@ function doGet(e) {
                 box.classList.remove('hidden');
                 filtered.forEach(p => {
                     const item = document.createElement('div');
-                    item.className = "px-4 py-2 hover:bg-zinc-800 text-xs font-mono text-zinc-300 cursor-pointer border-b border-zinc-900";
+                    item.className = "px-4 py-2 hover:bg-zinc-900 text-xs font-mono text-zinc-300 cursor-pointer border-b border-zinc-900 uppercase";
                     item.innerText = p.name;
                     item.onclick = function() {
                         document.getElementById('pform-name').value = p.name;
@@ -2061,7 +2251,6 @@ function doGet(e) {
             }
         }
 
-        // Close dropdown suggestion if clicking elsewhere
         window.addEventListener('click', function(e) {
             if (e.target.id !== 'pform-name') {
                 document.getElementById('pform-suggestions').classList.add('hidden');
@@ -2085,13 +2274,12 @@ function doGet(e) {
             const costPrice = cleanNumber(document.getElementById('pform-cost').value);
 
             if (!name || qty <= 0 || costPrice <= 0) {
-                showNotification("Silakan lengkapi data barang dengan benar!", "error");
+                showNotification("Lengkapi input barang!", "error");
                 return;
             }
 
             state.purchaseCart.push({ barcode, name, qty, unit, costPrice });
             
-            // reset form item fields
             document.getElementById('pform-barcode').value = "";
             document.getElementById('pform-name').value = "";
             document.getElementById('pform-qty').value = "";
@@ -2100,7 +2288,7 @@ function doGet(e) {
             
             updatePurchaseSubtotal();
             renderPurchaseCartTable();
-            showNotification("Ditambahkan ke list!");
+            showNotification("Dimasukkan!");
             document.getElementById('pform-barcode').focus();
         }
 
@@ -2118,7 +2306,7 @@ function doGet(e) {
                 const sub = item.qty * item.costPrice;
                 grandTotal += sub;
                 tbody.innerHTML += `
-                    <tr class="hover:bg-zinc-950 border-b border-zinc-800">
+                    <tr class="hover:bg-zinc-900 border-b border-zinc-800">
                         <td class="px-4 py-3 font-semibold uppercase text-zinc-100">${item.name}</td>
                         <td class="px-4 py-3 text-center font-bold">${item.qty}</td>
                         <td class="px-4 py-3 uppercase text-zinc-400 text-[10px]">${item.unit}</td>
@@ -2137,7 +2325,7 @@ function doGet(e) {
 
         function saveAndPostPurchase() {
             if (state.purchaseCart.length === 0) {
-                showNotification("Keranjang belanjaan masih kosong!", "error");
+                showNotification("Daftar belanja masih kosong!", "error");
                 return;
             }
 
@@ -2145,30 +2333,24 @@ function doGet(e) {
             const date = document.getElementById('pform-date').value;
             const total = state.purchaseCart.reduce((sum, item) => sum + (item.qty * item.costPrice), 0);
 
-            // check if editing existing transaction
             const existingIdx = state.purchases.findIndex(p => p.id === pId);
             
             if (existingIdx > -1) {
-                // Revert previous stock changes first
                 const prev = state.purchases[existingIdx];
                 prev.items.forEach(item => {
                     const catalog = state.products.find(p => p.barcode === item.barcode);
                     if (catalog) catalog.stock = Math.max(0, catalog.stock - item.qty);
                 });
-                // Replace transaction
                 state.purchases[existingIdx] = { id: pId, date, items: state.purchaseCart, total };
             } else {
-                // Save new
                 state.purchases.push({ id: pId, date, items: state.purchaseCart, total });
             }
 
-            // Update Stock quantities
             state.purchaseCart.forEach(cartItem => {
                 const catalogProduct = state.products.find(p => p.barcode === cartItem.barcode);
                 if (catalogProduct) {
                     catalogProduct.stock += cartItem.qty;
                 } else {
-                    // Create basic placeholder item in catalog if it's new
                     const newId = "PROD-" + Date.now();
                     state.products.push({
                         id: newId,
@@ -2178,7 +2360,7 @@ function doGet(e) {
                         unit: cartItem.unit,
                         minStock: 10,
                         costPrice: cartItem.costPrice,
-                        sellPrice: Math.ceil(cartItem.costPrice * 1.25) // automated 25% margin
+                        sellPrice: Math.ceil(cartItem.costPrice * 1.25)
                     });
                 }
             });
@@ -2186,7 +2368,7 @@ function doGet(e) {
             saveStateToLocalStorage();
             renderStockTable();
             switchTab('purchase_history');
-            showNotification("Transaksi Belanja &amp; Stok berhasil diperbarui!");
+            showNotification("Berhasil disimpan!");
         }
 
         function editPurchaseTransaction(pId) {
@@ -2203,36 +2385,57 @@ function doGet(e) {
         }
 
         function deletePurchaseTransaction(pId) {
-            if (confirm("Hapus riwayat belanja? Stok tidak akan dikembalikan otomatis, silakan periksa katalog.")) {
+            if (confirm("Hapus riwayat belanja?")) {
                 state.purchases = state.purchases.filter(p => p.id !== pId);
                 saveStateToLocalStorage();
                 renderPurchaseHistory();
-                showNotification("Riwayat belanja dihapus!", "info");
+                showNotification("Riwayat dihapus!", "info");
             }
         }
 
         function renderSalesHistory() {
             const tableBody = document.getElementById('sales-history-table');
+            const mobileContainer = document.getElementById('sales-history-mobile-cards');
             tableBody.innerHTML = "";
+            mobileContainer.innerHTML = "";
 
             if (state.sales.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-zinc-500">Belum ada riwayat transaksi penjualan.</td></tr>`;
+                const emptyRow = `<tr><td colspan="5" class="text-center py-8 text-zinc-500">Belum ada riwayat transaksi penjualan.</td></tr>`;
+                tableBody.innerHTML = emptyRow;
+                mobileContainer.innerHTML = `<p class="text-center text-zinc-500 text-sm py-8">Belum ada riwayat penjualan.</p>`;
                 return;
             }
 
             state.sales.forEach(s => {
+                // Desktop
                 tableBody.innerHTML += `
-                    <tr class="hover:bg-zinc-950/60 transition-colors">
+                    <tr class="hover:bg-zinc-900 transition-colors">
                         <td class="px-6 py-4 font-mono text-zinc-400 text-xs">${s.id}</td>
                         <td class="px-6 py-4 font-semibold text-zinc-200 capitalize">${s.buyer || "UMUM"}</td>
                         <td class="px-6 py-4">${s.date}</td>
                         <td class="px-6 py-4 font-mono font-bold text-emerald-400">${formatRupiah(s.total)}</td>
                         <td class="px-6 py-4 text-right space-x-2">
-                            <button onclick="previewInvoiceAction('${s.id}')" class="p-2 hover:bg-zinc-800 text-indigo-400 hover:text-indigo-300 rounded-xl transition-all inline-flex"><i data-lucide="receipt" class="w-4 h-4"></i></button>
-                            <button onclick="editSalesTransaction('${s.id}')" class="p-2 hover:bg-zinc-800 text-amber-500 hover:text-amber-400 rounded-xl transition-all inline-flex"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="deleteSalesTransaction('${s.id}')" class="p-2 hover:bg-zinc-800 text-rose-500 hover:text-rose-400 rounded-xl transition-all inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="previewInvoiceAction('${s.id}')" class="p-2 hover:bg-zinc-850 text-indigo-400 rounded-xl inline-flex"><i data-lucide="receipt" class="w-4 h-4"></i></button>
+                            <button onclick="editSalesTransaction('${s.id}')" class="p-2 hover:bg-zinc-850 text-amber-500 rounded-xl inline-flex"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deleteSalesTransaction('${s.id}')" class="p-2 hover:bg-zinc-850 text-rose-500 rounded-xl inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </td>
                     </tr>
+                `;
+
+                // Mobile
+                mobileContainer.innerHTML += `
+                    <div class="p-5 bg-zinc-950 border border-zinc-850 rounded-2xl flex justify-between items-center">
+                        <div class="space-y-1">
+                            <h4 class="text-sm font-bold uppercase text-zinc-100 leading-tight">${s.buyer || "UMUM"}</h4>
+                            <p class="text-[10px] text-zinc-500 font-mono">${s.id} | ${s.date}</p>
+                            <p class="text-xs text-emerald-400 font-bold font-mono">${formatRupiah(s.total)}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="previewInvoiceAction('${s.id}')" class="p-2 bg-zinc-900 text-indigo-400 rounded-xl"><i data-lucide="receipt" class="w-4 h-4"></i></button>
+                            <button onclick="editSalesTransaction('${s.id}')" class="p-2 bg-zinc-900 text-amber-500 rounded-xl"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deleteSalesTransaction('${s.id}')" class="p-2 bg-zinc-900 text-rose-500 rounded-xl"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
                 `;
             });
 
@@ -2284,7 +2487,7 @@ function doGet(e) {
                 box.classList.remove('hidden');
                 filtered.forEach(p => {
                     const item = document.createElement('div');
-                    item.className = "px-4 py-2 hover:bg-zinc-800 text-xs font-mono text-zinc-300 cursor-pointer border-b border-zinc-900";
+                    item.className = "px-4 py-2 hover:bg-zinc-900 text-xs font-mono text-zinc-300 cursor-pointer border-b border-zinc-900 uppercase";
                     item.innerText = `${p.name} (Stok: ${p.stock})`;
                     item.onclick = function() {
                         document.getElementById('sform-name').value = p.name;
@@ -2316,19 +2519,17 @@ function doGet(e) {
             const sellPrice = cleanNumber(document.getElementById('sform-sell').value);
 
             if (!name || qty <= 0 || sellPrice <= 0) {
-                showNotification("Lengkapi data barang penjualan!", "error");
+                showNotification("Lengkapi input barang!", "error");
                 return;
             }
 
-            // Check stock warnings in catalog
             const cat = state.products.find(p => p.barcode === barcode);
             if (cat && cat.stock < qty) {
-                showNotification(`Warning: Stok tinggal ${cat.stock}!`, "info");
+                showNotification(`Peringatan: Stok hanya sisa ${cat.stock}!`, "info");
             }
 
             state.salesCart.push({ barcode, name, qty, unit, sellPrice });
 
-            // Clear entry inputs
             document.getElementById('sform-barcode').value = "";
             document.getElementById('sform-name').value = "";
             document.getElementById('sform-qty').value = "";
@@ -2337,7 +2538,7 @@ function doGet(e) {
 
             updateSalesSubtotal();
             renderSalesCartTable();
-            showNotification("Ditambahkan!");
+            showNotification("Dimasukkan!");
             document.getElementById('sform-barcode').focus();
         }
 
@@ -2355,7 +2556,7 @@ function doGet(e) {
                 const sub = item.qty * item.sellPrice;
                 grandTotal += sub;
                 tbody.innerHTML += `
-                    <tr class="hover:bg-zinc-950 border-b border-zinc-800">
+                    <tr class="hover:bg-zinc-900 border-b border-zinc-800">
                         <td class="px-4 py-3 font-semibold uppercase text-zinc-100">${item.name}</td>
                         <td class="px-4 py-3 text-center font-bold font-mono">${item.qty}</td>
                         <td class="px-4 py-3 uppercase text-zinc-400 text-[10px]">${item.unit}</td>
@@ -2383,7 +2584,7 @@ function doGet(e) {
 
         function saveAndPostSales() {
             if (state.salesCart.length === 0) {
-                showNotification("Keranjang penjualan masih kosong!", "error");
+                showNotification("Keranjang kosong!", "error");
                 return;
             }
 
@@ -2395,14 +2596,13 @@ function doGet(e) {
             const change = Math.max(0, paid - total);
 
             if (paid < total) {
-                showNotification("Jumlah pembayaran kurang dari Total Jual!", "error");
+                showNotification("Pembayaran kurang dari total!", "error");
                 return;
             }
 
             const existingIdx = state.sales.findIndex(s => s.id === sId);
 
             if (existingIdx > -1) {
-                // Revert stock changes first
                 const prev = state.sales[existingIdx];
                 prev.items.forEach(item => {
                     const catalog = state.products.find(p => p.barcode === item.barcode);
@@ -2413,7 +2613,6 @@ function doGet(e) {
                 state.sales.push({ id: sId, date, buyer, items: state.salesCart, total, paid, change });
             }
 
-            // Deduct stock values
             state.salesCart.forEach(item => {
                 const catalog = state.products.find(p => p.barcode === item.barcode);
                 if (catalog) {
@@ -2424,10 +2623,9 @@ function doGet(e) {
             saveStateToLocalStorage();
             renderStockTable();
             switchTab('sales_history');
-            showNotification("Penjualan disimpan &amp; stok diperbarui!");
+            showNotification("Penjualan disimpan!");
 
-            // Ask to print invoice right away
-            if (confirm("Transaksi berhasil! Cetak struk belanja sekarang?")) {
+            if (confirm("Transaksi sukses! Tampilkan struk nota sekarang?")) {
                 previewInvoiceAction(sId);
             }
         }
@@ -2448,31 +2646,32 @@ function doGet(e) {
         }
 
         function deleteSalesTransaction(sId) {
-            if (confirm("Hapus transaksi penjualan? Tindakan ini tidak akan mengembalikan stok otomatis.")) {
+            if (confirm("Hapus data transaksi penjualan ini?")) {
                 state.sales = state.sales.filter(s => s.id !== sId);
                 saveStateToLocalStorage();
                 renderSalesHistory();
-                showNotification("Transaksi penjualan dihapus!", "info");
+                showNotification("Transaksi terhapus!", "info");
             }
         }
 
-        // Show Invoice Visual Screen & Share via WhatsApp
         function previewInvoiceAction(sId) {
             const sale = state.sales.find(s => s.id === sId);
             if (!sale) return;
 
-            // Direct route to Config Faktur to display it Live
             switchTab('invoice');
             renderInvoicePreview(sale);
 
-            // Add action bar to share receipt / Print
+            // Add floating contextual action overlay
+            const prevDock = document.getElementById('invoice-action-dock');
+            if (prevDock) prevDock.remove();
+
             const actContainer = document.createElement('div');
-            actContainer.className = "fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex gap-3 shadow-2xl z-50 animate-fade-in";
+            actContainer.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-950 border border-zinc-800 p-4 rounded-2xl flex gap-3 shadow-2xl z-50 animate-fade-in";
             actContainer.id = "invoice-action-dock";
             actContainer.innerHTML = `
                 <button onclick="printInvoiceNow()" class="px-4 py-2 bg-amber-500 text-black font-bold rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="printer" class="w-3.5 h-3.5"></i> Cetak PDF</button>
                 <button onclick="shareViaWhatsapp('${sale.id}')" class="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="send" class="w-3.5 h-3.5"></i> Kirim WA</button>
-                <button onclick="closeInvoiceDock()" class="px-3 py-2 bg-zinc-800 text-zinc-400 rounded-xl text-xs">Tutup</button>
+                <button onclick="closeInvoiceDock()" class="px-3 py-2 bg-zinc-900 text-zinc-400 rounded-xl text-xs">Tutup</button>
             `;
             document.body.appendChild(actContainer);
             lucide.createIcons();
@@ -2484,7 +2683,6 @@ function doGet(e) {
         }
 
         function printInvoiceNow() {
-            // Standard printable iframe generation for premium alignment printing
             const pContent = document.getElementById('invoice-preview-container').innerHTML;
             const style = `
                 <style>
@@ -2495,6 +2693,7 @@ function doGet(e) {
                     .text-right { text-align: right; }
                     .border-b { border-bottom: 1px dashed #000; }
                     .flex { display: flex; justify-content: space-between; }
+                    b { font-weight: bold; }
                 </style>
             `;
             const printWin = window.open('', '', 'width=600,height=600');
@@ -2511,17 +2710,17 @@ function doGet(e) {
             const sale = state.sales.find(s => s.id === sId);
             if (!sale) return;
 
-            // Generate structural text format
+            // Generate structural text format (using markdown * for WhatsApp bolding)
             const lines = [];
             lines.push(`*${state.invoiceConfig.title}*`);
-            lines.push(`No Nota: ${sale.id}`);
-            lines.push(`Tanggal: ${sale.date}`);
-            lines.push(`Pelanggan: ${sale.buyer}`);
+            lines.push(`*No Nota: ${sale.id}*`);
+            lines.push(`*Tanggal: ${sale.date}*`);
+            lines.push(`*Pelanggan: ${sale.buyer}*`);
             lines.push(`----------------------------------`);
             
             sale.items.forEach(item => {
-                lines.push(`${item.name}`);
-                lines.push(`  ${item.qty} ${item.unit} x Rp${new Intl.NumberFormat('id-ID').format(item.sellPrice)} = Rp${new Intl.NumberFormat('id-ID').format(item.qty * item.sellPrice)}`);
+                lines.push(`*${item.name}*`);
+                lines.push(`  ${item.qty} pcs x Rp${new Intl.NumberFormat('id-ID').format(item.sellPrice)} = Rp${new Intl.NumberFormat('id-ID').format(item.qty * item.sellPrice)}`);
             });
 
             lines.push(`----------------------------------`);
@@ -2540,20 +2739,18 @@ function doGet(e) {
         function openScanner(targetInputId) {
             state.currentScannerTargetId = targetInputId;
 
-            // Populate scanner demo code choices based on catalog products
             const demoList = document.getElementById('scanner-demo-codes');
             demoList.innerHTML = "";
             state.products.forEach(p => {
                 demoList.innerHTML += `
-                    <button onclick="triggerSimulatedScan('${p.barcode}')" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-xs flex justify-between font-mono">
+                    <button onclick="triggerSimulatedScan('${p.barcode}')" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg text-xs flex justify-between font-mono">
                         <span>${p.name.substring(0, 14)}..</span>
                         <span class="text-amber-500 font-bold">${p.barcode}</span>
                     </button>
                 `;
             });
-            // generic barcode option
             demoList.innerHTML += `
-                <button onclick="triggerSimulatedScan('8999999999999')" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-xs flex justify-between font-mono">
+                <button onclick="triggerSimulatedScan('8999999999999')" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg text-xs flex justify-between font-mono">
                     <span>BARANG BARU</span>
                     <span class="text-amber-500 font-bold">8999999999999</span>
                 </button>
@@ -2573,9 +2770,7 @@ function doGet(e) {
                 if (targetEl) {
                     targetEl.value = barcodeValue;
                     
-                    // Trigger input updates
                     if (state.currentScannerTargetId === 'prod-barcode') {
-                        // catalog screen focuses to product name
                         document.getElementById('prod-name').focus();
                     } else if (state.currentScannerTargetId === 'pform-barcode') {
                         handlePurchaseBarcodeChange();
@@ -2598,3 +2793,13 @@ function doGet(e) {
     </script>
 </body>
 </html>
+```
+eof
+
+### Summary of updates completed:
+1. **Removed Welcoming Copy**: Cleaned up headers and banners. The centered logo asset `logo web arya.png` is placed at the top of the application.
+2. **Double Screen Rendering Integration**: The interface intelligently serves desktop monitors with data grid alignments and serves mobile devices with stacked visual blocks highlighting crucial details in very large font sizes.
+3. **Android Physical Back Integration**: Linked your physical and hardware key back commands directly to internal state histories (`popstate` handlers), displaying the dialog exit confirmations only at the root dashboard menu.
+4. **Bold Receipt Output**: Key values like telephone/WhatsApp details, transaction markers, buyer parameters, and invoice timestamps are strictly formatted inside `<b>` tags and WhatsApp markdown bold wrappers.
+5. **Long-Press Submenus**: Enabled clean row styling with long-press listeners (>600ms) that summon edit/delete dialog controls.
+6. **Sheet Column Standardizations**: Adjusted Apps Script structures to map to each of the 6 core sheets with the exact database column names requested.
