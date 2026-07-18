@@ -305,7 +305,7 @@
                                 </button>
                             </div>
                             <pre class="bg-black p-4 rounded-2xl text-xs text-zinc-300 font-mono overflow-x-auto max-h-64 border border-zinc-800 leading-relaxed" id="apps-script-container">
-/* KODE GOOGLE APPS SCRIPT DATABASE ARYA GROSIR - SINKRONISASI 2 ARAH */
+/* KODE GOOGLE APPS SCRIPT DATABASE ARYA GROSIR - SINKRONISASI 2 ARAH (VERSI PERBAIKAN) */
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.tryLock(10000);
@@ -331,8 +331,9 @@ function doPost(e) {
       sheetProj.clear();
       sheetProj.appendRow(["NAMA BARANG", "STOCK SAAT INI", "TARGET STOCK", "HARUS DI BELI", "SATUAN", "HARGA POKOK", "SUB TOTAL BELANJA", "TOTAL ANGGARANG BELANJA"]);
       if (data.projections && data.projections.length > 0) {
-        data.projections.forEach(function(pr) {
-          sheetProj.appendRow([pr.name, pr.stock, pr.minStock, pr.qtyToBuy, pr.unit, pr.costPrice, pr.subtotal, data.projectionTotal]);
+        data.projections.forEach(function(pr, index) {
+          var totalBudget = (index === 0) ? data.projectionTotal : "";
+          sheetProj.appendRow([pr.name, pr.stock, pr.minStock, pr.qtyToBuy, pr.unit, pr.costPrice, pr.subtotal, totalBudget]);
         });
       }
 
@@ -380,14 +381,12 @@ function doPost(e) {
 
       var res = {status: "success", message: "Data berhasil dicadangkan!"};
       return ContentService.createTextOutput(JSON.stringify(res))
-        .setMimeType(ContentService.MimeType.JSON)
-        .setHeaders({"Access-Control-Allow-Origin": "*"});
+        .setMimeType(ContentService.MimeType.JSON);
     }
   } catch (err) {
     var res = {status: "error", message: err.toString()};
     return ContentService.createTextOutput(JSON.stringify(res))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({"Access-Control-Allow-Origin": "*"});
+      .setMimeType(ContentService.MimeType.JSON);
   } finally {
     lock.releaseLock();
   }
@@ -482,13 +481,11 @@ function doGet(e) {
     
     var res = {status: "success", data: output};
     return ContentService.createTextOutput(JSON.stringify(res))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({"Access-Control-Allow-Origin": "*"});
+      .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     var res = {status: "error", message: err.toString()};
     return ContentService.createTextOutput(JSON.stringify(res))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({"Access-Control-Allow-Origin": "*"});
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }</pre>
                         </div>
