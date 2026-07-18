@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARYA GROSIR - by Aries</title>
+    <title>ARYA GROSIR - Premium POS System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts (Inter & Poppins) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- HTML5-QRCode Scanner Library for Ultra-Sensitive Real Scanning -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -42,17 +44,20 @@
         .watermark-lunas {
             animation: watermark-fade 0.4s ease-out forwards;
         }
-        /* Fullscreen scanner camera styles */
-        #scanner-video {
-            object-fit: cover;
-            width: 100%;
-            height: 100%;
+        /* Fullscreen scanner viewport rules */
+        #interactive-reader {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        #interactive-reader video {
+            object-fit: cover !important;
+            width: 100% !important;
+            height: 100% !important;
         }
     </style>
 </head>
 <body class="text-zinc-100 flex flex-col min-h-screen justify-between selection:bg-amber-500/30 selection:text-amber-200">
 
-    <!-- App Container -->
     <div class="flex-grow flex flex-col pb-6">
         <!-- Toast Notification Center -->
         <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col gap-2 w-[90%] max-w-sm"></div>
@@ -97,7 +102,6 @@
             </div>
         </div>
 
-        <!-- Simulated & Actual Camera Scanner Modal Overlay -->
         <div id="scanner-modal" class="fixed inset-0 z-[80] bg-black flex flex-col justify-between hidden">
             <div class="p-4 flex items-center justify-between bg-zinc-950 border-b border-zinc-900 z-10">
                 <span class="font-poppins font-bold text-amber-500 flex items-center gap-2">
@@ -105,7 +109,6 @@
                     PEMINDAI BARCODE AKTIF
                 </span>
                 <div class="flex items-center gap-2">
-                    <!-- Torch/Flash Toggle Button -->
                     <button id="scanner-flash-btn" onclick="toggleScannerFlash()" class="p-2 rounded-full bg-zinc-900 text-zinc-400 hover:text-white transition-colors" title="Nyalakan Senter">
                         <i data-lucide="flashlight" class="w-5 h-5"></i>
                     </button>
@@ -115,22 +118,17 @@
                 </div>
             </div>
             
-            <div class="relative flex-grow flex items-center justify-center overflow-hidden bg-black">
-                <!-- Video Element for actual hardware stream -->
-                <video id="scanner-video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover hidden"></video>
+            <div class="relative flex-grow bg-black overflow-hidden">
+                <!-- Immersive true full screen camera renderer container -->
+                <div id="interactive-reader" class="absolute inset-0 w-full h-full"></div>
 
-                <!-- Dynamic scanning laser overlay -->
+                <!-- Active laser alignment crosshair overlay -->
                 <div class="absolute inset-x-0 h-1 bg-red-500 shadow-[0_0_15px_#ef4444] z-10 animate-[bounce_2.5s_infinite]"></div>
                 
-                <div class="w-72 h-72 border-2 border-dashed border-amber-500/60 rounded-3xl relative flex flex-col items-center justify-center bg-zinc-950/20 backdrop-blur-[0.5px] z-10">
-                    <span class="text-xs text-amber-400/95 uppercase tracking-widest text-center px-4 font-bold bg-black/40 py-1.5 rounded-lg">Posisikan Kode Batang<br>di Dalam Kotak</span>
-                    <i data-lucide="scan" class="w-16 h-16 text-amber-500/20 absolute"></i>
-                </div>
-
-                <!-- Simulation interface fallback if camera permission is denied or loading -->
-                <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-zinc-950/90 p-4 rounded-2xl border border-zinc-800 text-center max-w-xs w-[90%] z-20">
-                    <p class="text-[11px] text-zinc-400 mb-2 font-medium">Atau Pilih Kode untuk Simulasi:</p>
-                    <div id="scanner-demo-codes" class="flex flex-col gap-1 text-sm font-mono max-h-32 overflow-y-auto"></div>
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+                    <div class="w-72 h-72 border-2 border-dashed border-amber-500/80 rounded-3xl flex flex-col items-center justify-center bg-transparent relative">
+                        <span class="text-xs text-amber-400 uppercase tracking-widest text-center px-4 font-bold bg-black/70 py-2 rounded-lg pointer-events-auto mt-44">Posisikan Kode Batang</span>
+                    </div>
                 </div>
             </div>
 
@@ -145,7 +143,6 @@
             </div>
         </div>
 
-        <!-- Header Section -->
         <header class="p-4 bg-black flex flex-col items-center justify-center border-b border-zinc-900">
             <img src="logo web arya.png" alt="Arya Grosir Logo" onerror="this.src='https://placehold.co/400x160/000000/f59e0b?text=ARYA+GROSIR'" class="h-20 md:h-24 w-auto object-contain">
             <div class="flex items-center justify-between w-full max-w-7xl px-2 mt-2">
@@ -160,10 +157,9 @@
         <!-- Main Content Panel -->
         <main class="flex-grow p-4 md:p-6 max-w-7xl mx-auto w-full">
             
-            <!-- Tab: Main Dashboard Menu Grid (2x4 structured full screen design) -->
             <div id="tab-main" class="tab-pane animate-fade-in flex flex-col justify-between">
                 <div class="grid grid-cols-2 gap-4 md:gap-6 w-full py-2">
-                    <!-- 1. Buy Inventory (Belanja) -->
+                    <!-- 1. Belanja Barang -->
                     <button onclick="switchTab('purchase_history')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-850 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-3xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between h-36 md:h-40">
                         <div class="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="shopping-bag" class="w-5 h-5"></i>
@@ -173,17 +169,17 @@
                         </div>
                     </button>
 
-                    <!-- 2. Cashier Sales -->
+                    <!-- 2. Penjualan -->
                     <button onclick="switchTab('sales_history')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-850 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-3xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between h-36 md:h-40">
                         <div class="w-10 h-10 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="shopping-cart" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <h3 class="font-extrabold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors text-sm uppercase tracking-wide">Penjualan (Kasir)</h3>
+                            <h3 class="font-extrabold font-poppins text-zinc-100 group-hover:text-amber-400 transition-colors text-sm uppercase tracking-wide">Penjualan</h3>
                         </div>
                     </button>
 
-                    <!-- 3. Stock Management -->
+                    <!-- 3. Stok Barang -->
                     <button onclick="switchTab('stock')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-850 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-3xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between h-36 md:h-40">
                         <div class="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="boxes" class="w-5 h-5"></i>
@@ -193,7 +189,7 @@
                         </div>
                     </button>
 
-                    <!-- 4. Budget Projection -->
+                    <!-- 4. Perkiraan Belanja -->
                     <button onclick="switchTab('projection')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-850 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-3xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between h-36 md:h-40">
                         <div class="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="trending-up" class="w-5 h-5"></i>
@@ -203,7 +199,7 @@
                         </div>
                     </button>
 
-                    <!-- 5. Expense Ledger -->
+                    <!-- 5. Pengeluaran Lain -->
                     <button onclick="switchTab('expenses')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-850 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-3xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between h-36 md:h-40">
                         <div class="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="receipt-text" class="w-5 h-5"></i>
@@ -213,7 +209,7 @@
                         </div>
                     </button>
 
-                    <!-- 6. Profit Analysis -->
+                    <!-- 6. Keuntungan -->
                     <button onclick="switchTab('profit')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-850 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-3xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between h-36 md:h-40">
                         <div class="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="wallet" class="w-5 h-5"></i>
@@ -223,7 +219,7 @@
                         </div>
                     </button>
 
-                    <!-- 7. Invoice Settings -->
+                    <!-- 7. Pengaturan Faktur -->
                     <button onclick="switchTab('invoice')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-850 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-3xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between h-36 md:h-40">
                         <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="receipt" class="w-5 h-5"></i>
@@ -233,7 +229,7 @@
                         </div>
                     </button>
 
-                    <!-- 8. Google Spreadsheet Sync -->
+                    <!-- 8. Sinkronisasi -->
                     <button onclick="switchTab('sync')" class="group p-5 bg-gradient-to-br from-zinc-900 to-black hover:from-zinc-850 hover:to-zinc-950 border border-zinc-800 hover:border-amber-500/50 rounded-3xl text-left transition-all duration-300 shadow-lg flex flex-col justify-between h-36 md:h-40">
                         <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <i data-lucide="refresh-cw" class="w-5 h-5"></i>
@@ -245,7 +241,6 @@
                 </div>
             </div>
 
-            <!-- Tab: Sync Panel -->
             <div id="tab-sync" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex items-center gap-2 mb-4">
                     <button onclick="goBack()" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
@@ -501,7 +496,6 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- Tab: Invoice Settings -->
             <div id="tab-invoice" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex items-center gap-2 mb-4">
                     <button onclick="goBack()" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
@@ -519,7 +513,10 @@ function doGet(e) {
                                 <select id="inv-size" onchange="renderInvoicePreview()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-sm focus:outline-none">
                                     <option value="58mm">Kertas Thermal (58mm)</option>
                                     <option value="80mm">Kertas Thermal (80mm)</option>
+                                    <option value="a3">Ukuran Buku / A3</option>
+                                    <option value="a4">Ukuran Buku / A4</option>
                                     <option value="a5">Ukuran Buku / A5</option>
+                                    <option value="a6">Ukuran Buku / A6</option>
                                 </select>
                             </div>
                             <div>
@@ -535,11 +532,11 @@ function doGet(e) {
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs text-zinc-400 mb-1">WhatsApp (Tebal / Bold)</label>
+                                <label class="block text-xs text-zinc-400 mb-1">WhatsApp</label>
                                 <input type="text" id="inv-wa" oninput="renderInvoicePreview()" value="0851-2345-6789" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none font-bold">
                             </div>
                             <div>
-                                <label class="block text-xs text-zinc-400 mb-1">No. Telp (Tebal / Bold)</label>
+                                <label class="block text-xs text-zinc-400 mb-1">No. Telp</label>
                                 <input type="text" id="inv-telp" oninput="renderInvoicePreview()" value="0274-987654" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none font-bold">
                             </div>
                         </div>
@@ -551,14 +548,14 @@ function doGet(e) {
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs text-zinc-400 mb-1">Posisi Tanggal (Tebal)</label>
+                                <label class="block text-xs text-zinc-400 mb-1">Posisi Tanggal</label>
                                 <select id="inv-date-pos" onchange="renderInvoicePreview()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-sm focus:outline-none">
                                     <option value="left">Kiri</option>
                                     <option value="right">Kanan</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs text-zinc-400 mb-1">Posisi No. Faktur (Tebal)</label>
+                                <label class="block text-xs text-zinc-400 mb-1">Posisi No. Faktur</label>
                                 <select id="inv-no-pos" onchange="renderInvoicePreview()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-sm focus:outline-none">
                                     <option value="left">Kiri</option>
                                     <option value="right">Kanan</option>
@@ -568,7 +565,7 @@ function doGet(e) {
 
                         <div>
                             <span class="block text-xs text-zinc-400 mb-2">Kolom Tabel Yang Ditampilkan</span>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                                 <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer">
                                     <input type="checkbox" id="col-code" checked onchange="renderInvoicePreview()" class="rounded bg-black border-zinc-850 text-amber-500 focus:ring-0"> Kode
                                 </label>
@@ -592,12 +589,11 @@ function doGet(e) {
                     <!-- Visual Preview Panel -->
                     <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 flex flex-col items-center">
                         <span class="text-xs font-bold font-mono text-zinc-500 mb-4 self-start">LIVE PREVIEW STRUK:</span>
-                        <div id="invoice-preview-container" class="bg-white text-black p-6 rounded-lg shadow-2xl overflow-y-auto max-h-[500px] font-mono text-xs w-full max-w-[320px] relative border-4 border-zinc-800"></div>
+                        <div id="invoice-preview-container" class="bg-white text-black p-6 rounded-lg shadow-2xl overflow-y-auto max-h-[500px] font-mono text-xs w-full relative border-4 border-zinc-800"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab: Stock Management -->
             <div id="tab-stock" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="flex items-center gap-2">
@@ -637,7 +633,7 @@ function doGet(e) {
                         </table>
                     </div>
 
-                    <!-- Optimized Android/Mobile Cards with huge elements (Strictly vertical scroll) -->
+                    <!-- Optimized Mobile Cards (Strictly vertical scroll) -->
                     <div class="md:hidden flex flex-col gap-4" id="stock-mobile-cards"></div>
                 </div>
 
@@ -719,7 +715,6 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- Tab: Perkiraan Belanja -->
             <div id="tab-projection" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex items-center gap-2 mb-4">
                     <button onclick="goBack()" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
@@ -747,7 +742,7 @@ function doGet(e) {
                         </table>
                     </div>
 
-                    <!-- Mobile Cards: Extra large item names and Harus Beli quantities -->
+                    <!-- Mobile Cards: Extra large elements (Strictly vertical scroll) -->
                     <div class="md:hidden flex flex-col gap-4" id="projection-mobile-cards"></div>
 
                     <!-- Bottom totals -->
@@ -760,7 +755,6 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- Tab: Keuntungan -->
             <div id="tab-profit" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex items-center gap-2 mb-4">
                     <button onclick="goBack()" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
@@ -771,11 +765,11 @@ function doGet(e) {
                 <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
                     <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
                         <span class="text-xs text-zinc-400">Laba Hari Ini</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-emerald-400" id="laba-hari-ini">Rp 0</div>
+                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-zinc-100" id="laba-hari-ini">Rp 0</div>
                     </div>
                     <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
                         <span class="text-xs text-zinc-400">Laba Bulan Ini</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-emerald-400" id="laba-bulan-ini">Rp 0</div>
+                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-zinc-100" id="laba-bulan-ini">Rp 0</div>
                     </div>
                     <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
                         <span class="text-xs text-zinc-400">Pengeluaran Hari Ini</span>
@@ -811,12 +805,11 @@ function doGet(e) {
                     <!-- Custom Visual Monthly Bar Chart -->
                     <div class="lg:col-span-2 bg-zinc-950 border border-zinc-800 rounded-3xl p-6">
                         <h3 class="font-bold font-poppins text-zinc-100 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-5 h-5 text-amber-500"></i> Diagram Rekap Keuntungan Bulanan (Tahun Ini)</h3>
-                        <div class="h-64 flex items-end justify-between gap-2 pt-6" id="profit-chart-container"></div>
+                        <div class="h-80 flex items-end justify-between gap-2 pt-10" id="profit-chart-container"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab: Pengeluaran Lain-lain -->
             <div id="tab-expenses" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="flex items-center gap-2">
@@ -879,7 +872,6 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- Tab: Belanja Barang History -->
             <div id="tab-purchase_history" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="flex items-center gap-2">
@@ -912,7 +904,6 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- Tab: Input Belanja Baru Form (Interactive Cart Builder) -->
             <div id="tab-purchase_form" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex items-center gap-2 mb-4">
                     <button onclick="switchTab('purchase_history')" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
@@ -1013,7 +1004,6 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- Tab: Penjualan History -->
             <div id="tab-sales_history" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="flex items-center gap-2">
@@ -1047,7 +1037,6 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- Tab: Input Penjualan Baru Form (Kasir Screen) -->
             <div id="tab-sales_form" class="tab-pane hidden animate-fade-in space-y-6">
                 <div class="flex items-center gap-2 mb-4">
                     <button onclick="switchTab('sales_history')" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
@@ -1202,7 +1191,6 @@ function doGet(e) {
             selectedProductIdForContext: null
         };
 
-        // Rich default dataset to allow immediate simulation of features
         const defaultProducts = [
             { id: "PROD1", barcode: "8991234567890", name: "INDOMIE GORENG SPESIAL", stock: 120, unit: "pcs", minStock: 40, costPrice: 2800, sellPrice: 3500 },
             { id: "PROD2", barcode: "8992345678901", name: "TEH BOTOL SOSRO 350ML", stock: 15, unit: "pcs", minStock: 30, costPrice: 3200, sellPrice: 4000 },
@@ -1213,7 +1201,7 @@ function doGet(e) {
 
         const defaultExpenses = [
             { id: "EXP1", date: "2026-07-15", desc: "Bayar Listrik Toko", amount: 250000 },
-            { id: "EXP2", date: "2026-07-16", desc: "Isi Ulang Galon Toko", amount: 35005 }
+            { id: "EXP2", date: "2026-07-16", desc: "Isi Ulang Galon Toko", amount: 35000 }
         ];
 
         const defaultSales = [
@@ -1248,50 +1236,64 @@ function doGet(e) {
             }
         }
 
-        /* HARDWARE ACCESS CAM STREAMING HANDLERS */
-        let activeMediaStream = null;
+        /* HARDWARE CAMERA SCANNING WITH HTML5-QRCODE */
+        let html5QrScanner = null;
 
-        async function startCameraScanner() {
-            const videoEl = document.getElementById('scanner-video');
-            try {
-                activeMediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment", focusMode: "continuous" }
-                });
-                videoEl.srcObject = activeMediaStream;
-                videoEl.classList.remove('hidden');
-            } catch (err) {
-                console.warn("Camera hardware access denied/unsupported. Fallback to simulator overlay interface.", err);
-                videoEl.classList.add('hidden');
-            }
+        function startCameraScanner() {
+            // Instantiate HTML5-QRcode on interactive viewport container
+            html5QrScanner = new Html5Qrcode("interactive-reader");
+            
+            const config = { 
+                fps: 20, 
+                qrbox: function(width, height) {
+                    const size = Math.min(width, height) * 0.75;
+                    return { width: size, height: size };
+                },
+                aspectRatio: 1.0
+            };
+
+            // Start scanner on backing camera
+            html5QrScanner.start(
+                { facingMode: "environment" }, 
+                config,
+                (decodedText) => {
+                    // Success callback
+                    triggerSimulatedScan(decodedText);
+                },
+                (errorMessage) => {
+                    // Fail callbacks can be ignored to avoid console spamming during searches
+                }
+            ).catch(err => {
+                console.warn("Camera scan initiation error", err);
+                showNotification("Gagal mengakses modul kamera hardware.", "error");
+            });
         }
 
         function stopCameraScanner() {
-            if (activeMediaStream) {
-                activeMediaStream.getTracks().forEach(track => track.stop());
-                activeMediaStream = null;
+            if (html5QrScanner) {
+                html5QrScanner.stop().then(() => {
+                    html5QrScanner = null;
+                }).catch(err => {
+                    console.error("Camera stop process failure", err);
+                });
             }
-            const videoEl = document.getElementById('scanner-video');
-            videoEl.srcObject = null;
-            videoEl.classList.add('hidden');
         }
 
-        async function toggleScannerFlash() {
-            if (!activeMediaStream) {
+        function toggleScannerFlash() {
+            if (!html5QrScanner) {
                 showNotification("Senter tidak tersedia karena kamera tidak aktif.", "error");
                 return;
             }
-            const track = activeMediaStream.getVideoTracks()[0];
             try {
-                const capabilities = track.getCapabilities();
-                if (capabilities.torch) {
-                    const currentSettings = track.getSettings();
-                    await track.applyConstraints({
-                        advanced: [{ torch: !currentSettings.torch }]
-                    });
-                    showNotification(`Senter ${!currentSettings.torch ? 'AKTIF' : 'NONAKTIF'}`);
-                } else {
-                    showNotification("Perangkat keras Senter (Torch) tidak didukung browser ini.", "info");
-                }
+                const state = html5QrScanner.getTorchState();
+                const nextState = !state;
+                html5QrScanner.applyVideoConstrains({
+                    advanced: [{ torch: nextState }]
+                }).then(() => {
+                    showNotification(`Senter ${nextState ? 'AKTIF' : 'NONAKTIF'}`);
+                }).catch(err => {
+                    showNotification("Senter tidak didukung pada browser/kamera ini.", "info");
+                });
             } catch (err) {
                 showNotification("Gagal mengubah status senter.", "error");
             }
@@ -1318,22 +1320,20 @@ function doGet(e) {
             document.getElementById('pform-date').value = todayStr;
             document.getElementById('sform-date').value = todayStr;
 
-            // Pre-compile design previews
+            // Pre-compile previews
             renderStockTable();
             renderInvoicePreview();
 
-            // Set state management in the browser history to intercept native back-button actions
+            // Set state management in browser history to intercept native back button
             history.replaceState({ tab: 'main' }, '');
 
             window.addEventListener('popstate', function(event) {
                 if (event.state && event.state.tab) {
-                    // Close scanner if open
                     if (!document.getElementById('scanner-modal').classList.contains('hidden')) {
                         stopCameraScanner();
                         document.getElementById('scanner-modal').classList.add('hidden');
                         return;
                     }
-                    // Navigate visually to previous tab without modifying history again
                     switchTabVisual(event.state.tab);
                 } else {
                     if (!document.getElementById('scanner-modal').classList.contains('hidden')) {
@@ -1342,10 +1342,8 @@ function doGet(e) {
                         history.pushState({ tab: state.activeTab }, '');
                         return;
                     }
-                    // No history state left: meaning we popped out of main dashboard menu
                     switchTabVisual('main');
                     document.getElementById('exit-modal').classList.remove('hidden');
-                    // Push a protective history state back so the next Back-press doesn't instantly escape the page
                     history.pushState({ tab: 'main' }, '');
                 }
             });
@@ -1395,18 +1393,21 @@ function doGet(e) {
 
         function cleanNumber(val) {
             if (typeof val === 'number') return val;
-            return parseFloat(String(val).replace(/[^0-9.-]+/g, "")) || 0;
+            return parseFloat(String(val).replace(/[^0-9.-]+/g, "").replace(/\./g, "")) || 0;
         }
 
+        // Custom number formatting utilizing "." thousands separator on-the-fly with no boundaries
         function formatNumberInput(inputElement) {
             let cursorPosition = inputElement.selectionStart;
             let originalLength = inputElement.value.length;
-            let numericVal = cleanNumber(inputElement.value);
+            let cleanVal = String(inputElement.value).replace(/\D/g, "");
             
-            if (numericVal === 0 && inputElement.value === "") {
+            if (!cleanVal) {
+                inputElement.value = "";
                 return;
             }
             
+            let numericVal = parseInt(cleanVal);
             inputElement.value = new Intl.NumberFormat('id-ID').format(numericVal);
             
             let newLength = inputElement.value.length;
@@ -1421,7 +1422,6 @@ function doGet(e) {
             switchTabVisual(tabId);
         }
 
-        // Pure visual layout selector
         function switchTabVisual(tabId) {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
             const destination = document.getElementById(`tab-${tabId}`);
@@ -1450,11 +1450,7 @@ function doGet(e) {
         }
 
         function goBack() {
-            window.history.back(); // Triggers the popstate flow seamlessly
-        }
-
-        function goHome() {
-            switchTab('main');
+            window.history.back();
         }
 
         function closeExitModal(exitConfirm) {
@@ -1671,73 +1667,118 @@ function doGet(e) {
 
             const isLunas = transaction.paid >= transaction.total;
 
+            // Compute structural sizing styles based on paper selections
+            let containerStyle = "max-width: 100%;";
+            let logoClass = "max-h-12";
+            let textClass = "text-sm";
+            let subTextClass = "text-[9px]";
+
+            if (config.size === 'a3') {
+                containerStyle = "width: 100%; font-size: 16px;";
+                logoClass = "max-h-24";
+                textClass = "text-2xl";
+                subTextClass = "text-base";
+            } else if (config.size === 'a4') {
+                containerStyle = "width: 100%; font-size: 14px;";
+                logoClass = "max-h-20";
+                textClass = "text-xl";
+                subTextClass = "text-sm";
+            } else if (config.size === 'a5') {
+                containerStyle = "width: 100%; font-size: 12px;";
+                logoClass = "max-h-16";
+                textClass = "text-lg";
+                subTextClass = "text-xs";
+            } else if (config.size === 'a6') {
+                containerStyle = "width: 100%; font-size: 11px;";
+                logoClass = "max-h-14";
+                textClass = "text-base";
+                subTextClass = "text-[10px]";
+            } else if (config.size === '80mm') {
+                containerStyle = "max-width: 310px; font-size: 11px;";
+                logoClass = "max-h-14";
+                textClass = "text-sm";
+                subTextClass = "text-[10px]";
+            } else { // 58mm default
+                containerStyle = "max-width: 260px; font-size: 9px;";
+                logoClass = "max-h-10";
+                textClass = "text-xs";
+                subTextClass = "text-[8px]";
+            }
+
             let invoiceHtml = `
-                <div class="flex flex-col items-center text-center space-y-1 pb-4 border-b border-dashed border-zinc-300">
-                    ${config.logo ? `<img src="${config.logo}" class="max-h-12 w-auto object-contain mb-2">` : `<img src="logo web arya.png" alt="Arya Logo" class="max-h-10 w-auto object-contain mb-1" onerror="this.remove()">`}
-                    <h4 class="font-extrabold text-sm tracking-wide leading-tight uppercase text-zinc-900">${config.title}</h4>
-                    <p class="text-[9px] text-zinc-800 leading-tight"><b>WA: ${config.wa}</b> | <b>Telp: ${config.telp}</b></p>
-                    <p class="text-[9px] italic text-zinc-650 leading-tight mt-1">${config.desc}</p>
-                </div>
-                
-                <div class="py-3 border-b border-dashed border-zinc-300 space-y-1 text-[9px] text-zinc-800">
-                    <div class="flex justify-between">
-                        ${config.datePos === 'left' ? `<span><b>TGL: ${transaction.date}</b></span>` : ''}
-                        ${config.noPos === 'left' ? `<span><b>NO: ${transaction.id}</b></span>` : ''}
-                        ${config.datePos === 'right' ? `<span><b>TGL: ${transaction.date}</b></span>` : ''}
-                        ${config.noPos === 'right' ? `<span><b>NO: ${transaction.id}</b></span>` : ''}
-                    </div>
-                    <div class="flex justify-between">
-                        <span><b>PEMBELI: ${transaction.buyer || "UMUM"}</b></span>
-                    </div>
-                </div>
-
-                <table class="w-full text-left text-[9px] text-zinc-800 my-3">
-                    <thead>
-                        <tr class="border-b border-zinc-300 font-bold">
-                            ${config.columns.code ? `<th class="py-1">Kode</th>` : ''}
-                            <th class="py-1">Barang</th>
-                            ${config.columns.qty ? `<th class="py-1 text-center">Qty</th>` : ''}
-                            ${config.columns.unit ? `<th class="py-1 font-bold">Satuan</th>` : ''}
-                            ${config.columns.price ? `<th class="py-1 text-right">Harga</th>` : ''}
-                            <th class="py-1 text-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${transaction.items.map(item => `
-                            <tr>
-                                ${config.columns.code ? `<td class="py-1 font-mono font-bold">${item.barcode.substring(0, 6)}</td>` : ''}
-                                <td class="py-1 uppercase font-bold">${item.name}</td>
-                                ${config.columns.qty ? `<td class="py-1 text-center font-bold">${item.qty}</td>` : ''}
-                                ${config.columns.unit ? `<td class="py-1 uppercase font-bold">${item.unit}</td>` : ''}
-                                ${config.columns.price ? `<td class="py-1 text-right font-bold">${new Intl.NumberFormat('id-ID').format(item.sellPrice)}</td>` : ''}
-                                <td class="py-1 text-right font-extrabold text-zinc-900">${new Intl.NumberFormat('id-ID').format(item.qty * item.sellPrice)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-
-                <div class="border-t border-zinc-300 pt-2 space-y-1 text-[9px] text-zinc-850">
-                    <div class="flex justify-between font-extrabold text-sm text-zinc-900">
-                        <span><b>TOTAL HARGA:</b></span>
-                        <span><b>${formatRupiah(transaction.total)}</b></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span><b>DIBAYAR:</b></span>
-                        <span><b>${formatRupiah(transaction.paid)}</b></span>
-                    </div>
-                    <div class="flex justify-between font-extrabold text-zinc-900">
-                        <span><b>KEMBALIAN:</b></span>
-                        <span><b>${formatRupiah(transaction.change)}</b></span>
-                    </div>
-                </div>
-
-                ${isLunas ? `
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
-                        <div class="watermark-lunas border-4 border-emerald-500 text-emerald-500 font-black text-3xl tracking-widest uppercase py-2 px-6 rounded-2xl border-double -rotate-12 transform opacity-30">
-                            LUNAS
+                <div style="${containerStyle}" class="mx-auto">
+                    <!-- Adjusted header logo on the extreme left, side-by-side with text -->
+                    <div class="flex items-center gap-4 pb-4 border-b border-dashed border-zinc-300">
+                        <div class="shrink-0">
+                            ${config.logo ? `<img src="${config.logo}" class="${logoClass} w-auto object-contain">` : `<img src="logo web arya.png" alt="Arya Logo" class="${logoClass} w-auto object-contain" onerror="this.remove()">`}
+                        </div>
+                        <div class="text-left flex-grow">
+                            <h4 class="font-extrabold tracking-wide leading-tight uppercase text-zinc-900 ${textClass}">${config.title}</h4>
+                            <p class="${subTextClass} text-zinc-800 leading-tight"><b>WA: ${config.wa}</b> | <b>Telp: ${config.telp}</b></p>
+                            <p class="${subTextClass} italic text-zinc-650 leading-tight mt-0.5">${config.desc}</p>
                         </div>
                     </div>
-                ` : ''}
+                    
+                    <div class="py-3 border-b border-dashed border-zinc-300 space-y-1 ${subTextClass} text-zinc-800">
+                        <div class="flex justify-between">
+                            ${config.datePos === 'left' ? `<span><b>TGL: ${transaction.date}</b></span>` : ''}
+                            ${config.noPos === 'left' ? `<span><b>NO: ${transaction.id}</b></span>` : ''}
+                            ${config.datePos === 'right' ? `<span><b>TGL: ${transaction.date}</b></span>` : ''}
+                            ${config.noPos === 'right' ? `<span><b>NO: ${transaction.id}</b></span>` : ''}
+                        </div>
+                        <div class="flex justify-between">
+                            <span><b>PEMBELI: ${transaction.buyer || "UMUM"}</b></span>
+                        </div>
+                    </div>
+
+                    <table class="w-full text-left ${subTextClass} text-zinc-800 my-3">
+                        <thead>
+                            <tr class="border-b border-zinc-300 font-bold">
+                                ${config.columns.code ? `<th class="py-1">Kode</th>` : ''}
+                                <th class="py-1">Barang</th>
+                                ${config.columns.qty ? `<th class="py-1 text-center">Qty</th>` : ''}
+                                ${config.columns.unit ? `<th class="py-1 font-bold">Satuan</th>` : ''}
+                                ${config.columns.price ? `<th class="py-1 text-right">Harga</th>` : ''}
+                                <th class="py-1 text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${transaction.items.map(item => `
+                                <tr>
+                                    ${config.columns.code ? `<td class="py-1 font-mono font-bold">${item.barcode.substring(0, 6)}</td>` : ''}
+                                    <td class="py-1 uppercase font-bold">${item.name}</td>
+                                    ${config.columns.qty ? `<td class="py-1 text-center font-bold">${item.qty}</td>` : ''}
+                                    ${config.columns.unit ? `<td class="py-1 uppercase font-bold">${item.unit}</td>` : ''}
+                                    ${config.columns.price ? `<td class="py-1 text-right font-bold">${new Intl.NumberFormat('id-ID').format(item.sellPrice)}</td>` : ''}
+                                    <td class="py-1 text-right font-extrabold text-zinc-900">${new Intl.NumberFormat('id-ID').format(item.qty * item.sellPrice)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="border-t border-zinc-300 pt-2 space-y-1 ${subTextClass} text-zinc-850">
+                        <div class="flex justify-between font-extrabold text-zinc-900">
+                            <span><b>TOTAL HARGA:</b></span>
+                            <span><b>${formatRupiah(transaction.total)}</b></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span><b>DIBAYAR:</b></span>
+                            <span><b>${formatRupiah(transaction.paid)}</b></span>
+                        </div>
+                        <div class="flex justify-between font-extrabold text-zinc-900">
+                            <span><b>KEMBALIAN:</b></span>
+                            <span><b>${formatRupiah(transaction.change)}</b></span>
+                        </div>
+                    </div>
+
+                    ${isLunas ? `
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
+                            <div class="watermark-lunas border-4 border-emerald-500 text-emerald-500 font-black text-3xl tracking-widest uppercase py-2 px-6 rounded-2xl border-double -rotate-12 transform opacity-30">
+                                LUNAS
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
             `;
 
             previewContainer.innerHTML = invoiceHtml;
@@ -1746,7 +1787,6 @@ function doGet(e) {
         /* REGISTER LONG PRESS AND DOUBLE CLICK ROW EVENTS FOR CATALOG ROW SELECTORS */
         let touchTimer = null;
         function registerLongPress(element, productId, productName) {
-            // Touch handlers
             element.addEventListener('touchstart', function(e) {
                 touchTimer = setTimeout(() => {
                     openContextMenu(productId, productName);
@@ -1757,7 +1797,6 @@ function doGet(e) {
                 if (touchTimer) clearTimeout(touchTimer);
             });
 
-            // Desktop clicks
             element.addEventListener('dblclick', function() {
                 openContextMenu(productId, productName);
             });
@@ -2009,7 +2048,7 @@ function doGet(e) {
                     </tr>
                 `;
 
-                // Mobile Cards View: Extra Large Product Name and Harus Beli Quantity
+                // Mobile Cards View: Extra Large Elements
                 mobileContainer.innerHTML += `
                     <div class="p-5 bg-zinc-950 border border-zinc-800 rounded-2xl flex justify-between items-center">
                         <div class="space-y-1.5 pr-2">
@@ -2018,7 +2057,6 @@ function doGet(e) {
                             <p class="text-xs text-zinc-500 font-semibold">COGS: <span class="font-mono font-bold">${formatRupiah(p.costPrice)}</span></p>
                         </div>
                         <div class="text-right flex flex-col items-end shrink-0">
-                            <!-- Massive quantity to buy as requested -->
                             <div class="text-3xl md:text-4xl font-black text-rose-500 animate-pulse">${new Intl.NumberFormat('id-ID').format(qtyToBuy)}</div>
                             <span class="text-[10px] text-zinc-500 font-bold uppercase">${p.unit}</span>
                             <span class="text-xs text-emerald-400 font-bold font-mono mt-1">${formatRupiah(subtotal)}</span>
@@ -2072,11 +2110,35 @@ function doGet(e) {
                 }
             });
 
-            const netProfitToday = totalProfitToday - totalExpensesToday; 
+            // Laba hari ini: gross sales today - expenses today
+            let dailyGrossSales = state.sales.filter(s => s.date === today).reduce((acc, curr) => acc + curr.total, 0);
+            const netProfitToday = dailyGrossSales - totalExpensesToday;
+
+            // Laba bulan ini: monthly sales profit - monthly expenses
+            const netProfitMonth = totalProfitMonth - totalExpensesMonth;
+
+            // Update daily display indicators with colors and symbols
+            const dailyEl = document.getElementById('laba-hari-ini');
+            if (netProfitToday < 0) {
+                dailyEl.innerText = "-" + formatRupiah(Math.abs(netProfitToday));
+                dailyEl.className = "text-lg md:text-xl font-bold font-poppins mt-2 text-rose-500";
+            } else {
+                dailyEl.innerText = "+" + formatRupiah(netProfitToday);
+                dailyEl.className = "text-lg md:text-xl font-bold font-poppins mt-2 text-emerald-400";
+            }
+
+            // Update monthly display indicators with colors and symbols
+            const monthlyEl = document.getElementById('laba-bulan-ini');
+            if (netProfitMonth < 0) {
+                monthlyEl.innerText = "-" + formatRupiah(Math.abs(netProfitMonth));
+                monthlyEl.className = "text-lg md:text-xl font-bold font-poppins mt-2 text-rose-500";
+            } else {
+                monthlyEl.innerText = "+" + formatRupiah(netProfitMonth);
+                monthlyEl.className = "text-lg md:text-xl font-bold font-poppins mt-2 text-emerald-400";
+            }
+
             const netProfitFinal = (totalGrossRev - totalModalCost) - (totalExpensesMonth);
 
-            document.getElementById('laba-hari-ini').innerText = (netProfitToday < 0 ? "-" : "") + formatRupiah(Math.abs(netProfitToday));
-            document.getElementById('laba-bulan-ini').innerText = formatRupiah(totalProfitMonth);
             document.getElementById('exp-hari-ini').innerText = formatRupiah(totalExpensesToday);
             document.getElementById('exp-bulan-ini').innerText = formatRupiah(totalExpensesMonth);
             document.getElementById('laba-kotor').innerText = formatRupiah(totalGrossRev - totalModalCost);
@@ -2114,17 +2176,31 @@ function doGet(e) {
                 }
             });
 
+            // Adjust monthly net totals by subtracting monthly expenses
+            state.expenses.forEach(ex => {
+                if (ex.date.startsWith(String(currentYear))) {
+                    const parts = ex.date.split("-");
+                    const mIdx = parseInt(parts[1]) - 1;
+                    if (mIdx >= 0 && mIdx < 12) {
+                        monthlyProfits[mIdx] -= ex.amount;
+                    }
+                }
+            });
+
             const maxProfit = Math.max(...monthlyProfits, 50000);
 
             months.forEach((m, idx) => {
                 const profitVal = monthlyProfits[idx];
                 const pct = (profitVal / maxProfit) * 100;
-                const barHeight = Math.max(pct, 5);
+                // Cap visual bar height appropriately
+                const barHeight = Math.max(Math.min(pct, 100), 5);
+                const displayLabel = profitVal < 0 ? "-" + formatRupiah(Math.abs(profitVal)) : formatRupiah(profitVal);
                 
                 container.innerHTML += `
                     <div class="flex flex-col items-center flex-grow group relative h-full justify-end">
-                        <div class="absolute -top-10 scale-0 group-hover:scale-100 transition-transform bg-zinc-950 border border-zinc-800 text-[10px] py-1 px-2.5 rounded-lg text-emerald-400 font-bold shadow-2xl z-20 pointer-events-none whitespace-nowrap">
-                            Laba: ${formatRupiah(profitVal)}
+                        <!-- Placed net profit values clearly directly on top of each month bar -->
+                        <div class="text-[8px] font-mono font-bold text-emerald-400 mb-1 z-10 text-center select-none pointer-events-none">
+                            ${displayLabel}
                         </div>
                         <div class="w-full max-w-[14px] rounded-t-md bg-gradient-to-t from-emerald-600 to-amber-500 hover:opacity-85 transition-all shadow-[0_0_10px_rgba(16,185,129,0.2)]" style="height: ${barHeight}%;"></div>
                         <span class="text-[9px] text-zinc-500 mt-2 font-semibold">${m.name}</span>
@@ -2325,17 +2401,20 @@ function doGet(e) {
 
         window.addEventListener('click', function(e) {
             if (e.target.id !== 'pform-name') {
-                document.getElementById('pform-suggestions').classList.add('hidden');
+                const pbox = document.getElementById('pform-suggestions');
+                if (pbox) pbox.classList.add('hidden');
             }
             if (e.target.id !== 'sform-name') {
-                document.getElementById('sform-suggestions').classList.add('hidden');
+                const sbox = document.getElementById('sform-suggestions');
+                if (sbox) sbox.classList.add('hidden');
             }
         });
 
+        // Autocomplete purchase subtotal cleanly
         function updatePurchaseSubtotal() {
             const qty = cleanNumber(document.getElementById('pform-qty').value);
             const cost = cleanNumber(document.getElementById('pform-cost').value);
-            document.getElementById('pform-subtotal').innerText = formatRupiah(qty * cost);
+            document.getElementById('pform-subtotal').innerText = new Intl.NumberFormat('id-ID').format(qty * cost);
         }
 
         function addPurchaseCartItem() {
@@ -2380,10 +2459,10 @@ function doGet(e) {
                 tbody.innerHTML += `
                     <tr class="hover:bg-zinc-900 border-b border-zinc-800">
                         <td class="px-4 py-3 font-semibold uppercase text-zinc-100">${item.name}</td>
-                        <td class="px-4 py-3 text-center font-bold font-mono">${item.qty}</td>
+                        <td class="px-4 py-3 text-center font-bold font-mono">${new Intl.NumberFormat('id-ID').format(item.qty)}</td>
                         <td class="px-4 py-3 uppercase text-zinc-400 text-[10px]">${item.unit}</td>
-                        <td class="px-4 py-3 font-mono">${formatRupiah(item.costPrice)}</td>
-                        <td class="px-4 py-3 text-right font-bold text-zinc-100 font-mono">${formatRupiah(sub)}</td>
+                        <td class="px-4 py-3 font-mono">${new Intl.NumberFormat('id-ID').format(item.costPrice)}</td>
+                        <td class="px-4 py-3 text-right font-bold text-zinc-100 font-mono">${new Intl.NumberFormat('id-ID').format(sub)}</td>
                         <td class="px-4 py-3 text-right">
                             <button onclick="removePurchaseCartItem(${idx})" class="text-rose-500 hover:text-rose-400"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
                         </td>
@@ -2487,9 +2566,10 @@ function doGet(e) {
                         <td class="px-6 py-4">${s.date}</td>
                         <td class="px-6 py-4 font-mono font-bold text-emerald-400">${formatRupiah(s.total)}</td>
                         <td class="px-6 py-4 text-right space-x-2">
-                            <button onclick="previewInvoiceAction('${s.id}')" class="p-2 hover:bg-zinc-850 text-indigo-400 rounded-xl inline-flex"><i data-lucide="receipt" class="w-4 h-4"></i></button>
-                            <button onclick="editSalesTransaction('${s.id}')" class="p-2 hover:bg-zinc-850 text-amber-500 rounded-xl inline-flex"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="deleteSalesTransaction('${s.id}')" class="p-2 hover:bg-zinc-850 text-rose-500 rounded-xl inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <!-- Prominent PDF print actions directly in rows side-by-side -->
+                            <button onclick="previewInvoiceAction('${s.id}')" class="px-3.5 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-extrabold rounded-xl transition-all inline-flex items-center gap-1.5 shadow-lg shadow-yellow-500/20" title="Cetak Faktur PDF"><i data-lucide="printer" class="w-4 h-4"></i> Cetak</button>
+                            <button onclick="editSalesTransaction('${s.id}')" class="p-2 bg-zinc-800 hover:bg-zinc-700 text-amber-500 rounded-xl inline-flex"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deleteSalesTransaction('${s.id}')" class="p-2 bg-zinc-800 hover:bg-zinc-700 text-rose-500 rounded-xl inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </td>
                     </tr>
                 `;
@@ -2503,9 +2583,9 @@ function doGet(e) {
                             <p class="text-xs text-emerald-400 font-bold font-mono">${formatRupiah(s.total)}</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="previewInvoiceAction('${s.id}')" class="p-2 bg-zinc-900 text-indigo-400 rounded-xl"><i data-lucide="receipt" class="w-4 h-4"></i></button>
-                            <button onclick="editSalesTransaction('${s.id}')" class="p-2 bg-zinc-900 text-amber-500 rounded-xl"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="deleteSalesTransaction('${s.id}')" class="p-2 bg-zinc-900 text-rose-500 rounded-xl"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="previewInvoiceAction('${s.id}')" class="px-3 py-2.5 bg-yellow-500 text-black rounded-xl font-bold flex items-center gap-1"><i data-lucide="printer" class="w-4 h-4"></i> Cetak</button>
+                            <button onclick="editSalesTransaction('${s.id}')" class="p-2.5 bg-zinc-900 text-amber-500 rounded-xl"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deleteSalesTransaction('${s.id}')" class="p-2.5 bg-zinc-900 text-rose-500 rounded-xl"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </div>
                 `;
@@ -2577,10 +2657,11 @@ function doGet(e) {
             }
         }
 
+        // Dynamic cashier subtotal sum
         function updateSalesSubtotal() {
             const qty = cleanNumber(document.getElementById('sform-qty').value);
             const sell = cleanNumber(document.getElementById('sform-sell').value);
-            document.getElementById('sform-subtotal').innerText = formatRupiah(qty * sell);
+            document.getElementById('sform-subtotal').innerText = new Intl.NumberFormat('id-ID').format(qty * sell);
         }
 
         function addSalesCartItem() {
@@ -2630,10 +2711,10 @@ function doGet(e) {
                 tbody.innerHTML += `
                     <tr class="hover:bg-zinc-900 border-b border-zinc-800">
                         <td class="px-4 py-3 font-semibold uppercase text-zinc-100">${item.name}</td>
-                        <td class="px-4 py-3 text-center font-bold font-mono">${item.qty}</td>
+                        <td class="px-4 py-3 text-center font-bold font-mono">${new Intl.NumberFormat('id-ID').format(item.qty)}</td>
                         <td class="px-4 py-3 uppercase text-zinc-400 text-[10px]">${item.unit}</td>
-                        <td class="px-4 py-3 font-mono">${formatRupiah(item.sellPrice)}</td>
-                        <td class="px-4 py-3 text-right font-bold text-zinc-100 font-mono">${formatRupiah(sub)}</td>
+                        <td class="px-4 py-3 font-mono">${new Intl.NumberFormat('id-ID').format(item.sellPrice)}</td>
+                        <td class="px-4 py-3 text-right font-bold text-zinc-100 font-mono">${new Intl.NumberFormat('id-ID').format(sub)}</td>
                         <td class="px-4 py-3 text-right">
                             <button onclick="removeSalesCartItem(${idx})" class="text-rose-500 hover:text-rose-400"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
                         </td>
@@ -2695,7 +2776,9 @@ function doGet(e) {
             saveStateToLocalStorage();
             renderStockTable();
             switchTab('sales_history');
-            showNotification("Penjualan disimpan!");
+            
+            // Re-configured to only show single successful notification prompt
+            showNotification("Transaksi Sukses", "success");
 
             if (confirm("Transaksi sukses! Tampilkan struk nota sekarang?")) {
                 previewInvoiceAction(sId);
@@ -2755,12 +2838,21 @@ function doGet(e) {
 
         function printInvoiceNow() {
             const pContent = document.getElementById('invoice-preview-container').innerHTML;
+            
+            // Map selected paper widths
+            let printWidth = "58mm";
+            if (state.invoiceConfig.size === 'a3') printWidth = "297mm";
+            else if (state.invoiceConfig.size === 'a4') printWidth = "210mm";
+            else if (state.invoiceConfig.size === 'a5') printWidth = "148mm";
+            else if (state.invoiceConfig.size === 'a6') printWidth = "105mm";
+            else if (state.invoiceConfig.size === '80mm') printWidth = "80mm";
+
             const style = `
                 <style>
-                    body { font-family: monospace; font-size: 10px; color: #000; width: ${state.invoiceConfig.size === 'a5' ? '148mm' : state.invoiceConfig.size}; margin: 0; padding: 10px; }
+                    body { font-family: monospace; color: #000; width: ${printWidth}; margin: 0; padding: 10px; }
                     .watermark-lunas { border: 2px solid #10b981; color: #10b981; font-weight: bold; padding: 2px 10px; opacity: 0.8; transform: rotate(-12deg); margin: 10px auto; display: inline-block; }
                     table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-                    th, td { text-align: left; padding: 3px 0; font-size: 9px; }
+                    th, td { text-align: left; padding: 3px 0; }
                     .text-right { text-align: right; }
                     .border-b { border-bottom: 1px dashed #000; }
                     .flex { display: flex; justify-content: space-between; }
@@ -2781,7 +2873,6 @@ function doGet(e) {
             const sale = state.sales.find(s => s.id === sId);
             if (!sale) return;
 
-            // Generate structural text format (using markdown * for WhatsApp bolding)
             const lines = [];
             lines.push(`*${state.invoiceConfig.title}*`);
             lines.push(`*No Nota: ${sale.id}*`);
@@ -2810,24 +2901,6 @@ function doGet(e) {
         function openScanner(targetInputId) {
             state.currentScannerTargetId = targetInputId;
 
-            // Pre-compile barcode demo simulation list inside overlay
-            const demoList = document.getElementById('scanner-demo-codes');
-            demoList.innerHTML = "";
-            state.products.forEach(p => {
-                demoList.innerHTML += `
-                    <button onclick="triggerSimulatedScan('${p.barcode}')" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg text-xs flex justify-between font-mono">
-                        <span>${p.name.substring(0, 14)}..</span>
-                        <span class="text-amber-500 font-bold">${p.barcode}</span>
-                    </button>
-                `;
-            });
-            demoList.innerHTML += `
-                <button onclick="triggerSimulatedScan('8999999999999')" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg text-xs flex justify-between font-mono">
-                    <span>BARANG BARU</span>
-                    <span class="text-amber-500 font-bold">8999999999999</span>
-                </button>
-            `;
-
             // Push state for Android back-button scanner cancel handling
             history.pushState({ tab: 'scanner' }, '');
 
@@ -2838,7 +2911,6 @@ function doGet(e) {
         function closeScanner() {
             stopCameraScanner();
             document.getElementById('scanner-modal').classList.add('hidden');
-            // Safely fall back history
             if (history.state && history.state.tab === 'scanner') {
                 history.back();
             }
