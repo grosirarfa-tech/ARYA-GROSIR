@@ -60,10 +60,10 @@
 
     <div class="flex-grow flex flex-col pb-6">
         <!-- Toast Notification Center -->
-        <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col gap-2 w-[90%] max-w-sm"></div>
+        <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[150] pointer-events-none flex flex-col gap-2 w-[90%] max-w-sm"></div>
 
         <!-- Android Back Button Exit Confirmation Modal -->
-        <div id="exit-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm hidden">
+        <div id="exit-modal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm hidden">
             <div class="bg-zinc-950 border border-zinc-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl">
                 <div class="flex items-center gap-3 text-amber-500 mb-4">
                     <i data-lucide="log-out" class="w-8 h-8"></i>
@@ -78,6 +78,17 @@
                         Ya, Keluar
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Drilldown Data Modal -->
+        <div id="detail-list-modal" class="fixed inset-0 z-[110] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[80vh] flex flex-col">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-zinc-850">
+                    <h3 id="detail-modal-title" class="text-base font-bold font-poppins text-zinc-100 uppercase tracking-wider">Detail Data</h3>
+                    <button onclick="closeDetailModal()" class="p-1 rounded-full bg-zinc-850 text-zinc-400 hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="overflow-y-auto flex-grow rounded-xl border border-zinc-850 bg-black p-4" id="detail-modal-content"></div>
             </div>
         </div>
 
@@ -102,7 +113,7 @@
             </div>
         </div>
 
-        <div id="scanner-modal" class="fixed inset-0 z-[80] bg-black flex flex-col justify-between hidden">
+        <div id="scanner-modal" class="fixed inset-0 z-[105] bg-black flex flex-col justify-between hidden">
             <div class="p-4 flex items-center justify-between bg-zinc-950 border-b border-zinc-900 z-10">
                 <span class="font-poppins font-bold text-amber-500 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
@@ -288,7 +299,6 @@
                                     <span class="text-amber-400 font-mono text-xs font-bold">PROJECTION</span>, 
                                     <span class="text-amber-400 font-mono text-xs font-bold">PROFIT</span>, 
                                     <span class="text-amber-400 font-mono text-xs font-bold">EXPENSES</span>, 
-                                    <span class="text-amber-400 font-mono text-xs font-bold">PURCHASES</span>, 
                                     dan <span class="text-amber-400 font-mono text-xs font-bold">SALES</span>.
                                 </li>
                                 <li>Klik menu <span class="font-semibold text-zinc-200">Ekstensi &gt; Apps Script</span>.</li>
@@ -304,190 +314,7 @@
                                     <i data-lucide="copy" class="w-3.5 h-3.5"></i> Salin Kode
                                 </button>
                             </div>
-                            <pre class="bg-black p-4 rounded-2xl text-xs text-zinc-300 font-mono overflow-x-auto max-h-64 border border-zinc-800 leading-relaxed" id="apps-script-container">
-/* KODE GOOGLE APPS SCRIPT DATABASE ARYA GROSIR - SINKRONISASI 2 ARAH (VERSI PERBAIKAN) */
-function doPost(e) {
-  var lock = LockService.getScriptLock();
-  lock.tryLock(10000);
-  try {
-    var requestData = JSON.parse(e.postData.contents);
-    var action = requestData.action;
-    var data = requestData.data;
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    
-    if (action === "backup") {
-      // 1. Backup Catalog (Product Stock)
-      var sheetStock = ss.getSheetByName("STOCK_LIST") || ss.insertSheet("STOCK_LIST");
-      sheetStock.clear();
-      sheetStock.appendRow(["KODE/BARCODE", "NAMA BARANG", "STOCK", "SATUAN", "TARGET MINIMAL BARANG", "HARGA POKOK", "HARGA JUAL"]);
-      if (data.products && data.products.length > 0) {
-        data.products.forEach(function(p) {
-          sheetStock.appendRow([p.barcode, p.name, p.stock, p.unit, p.minStock, p.costPrice, p.sellPrice]);
-        });
-      }
-
-      // 2. Backup Projection (Perkiraan Belanja)
-      var sheetProj = ss.getSheetByName("PROJECTION") || ss.insertSheet("PROJECTION");
-      sheetProj.clear();
-      sheetProj.appendRow(["NAMA BARANG", "STOCK SAAT INI", "TARGET STOCK", "HARUS DI BELI", "SATUAN", "HARGA POKOK", "SUB TOTAL BELANJA", "TOTAL ANGGARANG BELANJA"]);
-      if (data.projections && data.projections.length > 0) {
-        data.projections.forEach(function(pr, index) {
-          var totalBudget = (index === 0) ? data.projectionTotal : "";
-          sheetProj.appendRow([pr.name, pr.stock, pr.minStock, pr.qtyToBuy, pr.unit, pr.costPrice, pr.subtotal, totalBudget]);
-        });
-      }
-
-      // 3. Backup Profit (Keuntungan)
-      var sheetProfit = ss.getSheetByName("PROFIT") || ss.insertSheet("PROFIT");
-      sheetProfit.clear();
-      sheetProfit.appendRow(["LABA HARI INI", "LABA BULAN INI", "PENGELUARAN PERHARI", "PENGELUARAN PER BULAN", "LABA KOTOR"]);
-      if (data.profit) {
-        sheetProfit.appendRow([data.profit.labaHariIni, data.profit.labaBulanIni, data.profit.expHariIni, data.profit.expBulanIni, data.profit.labaKotor]);
-      }
-
-      // 4. Backup Expenses (Pengeluaran Lain)
-      var sheetExp = ss.getSheetByName("EXPENSES") || ss.insertSheet("EXPENSES");
-      sheetExp.clear();
-      sheetExp.appendRow(["TANGGAL", "NOMINAL PENGELUARAN", "KETERANGAN"]);
-      if (data.expenses && data.expenses.length > 0) {
-        data.expenses.forEach(function(ex) {
-          sheetExp.appendRow([ex.date, ex.amount, ex.desc]);
-        });
-      }
-
-      // 5. Backup Purchases (Belanja Barang)
-      var sheetPurchases = ss.getSheetByName("PURCHASES") || ss.insertSheet("PURCHASES");
-      sheetPurchases.clear();
-      sheetPurchases.appendRow(["ID TRANSAKSI", "TANGGAL BELANJA", "KODE/BARCODE", "NAMA BARANG", "HARGA PER ITEM", "TOTAL HARAGA"]);
-      if (data.purchases && data.purchases.length > 0) {
-        data.purchases.forEach(function(pu) {
-          pu.items.forEach(function(item) {
-            sheetPurchases.appendRow([pu.id, pu.date, item.barcode, item.name, item.costPrice, pu.total]);
-          });
-        });
-      }
-
-      // 6. Backup Sales (Penjualan)
-      var sheetSales = ss.getSheetByName("SALES") || ss.insertSheet("SALES");
-      sheetSales.clear();
-      sheetSales.appendRow(["ID TRANSAKSI", "NAMA PEMBELI", "TANGGAL", "KODE/BARCODE", "NAMA BARANG", "HARGA PER ITEM", "TOTAL HARAGA", "DIBAYAR", "KEMBALIAN"]);
-      if (data.sales && data.sales.length > 0) {
-        data.sales.forEach(function(s) {
-          s.items.forEach(function(item) {
-            sheetSales.appendRow([s.id, s.buyer, s.date, item.barcode, item.name, item.sellPrice, s.total, s.paid, s.change]);
-          });
-        });
-      }
-
-      var res = {status: "success", message: "Data berhasil dicadangkan!"};
-      return ContentService.createTextOutput(JSON.stringify(res))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-  } catch (err) {
-    var res = {status: "error", message: err.toString()};
-    return ContentService.createTextOutput(JSON.stringify(res))
-      .setMimeType(ContentService.MimeType.JSON);
-  } finally {
-    lock.releaseLock();
-  }
-}
-
-function doGet(e) {
-  try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheetStock = ss.getSheetByName("STOCK_LIST");
-    var sheetExp = ss.getSheetByName("EXPENSES");
-    var sheetPurchases = ss.getSheetByName("PURCHASES");
-    var sheetSales = ss.getSheetByName("SALES");
-    
-    var output = { products: [], expenses: [], purchases: [], sales: [] };
-    
-    // Read Stock
-    if (sheetStock) {
-      var rows = sheetStock.getDataRange().getValues();
-      for (var i = 1; i < rows.length; i++) {
-        output.products.push({
-          id: "PROD-" + i,
-          barcode: String(rows[i][0] || ""),
-          name: String(rows[i][1] || ""),
-          stock: Number(rows[i][2] || 0),
-          unit: String(rows[i][3] || "pcs"),
-          minStock: Number(rows[i][4] || 0),
-          costPrice: Number(rows[i][5] || 0),
-          sellPrice: Number(rows[i][6] || 0)
-        });
-      }
-    }
-    
-    // Read Expenses
-    if (sheetExp) {
-      var rowsExp = sheetExp.getDataRange().getValues();
-      for (var i = 1; i < rowsExp.length; i++) {
-        output.expenses.push({
-          id: "EXP-" + i,
-          date: String(rowsExp[i][0] || ""),
-          amount: Number(rowsExp[i][1] || 0),
-          desc: String(rowsExp[i][2] || "")
-        });
-      }
-    }
-
-    // Read Purchases
-    if (sheetPurchases) {
-      var rowsPu = sheetPurchases.getDataRange().getValues();
-      var purchaseMap = {};
-      for (var i = 1; i < rowsPu.length; i++) {
-        var id = String(rowsPu[i][0]);
-        var date = String(rowsPu[i][1]);
-        var barcode = String(rowsPu[i][2]);
-        var name = String(rowsPu[i][3]);
-        var cost = Number(rowsPu[i][4] || 0);
-        var total = Number(rowsPu[i][5] || 0);
-        
-        if (!purchaseMap[id]) {
-          purchaseMap[id] = { id: id, date: date, total: total, items: [] };
-        }
-        purchaseMap[id].items.push({ barcode: barcode, name: name, qty: 1, unit: "pcs", costPrice: cost });
-      }
-      for (var key in purchaseMap) {
-        output.purchases.push(purchaseMap[key]);
-      }
-    }
-    
-    // Read Sales
-    if (sheetSales) {
-      var rowsSales = sheetSales.getDataRange().getValues();
-      var salesMap = {};
-      for (var i = 1; i < rowsSales.length; i++) {
-        var id = String(rowsSales[i][0]);
-        var buyer = String(rowsSales[i][1]);
-        var date = String(rowsSales[i][2]);
-        var barcode = String(rowsSales[i][3]);
-        var name = String(rowsSales[i][4]);
-        var price = Number(rowsSales[i][5] || 0);
-        var total = Number(rowsSales[i][6] || 0);
-        var paid = Number(rowsSales[i][7] || 0);
-        var change = Number(rowsSales[i][8] || 0);
-        
-        if (!salesMap[id]) {
-          salesMap[id] = { id: id, buyer: buyer, date: date, total: total, paid: paid, change: change, items: [] };
-        }
-        salesMap[id].items.push({ barcode: barcode, name: name, qty: 1, unit: "pcs", sellPrice: price });
-      }
-      for (var key in salesMap) {
-        output.sales.push(salesMap[key]);
-      }
-    }
-    
-    var res = {status: "success", data: output};
-    return ContentService.createTextOutput(JSON.stringify(res))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    var res = {status: "error", message: err.toString()};
-    return ContentService.createTextOutput(JSON.stringify(res))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}</pre>
+                            <pre class="bg-black p-4 rounded-2xl text-xs text-zinc-300 font-mono overflow-x-auto max-h-64 border border-zinc-800 leading-relaxed" id="apps-script-container">Loading Apps Script...</pre>
                         </div>
                     </div>
                 </div>
@@ -631,7 +458,7 @@ function doGet(e) {
                     </div>
 
                     <!-- Optimized Mobile Cards (Strictly vertical scroll) -->
-                    <div class="md:hidden flex flex-col gap-4" id="stock-mobile-cards"></div>
+                    <div class="md:hidden flex flex-col gap-4 animate-fade-in" id="stock-mobile-cards"></div>
                 </div>
 
                 <!-- Input/Edit dialog popup Overlay -->
@@ -724,7 +551,7 @@ function doGet(e) {
                     <!-- Desktop Table view -->
                     <div class="hidden md:block overflow-x-auto rounded-2xl border border-zinc-800">
                         <table class="w-full border-collapse text-left text-sm text-zinc-300">
-                            <thead class="bg-black text-zinc-400 uppercase text-[10px] font-bold tracking-wider">
+                            <thead class="bg-black text-zinc-400 uppercase text-[10px] font-bold tracking-wider border-b border-zinc-800">
                                 <tr>
                                     <th class="px-6 py-4">Nama Barang</th>
                                     <th class="px-6 py-4">Stok Saat Ini</th>
@@ -745,7 +572,7 @@ function doGet(e) {
                     <!-- Bottom totals -->
                     <div class="flex justify-end pt-4 border-t border-zinc-800">
                         <div class="text-right">
-                            <span class="text-xs text-zinc-400 uppercase tracking-wider">Total Anggaran Belanja:</span>
+                            <span class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Total Anggaran Belanja:</span>
                             <div class="text-3xl font-black font-poppins text-emerald-400 mt-1" id="projection-grand-total">Rp 0</div>
                         </div>
                     </div>
@@ -758,52 +585,71 @@ function doGet(e) {
                     <h2 class="text-xl font-bold font-poppins">Laporan Keuangan & Laba</h2>
                 </div>
 
-                <!-- Financial Structure Metrics Grid -->
-                <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
-                        <span class="text-xs text-zinc-400">Laba Hari Ini</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-zinc-100" id="laba-hari-ini">Rp 0</div>
-                    </div>
-                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
-                        <span class="text-xs text-zinc-400">Laba Bulan Ini</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-zinc-100" id="laba-bulan-ini">Rp 0</div>
-                    </div>
-                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
-                        <span class="text-xs text-zinc-400">Pengeluaran Hari Ini</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-rose-400" id="exp-hari-ini">Rp 0</div>
-                    </div>
-                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl">
-                        <span class="text-xs text-zinc-400">Pengeluaran Bulan Ini</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-rose-400" id="exp-bulan-ini">Rp 0</div>
-                    </div>
-                    <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl col-span-2 lg:col-span-1">
-                        <span class="text-xs text-zinc-400">Laba Kotor</span>
-                        <div class="text-lg md:text-xl font-bold font-poppins mt-2 text-amber-500" id="laba-kotor">Rp 0</div>
+                <!-- Redesigned Financial 2x2 Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Card 1: Laba Bersih Hari Ini -->
+                    <button onclick="showProfitDetailModal('today')" class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl text-left hover:border-amber-500/50 hover:bg-zinc-900/40 transition-all shadow-md group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-zinc-400 font-semibold group-hover:text-amber-400 transition-colors">Laba Bersih Hari Ini</span>
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-zinc-500"></i>
+                        </div>
+                        <div class="text-lg md:text-2xl font-black font-poppins" id="laba-bersih-hari-ini">Rp 0</div>
+                    </button>
+                    <!-- Card 2: Laba Bersih Bulan Ini -->
+                    <button onclick="showProfitDetailModal('month')" class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl text-left hover:border-amber-500/50 hover:bg-zinc-900/40 transition-all shadow-md group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-zinc-400 font-semibold group-hover:text-amber-400 transition-colors">Laba Bersih Bulan Ini</span>
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-zinc-500"></i>
+                        </div>
+                        <div class="text-lg md:text-2xl font-black font-poppins" id="laba-bersih-bulan-ini">Rp 0</div>
+                    </button>
+                    <!-- Card 3: Pengeluaran Hari Ini -->
+                    <button onclick="showExpenseDetailModal('today')" class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl text-left hover:border-amber-500/50 hover:bg-zinc-900/40 transition-all shadow-md group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-zinc-400 font-semibold group-hover:text-amber-400 transition-colors">Pengeluaran Hari Ini</span>
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-zinc-500"></i>
+                        </div>
+                        <div class="text-lg md:text-2xl font-black font-poppins text-rose-500" id="pengeluaran-hari-ini">Rp 0</div>
+                    </button>
+                    <!-- Card 4: Pengeluaran Bulan Ini -->
+                    <button onclick="showExpenseDetailModal('month')" class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl text-left hover:border-amber-500/50 hover:bg-zinc-900/40 transition-all shadow-md group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-zinc-400 font-semibold group-hover:text-amber-400 transition-colors">Pengeluaran Bulan Ini</span>
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-zinc-500"></i>
+                        </div>
+                        <div class="text-lg md:text-2xl font-black font-poppins text-rose-500" id="pengeluaran-bulan-ini">Rp 0</div>
+                    </button>
+                </div>
+
+                <!-- Ledger list by Date: Keuntungan Per Tanggal -->
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 shadow-xl">
+                    <h3 class="font-bold text-zinc-100 mb-4 font-poppins text-sm uppercase tracking-wider">Daftar Keuntungan Per Tanggal</h3>
+                    <div class="overflow-x-auto rounded-2xl border border-zinc-800">
+                        <table class="w-full text-left text-xs md:text-sm text-zinc-300">
+                            <thead class="bg-black text-zinc-400 uppercase text-[10px] font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">Tanggal</th>
+                                    <th class="px-6 py-4 text-emerald-400">Keuntungan Hari Ini</th>
+                                    <th class="px-6 py-4 text-rose-400">Pengeluaran Hari Ini</th>
+                                    <th class="px-6 py-4">Keuntungan Bersih Hari Ini</th>
+                                </tr>
+                            </thead>
+                            <tbody id="daily-profit-table-body" class="divide-y divide-zinc-800 bg-zinc-950/40"></tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Financial Balance and Graph -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Net Profit Summary Card -->
-                    <div class="bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 rounded-3xl p-6 flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-bold text-zinc-400 text-sm mb-2 uppercase tracking-wider">Laba Bersih Akhir</h3>
-                            <p class="text-xs text-zinc-500 leading-relaxed">Keuntungan bersih terakumulasi dari total pendapatan kotor dikurangi biaya modal (COGS) dan pengeluaran operasional lain-lain.</p>
-                        </div>
-                        <div class="my-6 py-6 border-y border-zinc-800/60">
-                            <span class="text-xs text-zinc-400">Laba Bersih Akhir:</span>
-                            <div class="text-3xl font-black font-poppins mt-2 text-emerald-400" id="laba-bersih-akhir">Rp 0</div>
-                        </div>
-                        <p class="text-xs text-amber-500 font-semibold flex items-center gap-1">
-                            <i data-lucide="info" class="w-4 h-4"></i> Sinkronisasi 2 arah aktif
-                        </p>
-                    </div>
+                <!-- Laba Bersih Akhir Bulan Ini -->
+                <div class="bg-gradient-to-r from-zinc-950 to-zinc-900 border border-zinc-800 p-6 rounded-3xl shadow-xl">
+                    <span class="text-xs text-zinc-400 uppercase font-semibold">Laba Bersih Akhir Bulan Ini</span>
+                    <div class="text-3xl md:text-4xl font-black font-poppins text-emerald-400 mt-2" id="laba-bersih-akhir-bulan">Rp 0</div>
+                    <p class="text-xs text-zinc-500 mt-1.5">Laba bersih diperoleh dari total penjualan dikurangi biaya pokok barang (COGS) serta pengeluaran operasional bulan berjalan.</p>
+                </div>
 
-                    <!-- Custom Visual Monthly Bar Chart -->
-                    <div class="lg:col-span-2 bg-zinc-950 border border-zinc-800 rounded-3xl p-6">
-                        <h3 class="font-bold font-poppins text-zinc-100 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-5 h-5 text-amber-500"></i> Diagram Rekap Keuntungan Bulanan (Tahun Ini)</h3>
-                        <div class="h-80 flex items-end justify-between gap-2 pt-10" id="profit-chart-container"></div>
-                    </div>
+                <!-- Diagram Rekap Keuntungan Bulanan (Tahun Ini) -->
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 shadow-xl">
+                    <h3 class="font-bold font-poppins text-zinc-100 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-5 h-5 text-amber-500"></i> Diagram Rekap Keuntungan Bulanan (Tahun Ini)</h3>
+                    <div class="h-80 flex items-end justify-between gap-2 pt-10 border-b border-zinc-800" id="profit-chart-container"></div>
                 </div>
             </div>
 
@@ -990,7 +836,7 @@ function doGet(e) {
 
                         <div class="border-t border-zinc-800 pt-4 flex justify-between items-end">
                             <div>
-                                <span class="text-xs text-zinc-400 uppercase">Total Belanja:</span>
+                                <span class="text-xs text-zinc-400 uppercase font-semibold">Total Belanja:</span>
                                 <div class="text-2xl font-black font-poppins text-emerald-400 mt-1" id="purchase-cart-total">Rp 0</div>
                             </div>
                             <button onclick="saveAndPostPurchase()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-lg transition-all active:scale-95">
@@ -1209,6 +1055,155 @@ function doGet(e) {
             { id: "P-20001", date: "2026-07-16", items: [{ barcode: "8991234567890", name: "INDOMIE GORENG SPESIAL", qty: 40, unit: "pcs", costPrice: 2800 }], total: 112000 }
         ];
 
+        const appsScriptText = `/* KODE GOOGLE APPS SCRIPT DATABASE ARYA GROSIR - SINKRONISASI 2 ARAH (VERSI PERBAIKAN) */
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+  try {
+    var requestData = JSON.parse(e.postData.contents);
+    var action = requestData.action;
+    var data = requestData.data;
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    if (action === "backup") {
+      // 1. Backup Catalog (Product Stock)
+      var sheetStock = ss.getSheetByName("STOCK_LIST") || ss.insertSheet("STOCK_LIST");
+      sheetStock.clear();
+      sheetStock.appendRow(["KODE/BARCODE", "NAMA BARANG", "STOCK", "SATUAN", "TARGET MINIMAL BARANG", "HARGA POKOK", "HARGA JUAL"]);
+      if (data.products && data.products.length > 0) {
+        data.products.forEach(function(p) {
+          sheetStock.appendRow([p.barcode, p.name, p.stock, p.unit, p.minStock, p.costPrice, p.sellPrice]);
+        });
+      }
+
+      // 2. Backup Projection (Perkiraan Belanja)
+      var sheetProj = ss.getSheetByName("PROJECTION") || ss.insertSheet("PROJECTION");
+      sheetProj.clear();
+      sheetProj.appendRow(["NAMA BARANG", "STOCK SAAT INI", "TARGET STOCK", "HARUS DI BELI", "SATUAN", "HARGA POKOK", "SUB TOTAL BELANJA", "TOTAL ANGGARANG BELANJA"]);
+      if (data.projections && data.projections.length > 0) {
+        data.projections.forEach(function(pr, index) {
+          var totalBudget = (index === 0) ? data.projectionTotal : "";
+          sheetProj.appendRow([pr.name, pr.stock, pr.minStock, pr.qtyToBuy, pr.unit, pr.costPrice, pr.subtotal, totalBudget]);
+        });
+      }
+
+      // 3. Backup Profit (Keuntungan)
+      var sheetProfit = ss.getSheetByName("PROFIT") || ss.insertSheet("PROFIT");
+      sheetProfit.clear();
+      sheetProfit.appendRow(["LABA HARI INI", "LABA BULAN INI", "PENGELUARAN PERHARI", "PENGELUARAN PER BULAN", "LABA KOTOR"]);
+      if (data.profit) {
+        sheetProfit.appendRow([data.profit.labaHariIni, data.profit.labaBulanIni, data.profit.expHariIni, data.profit.expBulanIni, data.profit.labaKotor]);
+      }
+
+      // 4. Backup Expenses (Pengeluaran Lain)
+      var sheetExp = ss.getSheetByName("EXPENSES") || ss.insertSheet("EXPENSES");
+      sheetExp.clear();
+      sheetExp.appendRow(["TANGGAL", "NOMINAL PENGELUARAN", "KETERANGAN"]);
+      if (data.expenses && data.expenses.length > 0) {
+        data.expenses.forEach(function(ex) {
+          sheetExp.appendRow([ex.date, ex.amount, ex.desc]);
+        });
+      }
+
+      // 5. Backup Sales (Penjualan)
+      var sheetSales = ss.getSheetByName("SALES") || ss.insertSheet("SALES");
+      sheetSales.clear();
+      sheetSales.appendRow(["ID TRANSAKSI", "NAMA PEMBELI", "TANGGAL", "KODE/BARCODE", "NAMA BARANG", "HARGA PER ITEM", "TOTAL HARAGA", "DIBAYAR", "KEMBALIAN"]);
+      if (data.sales && data.sales.length > 0) {
+        data.sales.forEach(function(s) {
+          s.items.forEach(function(item) {
+            sheetSales.appendRow([s.id, s.buyer, s.date, item.barcode, item.name, item.sellPrice, s.total, s.paid, s.change]);
+          });
+        });
+      }
+
+      var res = {status: "success", message: "Data berhasil dicadangkan!"};
+      return ContentService.createTextOutput(JSON.stringify(res))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  } catch (err) {
+    var res = {status: "error", message: err.toString()};
+    return ContentService.createTextOutput(JSON.stringify(res))
+      .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function doGet(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheetStock = ss.getSheetByName("STOCK_LIST");
+    var sheetExp = ss.getSheetByName("EXPENSES");
+    var sheetSales = ss.getSheetByName("SALES");
+    
+    var output = { products: [], expenses: [], purchases: [], sales: [] };
+    
+    // Read Stock
+    if (sheetStock) {
+      var rows = sheetStock.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        output.products.push({
+          id: "PROD-" + i,
+          barcode: String(rows[i][0] || ""),
+          name: String(rows[i][1] || ""),
+          stock: Number(rows[i][2] || 0),
+          unit: String(rows[i][3] || "pcs"),
+          minStock: Number(rows[i][4] || 0),
+          costPrice: Number(rows[i][5] || 0),
+          sellPrice: Number(rows[i][6] || 0)
+        });
+      }
+    }
+    
+    // Read Expenses
+    if (sheetExp) {
+      var rowsExp = sheetExp.getDataRange().getValues();
+      for (var i = 1; i < rowsExp.length; i++) {
+        output.expenses.push({
+          id: "EXP-" + i,
+          date: String(rowsExp[i][0] || ""),
+          amount: Number(rowsExp[i][1] || 0),
+          desc: String(rowsExp[i][2] || "")
+        });
+      }
+    }
+    
+    // Read Sales
+    if (sheetSales) {
+      var rowsSales = sheetSales.getDataRange().getValues();
+      var salesMap = {};
+      for (var i = 1; i < rowsSales.length; i++) {
+        var id = String(rowsSales[i][0]);
+        var buyer = String(rowsSales[i][1]);
+        var date = String(rowsSales[i][2]);
+        var barcode = String(rowsSales[i][3]);
+        var name = String(rowsSales[i][4]);
+        var price = Number(rowsSales[i][5] || 0);
+        var total = Number(rowsSales[i][6] || 0);
+        var paid = Number(rowsSales[i][7] || 0);
+        var change = Number(rowsSales[i][8] || 0);
+        
+        if (!salesMap[id]) {
+          salesMap[id] = { id: id, buyer: buyer, date: date, total: total, paid: paid, change: change, items: [] };
+        }
+        salesMap[id].items.push({ barcode: barcode, name: name, qty: 1, unit: "pcs", sellPrice: price });
+      }
+      for (var key in salesMap) {
+        output.sales.push(salesMap[key]);
+      }
+    }
+    
+    var res = {status: "success", data: output};
+    return ContentService.createTextOutput(JSON.stringify(res))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    var res = {status: "error", message: err.toString()};
+    return ContentService.createTextOutput(JSON.stringify(res))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
         function initLocalStorage() {
             try {
                 if (localStorage.getItem('arya_grosir_state_v3')) {
@@ -1237,28 +1232,25 @@ function doGet(e) {
         let html5QrScanner = null;
 
         function startCameraScanner() {
-            // Instantiate HTML5-QRcode on interactive viewport container
             html5QrScanner = new Html5Qrcode("interactive-reader");
             
             const config = { 
-                fps: 20, 
+                fps: 30, 
                 qrbox: function(width, height) {
-                    const size = Math.min(width, height) * 0.75;
+                    const size = Math.min(width, height) * 0.8;
                     return { width: size, height: size };
                 },
                 aspectRatio: 1.0
             };
 
-            // Start scanner on backing camera
             html5QrScanner.start(
                 { facingMode: "environment" }, 
                 config,
                 (decodedText) => {
-                    // Success callback
                     triggerSimulatedScan(decodedText);
                 },
                 (errorMessage) => {
-                    // Fail callbacks can be ignored to avoid console spamming during searches
+                    // silent fallback
                 }
             ).catch(err => {
                 console.warn("Camera scan initiation error", err);
@@ -1282,8 +1274,8 @@ function doGet(e) {
                 return;
             }
             try {
-                const state = html5QrScanner.getTorchState();
-                const nextState = !state;
+                const stateTorch = html5QrScanner.getTorchState();
+                const nextState = !stateTorch;
                 html5QrScanner.applyVideoConstrains({
                     advanced: [{ torch: nextState }]
                 }).then(() => {
@@ -1300,28 +1292,30 @@ function doGet(e) {
             initLocalStorage();
             lucide.createIcons();
             
+            // Set up coding script display
+            const scriptContainer = document.getElementById('apps-script-container');
+            if (scriptContainer) {
+                scriptContainer.innerText = appsScriptText;
+            }
+
             // Set up real-time digital clock
             setInterval(() => {
                 const now = new Date();
                 document.getElementById('realtime-clock').innerText = now.toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'medium' });
                 
-                // Automated background sync at exact 23:00 (11:00 PM)
                 if (now.getHours() === 23 && now.getMinutes() === 0 && now.getSeconds() === 0) {
                     autoBackupAtEleven();
                 }
             }, 1000);
 
-            // Default form calendar entries to today
             const todayStr = new Date().toISOString().split('T')[0];
             document.getElementById('exp-date').value = todayStr;
             document.getElementById('pform-date').value = todayStr;
             document.getElementById('sform-date').value = todayStr;
 
-            // Pre-compile previews
             renderStockTable();
             renderInvoicePreview();
 
-            // Set state management in browser history to intercept native back button
             history.replaceState({ tab: 'main' }, '');
 
             window.addEventListener('popstate', function(event) {
@@ -1331,11 +1325,20 @@ function doGet(e) {
                         document.getElementById('scanner-modal').classList.add('hidden');
                         return;
                     }
+                    if (!document.getElementById('detail-list-modal').classList.contains('hidden')) {
+                        closeDetailModal();
+                        return;
+                    }
                     switchTabVisual(event.state.tab);
                 } else {
                     if (!document.getElementById('scanner-modal').classList.contains('hidden')) {
                         stopCameraScanner();
                         document.getElementById('scanner-modal').classList.add('hidden');
+                        history.pushState({ tab: state.activeTab }, '');
+                        return;
+                    }
+                    if (!document.getElementById('detail-list-modal').classList.contains('hidden')) {
+                        closeDetailModal();
                         history.pushState({ tab: state.activeTab }, '');
                         return;
                     }
@@ -1371,7 +1374,6 @@ function doGet(e) {
                 toast.classList.add('scale-100', 'translate-y-0', 'opacity-100');
             }, 10);
 
-            // Strict 1 second (1000ms) fadeout rule
             setTimeout(() => {
                 toast.classList.add('scale-95', '-translate-y-2', 'opacity-0');
                 setTimeout(() => {
@@ -1393,7 +1395,6 @@ function doGet(e) {
             return parseFloat(String(val).replace(/[^0-9.-]+/g, "").replace(/\./g, "")) || 0;
         }
 
-        // Custom number formatting utilizing "." thousands separator on-the-fly with no boundaries
         function formatNumberInput(inputElement) {
             let cursorPosition = inputElement.selectionStart;
             let originalLength = inputElement.value.length;
@@ -1411,10 +1412,8 @@ function doGet(e) {
             inputElement.setSelectionRange(cursorPosition + (newLength - originalLength), cursorPosition + (newLength - originalLength));
         }
 
-        // Switch tabs including push history state for native Android Back interception
         function switchTab(tabId) {
             if (state.activeTab === tabId) return;
-
             history.pushState({ tab: tabId }, '');
             switchTabVisual(tabId);
         }
@@ -1428,7 +1427,6 @@ function doGet(e) {
             
             state.activeTab = tabId;
 
-            // Re-render calculations dynamically
             if (tabId === 'stock') {
                 renderStockTable();
             } else if (tabId === 'projection') {
@@ -1493,7 +1491,6 @@ function doGet(e) {
             document.getElementById('connection-status').innerText = "MENYIMPAN...";
             document.getElementById('connection-status').className = "text-[9px] font-bold px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-amber-500 animate-pulse";
 
-            // Prepare projection dataset to send structured
             const projectionsData = state.products.filter(p => p.stock < p.minStock).map(p => {
                 const qtyToBuy = p.minStock - p.stock;
                 return {
@@ -1508,7 +1505,6 @@ function doGet(e) {
             });
             const projTotal = projectionsData.reduce((sum, item) => sum + item.subtotal, 0);
 
-            // Compile core profit analytics fields
             let labaHariIni = 0; let labaBulanIni = 0; let expHariIni = 0; let expBulanIni = 0; let labaKotor = 0;
             const today = new Date().toISOString().split('T')[0];
             const currentMonth = today.substring(0, 7);
@@ -1664,7 +1660,6 @@ function doGet(e) {
 
             const isLunas = transaction.paid >= transaction.total;
 
-            // Compute structural sizing styles based on paper selections
             let containerStyle = "max-width: 100%;";
             let logoClass = "max-h-12";
             let textClass = "text-sm";
@@ -1703,13 +1698,13 @@ function doGet(e) {
             }
 
             let invoiceHtml = `
-                <div style="${containerStyle}" class="mx-auto">
+                <div style="${containerStyle}" class="mx-auto relative">
                     <!-- Adjusted header logo on the extreme left, side-by-side with text -->
-                    <div class="flex items-center gap-4 pb-4 border-b border-dashed border-zinc-300">
-                        <div class="shrink-0">
+                    <div class="relative min-h-[48px] border-b border-dashed border-zinc-300 pb-4 mb-3 flex items-center justify-center">
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 shrink-0">
                             ${config.logo ? `<img src="${config.logo}" class="${logoClass} w-auto object-contain">` : `<img src="logo web arya.png" alt="Arya Logo" class="${logoClass} w-auto object-contain" onerror="this.remove()">`}
                         </div>
-                        <div class="text-left flex-grow">
+                        <div class="text-center w-full">
                             <h4 class="font-extrabold tracking-wide leading-tight uppercase text-zinc-900 ${textClass}">${config.title}</h4>
                             <p class="${subTextClass} text-zinc-800 leading-tight"><b>WA: ${config.wa}</b> | <b>Telp: ${config.telp}</b></p>
                             <p class="${subTextClass} italic text-zinc-650 leading-tight mt-0.5">${config.desc}</p>
@@ -1787,7 +1782,7 @@ function doGet(e) {
             element.addEventListener('touchstart', function(e) {
                 touchTimer = setTimeout(() => {
                     openContextMenu(productId, productName);
-                }, 500); // Trigger after 500ms
+                }, 500); 
             }, { passive: true });
 
             element.addEventListener('touchend', function() {
@@ -2032,7 +2027,6 @@ function doGet(e) {
                 const subtotal = qtyToBuy * p.costPrice;
                 grandTotal += subtotal;
 
-                // Desktop View
                 tableBody.innerHTML += `
                     <tr class="hover:bg-zinc-900 transition-colors">
                         <td class="px-6 py-4 font-bold text-zinc-100 uppercase">${p.name}</td>
@@ -2045,7 +2039,6 @@ function doGet(e) {
                     </tr>
                 `;
 
-                // Mobile Cards View: Extra Large Elements
                 mobileContainer.innerHTML += `
                     <div class="p-5 bg-zinc-950 border border-zinc-800 rounded-2xl flex justify-between items-center">
                         <div class="space-y-1.5 pr-2">
@@ -2107,41 +2100,218 @@ function doGet(e) {
                 }
             });
 
-            // Laba hari ini: gross sales today - expenses today
-            let dailyGrossSales = state.sales.filter(s => s.date === today).reduce((acc, curr) => acc + curr.total, 0);
-            const netProfitToday = dailyGrossSales - totalExpensesToday;
+            // Laba bersih hari ini: profit dari penjualan hari ini - pengeluaran hari ini
+            const netProfitToday = totalProfitToday - totalExpensesToday;
 
-            // Laba bulan ini: monthly sales profit - monthly expenses
+            // Laba bersih bulan ini: profit penjualan bulan ini - pengeluaran bulan ini
             const netProfitMonth = totalProfitMonth - totalExpensesMonth;
 
-            // Update daily display indicators with colors and symbols
-            const dailyEl = document.getElementById('laba-hari-ini');
+            // Render Laba Bersih Hari Ini
+            const dailyEl = document.getElementById('laba-bersih-hari-ini');
             if (netProfitToday < 0) {
                 dailyEl.innerText = "-" + formatRupiah(Math.abs(netProfitToday));
-                dailyEl.className = "text-lg md:text-xl font-bold font-poppins mt-2 text-rose-500";
+                dailyEl.className = "text-lg md:text-2xl font-black font-poppins text-rose-500";
             } else {
                 dailyEl.innerText = "+" + formatRupiah(netProfitToday);
-                dailyEl.className = "text-lg md:text-xl font-bold font-poppins mt-2 text-emerald-400";
+                dailyEl.className = "text-lg md:text-2xl font-black font-poppins text-emerald-400";
             }
 
-            // Update monthly display indicators with colors and symbols
-            const monthlyEl = document.getElementById('laba-bulan-ini');
+            // Render Laba Bersih Bulan Ini
+            const monthlyEl = document.getElementById('laba-bersih-bulan-ini');
             if (netProfitMonth < 0) {
                 monthlyEl.innerText = "-" + formatRupiah(Math.abs(netProfitMonth));
-                monthlyEl.className = "text-lg md:text-xl font-bold font-poppins mt-2 text-rose-500";
+                monthlyEl.className = "text-lg md:text-2xl font-black font-poppins text-rose-500";
             } else {
                 monthlyEl.innerText = "+" + formatRupiah(netProfitMonth);
-                monthlyEl.className = "text-lg md:text-xl font-bold font-poppins mt-2 text-emerald-400";
+                monthlyEl.className = "text-lg md:text-2xl font-black font-poppins text-emerald-400";
             }
 
-            const netProfitFinal = (totalGrossRev - totalModalCost) - (totalExpensesMonth);
+            // Render Expenses cards
+            document.getElementById('pengeluaran-hari-ini').innerText = formatRupiah(totalExpensesToday);
+            document.getElementById('pengeluaran-bulan-ini').innerText = formatRupiah(totalExpensesMonth);
 
-            document.getElementById('exp-hari-ini').innerText = formatRupiah(totalExpensesToday);
-            document.getElementById('exp-bulan-ini').innerText = formatRupiah(totalExpensesMonth);
-            document.getElementById('laba-kotor').innerText = formatRupiah(totalGrossRev - totalModalCost);
-            document.getElementById('laba-bersih-akhir').innerText = (netProfitFinal < 0 ? "-" : "") + formatRupiah(Math.abs(netProfitFinal));
+            // Render Laba Bersih Akhir Bulan Ini
+            const netProfitFinalMonth = totalProfitMonth - totalExpensesMonth;
+            const finalMonthEl = document.getElementById('laba-bersih-akhir-bulan');
+            finalMonthEl.innerText = (netProfitFinalMonth < 0 ? "-" : "+") + formatRupiah(Math.abs(netProfitFinalMonth));
+            if (netProfitFinalMonth < 0) {
+                finalMonthEl.className = "text-3xl md:text-4xl font-black font-poppins text-rose-500 mt-2";
+            } else {
+                finalMonthEl.className = "text-3xl md:text-4xl font-black font-poppins text-emerald-400 mt-2";
+            }
 
             renderProfitChart(currentMonthStr);
+            renderDailyLedgerTable();
+        }
+
+        function showProfitDetailModal(period) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const currentMonthStr = todayStr.substring(0, 7);
+            
+            const salesInPeriod = state.sales.filter(s => {
+                if (period === 'today') return s.date === todayStr;
+                return s.date.startsWith(currentMonthStr);
+            });
+
+            const itemMap = {};
+            salesInPeriod.forEach(s => {
+                s.items.forEach(item => {
+                    const barcode = item.barcode;
+                    const catItem = state.products.find(p => p.barcode === barcode);
+                    const cost = catItem ? catItem.costPrice : (item.sellPrice * 0.8);
+                    const profitPerItem = item.sellPrice - cost;
+
+                    if (!itemMap[barcode]) {
+                        itemMap[barcode] = {
+                            name: item.name,
+                            qty: 0,
+                            unit: item.unit || 'pcs',
+                            profitPerItem: profitPerItem,
+                            totalProfit: 0
+                        };
+                    }
+                    itemMap[barcode].qty += item.qty;
+                    itemMap[barcode].totalProfit += (item.qty * profitPerItem);
+                });
+            });
+
+            const items = Object.values(itemMap);
+            const title = period === 'today' ? "Laba Bersih Hari Ini (Detail Item)" : "Laba Bersih Bulan Ini (Detail Item)";
+            
+            let modalHtml = "";
+            if (items.length === 0) {
+                modalHtml = `<p class="text-zinc-500 text-sm text-center py-6">Tidak ada data transaksi penjualan pada periode ini.</p>`;
+            } else {
+                modalHtml = `
+                    <table class="w-full text-left text-xs text-zinc-300 font-mono">
+                        <thead>
+                            <tr class="border-b border-zinc-800 text-zinc-500 text-[10px] uppercase">
+                                <th class="pb-2">Barang</th>
+                                <th class="pb-2 text-center">Jumlah</th>
+                                <th class="pb-2 text-right">Laba/Pcs</th>
+                                <th class="pb-2 text-right">Total Laba</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-900">
+                            ${items.map(item => `
+                                <tr>
+                                    <td class="py-2.5 uppercase font-bold text-zinc-250">${item.name}</td>
+                                    <td class="py-2.5 text-center font-bold">${item.qty} ${item.unit}</td>
+                                    <td class="py-2.5 text-right">${formatRupiah(item.profitPerItem)}</td>
+                                    <td class="py-2.5 text-right font-extrabold text-emerald-400">${formatRupiah(item.totalProfit)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            document.getElementById('detail-modal-title').innerText = title;
+            document.getElementById('detail-modal-content').innerHTML = modalHtml;
+            document.getElementById('detail-list-modal').classList.remove('hidden');
+            history.pushState({ tab: 'profit' }, '');
+        }
+
+        function showExpenseDetailModal(period) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const currentMonthStr = todayStr.substring(0, 7);
+
+            const expensesInPeriod = state.expenses.filter(ex => {
+                if (period === 'today') return ex.date === todayStr;
+                return ex.date.startsWith(currentMonthStr);
+            });
+
+            const title = period === 'today' ? "Pengeluaran Hari Ini (Detail)" : "Pengeluaran Bulan Ini (Detail)";
+            
+            let modalHtml = "";
+            if (expensesInPeriod.length === 0) {
+                modalHtml = `<p class="text-zinc-500 text-sm text-center py-6">Tidak ada catatan pengeluaran pada periode ini.</p>`;
+            } else {
+                modalHtml = `
+                    <table class="w-full text-left text-xs text-zinc-300 font-mono">
+                        <thead>
+                            <tr class="border-b border-zinc-800 text-zinc-500 text-[10px] uppercase">
+                                <th class="pb-2">Keterangan</th>
+                                <th class="pb-2">Tanggal</th>
+                                <th class="pb-2 text-right">Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-900">
+                            ${expensesInPeriod.map(item => `
+                                <tr>
+                                    <td class="py-2.5 font-bold text-zinc-250 capitalize">${item.desc}</td>
+                                    <td class="py-2.5 text-zinc-400">${item.date}</td>
+                                    <td class="py-2.5 text-right font-bold text-rose-400">${formatRupiah(item.amount)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            document.getElementById('detail-modal-title').innerText = title;
+            document.getElementById('detail-modal-content').innerHTML = modalHtml;
+            document.getElementById('detail-list-modal').classList.remove('hidden');
+            history.pushState({ tab: 'profit' }, '');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-list-modal').classList.add('hidden');
+        }
+
+        function renderDailyLedgerTable() {
+            const tableBody = document.getElementById('daily-profit-table-body');
+            if (!tableBody) return;
+            tableBody.innerHTML = "";
+
+            const dailyData = {};
+            
+            // Collect from sales
+            state.sales.forEach(s => {
+                const date = s.date;
+                if (!dailyData[date]) {
+                    dailyData[date] = { salesProfit: 0, expenses: 0 };
+                }
+                let saleCOGS = 0;
+                s.items.forEach(item => {
+                    const catItem = state.products.find(p => p.barcode === item.barcode);
+                    const cost = catItem ? catItem.costPrice : (item.sellPrice * 0.8);
+                    saleCOGS += (cost * item.qty);
+                });
+                dailyData[date].salesProfit += (s.total - saleCOGS);
+            });
+
+            // Collect from expenses
+            state.expenses.forEach(ex => {
+                const date = ex.date;
+                if (!dailyData[date]) {
+                    dailyData[date] = { salesProfit: 0, expenses: 0 };
+                }
+                dailyData[date].expenses += ex.amount;
+            });
+
+            const sortedDates = Object.keys(dailyData).sort((a, b) => b.localeCompare(a));
+
+            if (sortedDates.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-zinc-500">Belum ada data transaksi keuntungan harian.</td></tr>`;
+                return;
+            }
+
+            sortedDates.forEach(date => {
+                const info = dailyData[date];
+                const net = info.salesProfit - info.expenses;
+                const netColor = net < 0 ? "text-rose-500 font-extrabold" : "text-emerald-400 font-extrabold";
+                const netSign = net < 0 ? "-" : "+";
+
+                tableBody.innerHTML += `
+                    <tr class="hover:bg-zinc-900 transition-colors">
+                        <td class="px-6 py-4 font-mono font-bold">${date}</td>
+                        <td class="px-6 py-4 font-mono text-emerald-400">+${formatRupiah(info.salesProfit)}</td>
+                        <td class="px-6 py-4 font-mono text-rose-500">${formatRupiah(info.expenses)}</td>
+                        <td class="px-6 py-4 font-mono ${netColor}">${netSign}${formatRupiah(Math.abs(net))}</td>
+                    </tr>
+                `;
+            });
         }
 
         function renderProfitChart(currentYearMonth) {
@@ -2173,7 +2343,6 @@ function doGet(e) {
                 }
             });
 
-            // Adjust monthly net totals by subtracting monthly expenses
             state.expenses.forEach(ex => {
                 if (ex.date.startsWith(String(currentYear))) {
                     const parts = ex.date.split("-");
@@ -2184,22 +2353,22 @@ function doGet(e) {
                 }
             });
 
-            const maxProfit = Math.max(...monthlyProfits, 50000);
+            const maxProfit = Math.max(...monthlyProfits.map(Math.abs), 50000);
 
             months.forEach((m, idx) => {
                 const profitVal = monthlyProfits[idx];
-                const pct = (profitVal / maxProfit) * 100;
-                // Cap visual bar height appropriately
+                const pct = (Math.abs(profitVal) / maxProfit) * 100;
                 const barHeight = Math.max(Math.min(pct, 100), 5);
-                const displayLabel = profitVal < 0 ? "-" + formatRupiah(Math.abs(profitVal)) : formatRupiah(profitVal);
-                
+                const displayLabel = profitVal < 0 ? "-" + formatRupiah(Math.abs(profitVal)) : "+" + formatRupiah(profitVal);
+                const labelColor = profitVal < 0 ? "text-rose-500 font-extrabold" : "text-emerald-400 font-extrabold";
+                const barColor = profitVal < 0 ? "from-rose-700 to-rose-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]" : "from-emerald-600 to-amber-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]";
+
                 container.innerHTML += `
                     <div class="flex flex-col items-center flex-grow group relative h-full justify-end">
-                        <!-- Placed net profit values clearly directly on top of each month bar -->
-                        <div class="text-[8px] font-mono font-bold text-emerald-400 mb-1 z-10 text-center select-none pointer-events-none">
+                        <div class="text-[8px] font-mono mb-1 text-center select-none pointer-events-none ${labelColor}">
                             ${displayLabel}
                         </div>
-                        <div class="w-full max-w-[14px] rounded-t-md bg-gradient-to-t from-emerald-600 to-amber-500 hover:opacity-85 transition-all shadow-[0_0_10px_rgba(16,185,129,0.2)]" style="height: ${barHeight}%;"></div>
+                        <div class="w-full max-w-[14px] rounded-t-md bg-gradient-to-t ${barColor} hover:opacity-85 transition-all" style="height: ${barHeight}%;"></div>
                         <span class="text-[9px] text-zinc-500 mt-2 font-semibold">${m.name}</span>
                     </div>
                 `;
@@ -2220,7 +2389,6 @@ function doGet(e) {
             }
 
             state.expenses.forEach(exp => {
-                // Desktop
                 tableBody.innerHTML += `
                     <tr class="hover:bg-zinc-900 transition-colors text-zinc-100">
                         <td class="px-6 py-4 text-xs font-mono text-zinc-400">${exp.date}</td>
@@ -2232,7 +2400,6 @@ function doGet(e) {
                     </tr>
                 `;
 
-                // Mobile
                 mobileContainer.innerHTML += `
                     <div class="p-5 bg-zinc-950 border border-zinc-855 rounded-2xl flex justify-between items-center">
                         <div class="space-y-1">
@@ -2304,7 +2471,6 @@ function doGet(e) {
             }
 
             state.purchases.forEach(p => {
-                // Desktop
                 tableBody.innerHTML += `
                     <tr class="hover:bg-zinc-900 transition-colors">
                         <td class="px-6 py-4 font-mono text-zinc-400 text-xs">${p.id}</td>
@@ -2317,7 +2483,6 @@ function doGet(e) {
                     </tr>
                 `;
 
-                // Mobile
                 mobileContainer.innerHTML += `
                     <div class="p-5 bg-zinc-950 border border-zinc-850 rounded-2xl flex justify-between items-center">
                         <div class="space-y-1">
@@ -2407,7 +2572,6 @@ function doGet(e) {
             }
         });
 
-        // Autocomplete purchase subtotal cleanly
         function updatePurchaseSubtotal() {
             const qty = cleanNumber(document.getElementById('pform-qty').value);
             const cost = cleanNumber(document.getElementById('pform-cost').value);
@@ -2555,7 +2719,6 @@ function doGet(e) {
             }
 
             state.sales.forEach(s => {
-                // Desktop
                 tableBody.innerHTML += `
                     <tr class="hover:bg-zinc-900 transition-colors">
                         <td class="px-6 py-4 font-mono text-zinc-400 text-xs">${s.id}</td>
@@ -2563,7 +2726,7 @@ function doGet(e) {
                         <td class="px-6 py-4">${s.date}</td>
                         <td class="px-6 py-4 font-mono font-bold text-emerald-400">${formatRupiah(s.total)}</td>
                         <td class="px-6 py-4 text-right space-x-2">
-                            <!-- Prominent PDF print actions directly in rows side-by-side -->
+                            <!-- Premium PDF print actions styled with prominent visual yellow backgrounds -->
                             <button onclick="previewInvoiceAction('${s.id}')" class="px-3.5 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-extrabold rounded-xl transition-all inline-flex items-center gap-1.5 shadow-lg shadow-yellow-500/20" title="Cetak Faktur PDF"><i data-lucide="printer" class="w-4 h-4"></i> Cetak</button>
                             <button onclick="editSalesTransaction('${s.id}')" class="p-2 bg-zinc-800 hover:bg-zinc-700 text-amber-500 rounded-xl inline-flex"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
                             <button onclick="deleteSalesTransaction('${s.id}')" class="p-2 bg-zinc-800 hover:bg-zinc-700 text-rose-500 rounded-xl inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -2571,9 +2734,8 @@ function doGet(e) {
                     </tr>
                 `;
 
-                // Mobile
                 mobileContainer.innerHTML += `
-                    <div class="p-5 bg-zinc-950 border border-zinc-850 rounded-2xl flex justify-between items-center">
+                    <div class="p-5 bg-zinc-950 border border-zinc-855 rounded-2xl flex justify-between items-center">
                         <div class="space-y-1">
                             <h4 class="text-sm font-bold uppercase text-zinc-100 leading-tight">${s.buyer || "UMUM"}</h4>
                             <p class="text-[10px] text-zinc-500 font-mono">${s.id} | ${s.date}</p>
@@ -2654,7 +2816,6 @@ function doGet(e) {
             }
         }
 
-        // Dynamic cashier subtotal sum
         function updateSalesSubtotal() {
             const qty = cleanNumber(document.getElementById('sform-qty').value);
             const sell = cleanNumber(document.getElementById('sform-sell').value);
@@ -2772,14 +2933,11 @@ function doGet(e) {
 
             saveStateToLocalStorage();
             renderStockTable();
+            renderSalesHistory();
             switchTab('sales_history');
             
-            // Re-configured to only show single successful notification prompt
-            showNotification("Transaksi Sukses", "success");
-
-            if (confirm("Transaksi sukses! Tampilkan struk nota sekarang?")) {
-                previewInvoiceAction(sId);
-            }
+            // Fixed direct 1-second notification layout
+            showNotification("simpan dan potong stok sukses", "success");
         }
 
         function editSalesTransaction(sId) {
@@ -2794,7 +2952,7 @@ function doGet(e) {
             
             updateSalesSubtotal();
             renderSalesCartTable();
-            switchTab('sales_form');
+            switchTab('sform_id');
         }
 
         function deleteSalesTransaction(sId) {
@@ -2833,10 +2991,10 @@ function doGet(e) {
             if (el) el.remove();
         }
 
+        /* Fixed PDF generation to avoid window popup blocking issues entirely */
         function printInvoiceNow() {
             const pContent = document.getElementById('invoice-preview-container').innerHTML;
             
-            // Map selected paper widths
             let printWidth = "58mm";
             if (state.invoiceConfig.size === 'a3') printWidth = "297mm";
             else if (state.invoiceConfig.size === 'a4') printWidth = "210mm";
@@ -2853,17 +3011,40 @@ function doGet(e) {
                     .text-right { text-align: right; }
                     .border-b { border-bottom: 1px dashed #000; }
                     .flex { display: flex; justify-content: space-between; }
+                    .text-center { text-align: center; }
                     b { font-weight: bold; }
+                    .relative { position: relative; }
+                    .absolute { position: absolute; }
+                    .left-0 { left: 0; }
+                    .top-1\\/2 { top: 50%; }
+                    .-translate-y-1\\/2 { transform: translateY(-50%); }
                 </style>
             `;
-            const printWin = window.open('', '', 'width=600,height=600');
-            printWin.document.write('<html><head><title>Print Invoice</title>' + style + '</head><body>' + pContent + '</body></html>');
-            printWin.document.close();
-            printWin.focus();
+
+            // Spawns/updates a secure hidden print iframe context dynamically
+            let printFrame = document.getElementById('print-iframe');
+            if (!printFrame) {
+                printFrame = document.createElement('iframe');
+                printFrame.id = 'print-iframe';
+                printFrame.style.position = 'fixed';
+                printFrame.style.right = '0';
+                printFrame.style.bottom = '0';
+                printFrame.style.width = '0';
+                printFrame.style.height = '0';
+                printFrame.style.border = '0';
+                document.body.appendChild(printFrame);
+            }
+
+            const doc = printFrame.contentWindow.document;
+            doc.open();
+            doc.write('<html><head><title>Print Invoice</title>' + style + '</head><body>' + pContent + '</body></html>');
+            doc.close();
+
+            // Focus and initiate printing cleanly
             setTimeout(() => {
-                printWin.print();
-                printWin.close();
-            }, 250);
+                printFrame.contentWindow.focus();
+                printFrame.contentWindow.print();
+            }, 300);
         }
 
         function shareViaWhatsapp(sId) {
@@ -2898,7 +3079,6 @@ function doGet(e) {
         function openScanner(targetInputId) {
             state.currentScannerTargetId = targetInputId;
 
-            // Push state for Android back-button scanner cancel handling
             history.pushState({ tab: 'scanner' }, '');
 
             document.getElementById('scanner-modal').classList.remove('hidden');
