@@ -113,6 +113,7 @@
             </div>
         </div>
 
+        <!-- Immersive Fullscreen Scanner viewport overlay structure -->
         <div id="scanner-modal" class="fixed inset-0 z-[105] bg-black flex flex-col justify-between hidden">
             <div class="p-4 flex items-center justify-between bg-zinc-950 border-b border-zinc-900 z-10">
                 <span class="font-poppins font-bold text-amber-500 flex items-center gap-2">
@@ -154,6 +155,7 @@
             </div>
         </div>
 
+        <!-- Brand banner header -->
         <header class="p-4 bg-black flex flex-col items-center justify-center border-b border-zinc-900">
             <img src="logo web arya.png" alt="Arya Grosir Logo" onerror="this.src='https://placehold.co/400x160/000000/f59e0b?text=ARYA+GROSIR'" class="h-20 md:h-24 w-auto object-contain">
             <div class="flex items-center justify-between w-full max-w-7xl px-2 mt-2">
@@ -168,6 +170,7 @@
         <!-- Main Content Panel -->
         <main class="flex-grow p-4 md:p-6 max-w-7xl mx-auto w-full">
             
+            <!-- Android Optimized 2x4 Fullscreen Dashboard Main Menu Grid -->
             <div id="tab-main" class="tab-pane animate-fade-in flex flex-col justify-between">
                 <div class="grid grid-cols-2 gap-4 md:gap-6 w-full py-2">
                     <!-- 1. Belanja Barang -->
@@ -367,7 +370,7 @@
 
                         <div>
                             <label class="block text-xs text-zinc-400 mb-1">Deskripsi Tambahan</label>
-                            <textarea id="inv-desc" oninput="renderInvoicePreview()" rows="2" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none">Belanja Hemat & Bersahabat. Terima Kasih atas Kunjungan Anda!</textarea>
+                            <textarea id="inv-desc" oninput="renderInvoicePreview()" rows="2" class="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2 text-sm focus:outline-none font-bold">Belanja Hemat & Bersahabat. Terima Kasih atas Kunjungan Anda!</textarea>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
@@ -390,16 +393,16 @@
                         <div>
                             <span class="block text-xs text-zinc-400 mb-2">Kolom Tabel Yang Ditampilkan</span>
                             <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer">
+                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer font-bold">
                                     <input type="checkbox" id="col-code" checked onchange="renderInvoicePreview()" class="rounded bg-black border-zinc-850 text-amber-500 focus:ring-0"> Kode
                                 </label>
-                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer">
+                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer font-bold">
                                     <input type="checkbox" id="col-qty" checked onchange="renderInvoicePreview()" class="rounded bg-black border-zinc-850 text-amber-500 focus:ring-0"> Qty
                                 </label>
-                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer">
+                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer font-bold">
                                     <input type="checkbox" id="col-unit" checked onchange="renderInvoicePreview()" class="rounded bg-black border-zinc-850 text-amber-500 focus:ring-0"> Satuan
                                 </label>
-                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer">
+                                <label class="flex items-center gap-2 text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 cursor-pointer font-bold">
                                     <input type="checkbox" id="col-price" checked onchange="renderInvoicePreview()" class="rounded bg-black border-zinc-850 text-amber-500 focus:ring-0"> Harga
                                 </label>
                             </div>
@@ -450,7 +453,8 @@
                                     <th class="px-6 py-4">Satuan</th>
                                     <th class="px-6 py-4 text-amber-500">Target Min</th>
                                     <th class="px-6 py-4">Harga Pokok</th>
-                                    <th class="px-6 py-4 text-emerald-400">Harga Jual</th>
+                                    <th class="px-6 py-4 text-emerald-400">Harga Jual (Umum)</th>
+                                    <th class="px-6 py-4 text-amber-400">Harga Jual Grosir</th>
                                 </tr>
                             </thead>
                             <tbody id="stock-table-body" class="divide-y divide-zinc-800 bg-zinc-950/40"></tbody>
@@ -520,14 +524,18 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-3 gap-4">
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Harga Pokok (Beli)</label>
-                                    <input type="text" id="prod-cost" inputmode="numeric" oninput="formatNumberInput(this)" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="0">
+                                    <input type="text" id="prod-cost" inputmode="numeric" oninput="formatNumberInput(this)" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-3 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="0">
                                 </div>
                                 <div>
-                                    <label class="block text-xs text-zinc-400 mb-1">Harga Jual (Eceran)</label>
-                                    <input type="text" id="prod-sell" inputmode="numeric" oninput="formatNumberInput(this)" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="0">
+                                    <label class="block text-xs text-zinc-400 mb-1">Harga Jual (Umum)</label>
+                                    <input type="text" id="prod-sell" inputmode="numeric" oninput="formatNumberInput(this)" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-3 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="0">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-zinc-400 mb-1">Harga Jual Grosir</label>
+                                    <input type="text" id="prod-sell-wholesale" inputmode="numeric" oninput="formatNumberInput(this)" class="prod-input w-full bg-black border border-zinc-800 rounded-xl px-3 py-3 text-zinc-100 focus:outline-none font-mono" placeholder="0">
                                 </div>
                             </div>
 
@@ -585,7 +593,7 @@
                     <h2 class="text-xl font-bold font-poppins">Laporan Keuangan & Laba</h2>
                 </div>
 
-                <!-- Redesigned Financial 2x2 Grid -->
+                <!-- Financial 2x2 Interactive Grid -->
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Card 1: Laba Bersih Hari Ini -->
                     <button onclick="showProfitDetailModal('today')" class="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl text-left hover:border-amber-500/50 hover:bg-zinc-900/40 transition-all shadow-md group">
@@ -770,6 +778,12 @@
                                 </div>
                             </div>
 
+                            <div class="relative">
+                                <label class="block text-xs text-zinc-400 mb-1">Nama Barang (Ketik untuk referensi)</label>
+                                <input type="text" id="pform-name" oninput="handlePurchaseNameChange()" onfocus="showPurchaseNameSuggestions()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 uppercase focus:outline-none font-bold" placeholder="Cari nama barang...">
+                                <div id="pform-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-zinc-950 border border-zinc-850 rounded-xl overflow-hidden z-[90] hidden max-h-40 overflow-y-auto shadow-2xl"></div>
+                            </div>
+
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">Scan Barcode / Kode</label>
                                 <div class="flex gap-2">
@@ -780,20 +794,14 @@
                                 </div>
                             </div>
 
-                            <div class="relative">
-                                <label class="block text-xs text-zinc-400 mb-1">Nama Barang (Ketik untuk referensi)</label>
-                                <input type="text" id="pform-name" oninput="handlePurchaseNameChange()" onfocus="showPurchaseNameSuggestions()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 uppercase focus:outline-none" placeholder="Cari nama barang...">
-                                <div id="pform-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-zinc-950 border border-zinc-850 rounded-xl overflow-hidden z-[90] hidden max-h-40 overflow-y-auto shadow-2xl"></div>
-                            </div>
-
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Jumlah (Qty)</label>
-                                    <input type="text" id="pform-qty" inputmode="numeric" oninput="formatNumberInput(this); updatePurchaseSubtotal()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
+                                    <input type="text" id="pform-qty" inputmode="numeric" oninput="formatNumberInput(this); updatePurchaseSubtotal()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none font-bold" placeholder="0">
                                 </div>
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Satuan</label>
-                                    <input type="text" id="pform-unit" class="w-full bg-zinc-900 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none uppercase" readonly placeholder="Satuan">
+                                    <input type="text" id="pform-unit" class="w-full bg-zinc-900 text-zinc-500 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none uppercase font-bold" readonly placeholder="Satuan">
                                 </div>
                             </div>
 
@@ -804,7 +812,7 @@
 
                             <div class="p-3 bg-black rounded-xl border border-zinc-800 flex justify-between items-center">
                                 <span class="text-xs text-zinc-400 font-bold">Total Beli Item:</span>
-                                <span class="font-extrabold text-amber-400 text-sm font-mono" id="pform-subtotal">Rp 0</span>
+                                <span class="font-extrabold text-amber-400 text-sm font-mono animate-pulse" id="pform-subtotal">Rp 0</span>
                             </div>
 
                             <button onclick="addPurchaseCartItem()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-black font-extrabold rounded-xl text-xs transition-transform active:scale-95">
@@ -903,9 +911,24 @@
                                 </div>
                             </div>
 
+                            <!-- Opsi 1: Customer Pricing Type Segmented Toggle -->
                             <div>
-                                <label class="block text-xs text-zinc-400 mb-1">Nama Pembeli (Huruf Kapital)</label>
-                                <input type="text" id="sform-buyer" oninput="this.value = this.value.toUpperCase()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none uppercase font-bold" placeholder="UMUM">
+                                <label class="block text-xs text-zinc-400 mb-1 font-semibold">Tipe Pelanggan</label>
+                                <div class="grid grid-cols-2 gap-1 bg-black p-1 rounded-xl border border-zinc-800">
+                                    <button type="button" id="sform-type-umum" onclick="setSalesPriceType('UMUM')" class="py-2.5 text-xs font-bold rounded-lg transition-all bg-amber-500 text-black">UMUM (Retail)</button>
+                                    <button type="button" id="sform-type-grosir" onclick="setSalesPriceType('GROSIR')" class="py-2.5 text-xs font-bold rounded-lg transition-all text-zinc-400 hover:text-white">GROSIR</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1 font-semibold">Nama Pembeli (Huruf Kapital)</label>
+                                <input type="text" id="sform-buyer" oninput="this.value = this.value.toUpperCase()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none uppercase font-bold" value="UMUM" placeholder="UMUM">
+                            </div>
+
+                            <div class="relative">
+                                <label class="block text-xs text-zinc-400 mb-1">Nama Barang (Ketik untuk referensi)</label>
+                                <input type="text" id="sform-name" oninput="handleSalesNameChange()" onfocus="showSalesNameSuggestions()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 uppercase focus:outline-none font-bold animate-pulse" placeholder="Cari nama barang...">
+                                <div id="sform-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-zinc-950 border border-zinc-855 rounded-xl overflow-hidden z-[90] hidden max-h-40 overflow-y-auto shadow-2xl"></div>
                             </div>
 
                             <div>
@@ -918,16 +941,10 @@
                                 </div>
                             </div>
 
-                            <div class="relative">
-                                <label class="block text-xs text-zinc-400 mb-1">Nama Barang (Ketik untuk referensi)</label>
-                                <input type="text" id="sform-name" oninput="handleSalesNameChange()" onfocus="showSalesNameSuggestions()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 uppercase focus:outline-none" placeholder="Cari nama barang...">
-                                <div id="sform-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-zinc-950 border border-zinc-850 rounded-xl overflow-hidden z-[90] hidden max-h-40 overflow-y-auto shadow-2xl"></div>
-                            </div>
-
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-xs text-zinc-400 mb-1">Jumlah (Qty)</label>
-                                    <input type="text" id="sform-qty" inputmode="numeric" oninput="formatNumberInput(this); updateSalesSubtotal()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none" placeholder="0">
+                                    <label class="block text-xs text-zinc-400 mb-1 font-semibold">Jumlah (Qty)</label>
+                                    <input type="text" id="sform-qty" inputmode="numeric" oninput="formatNumberInput(this); updateSalesSubtotal()" class="w-full bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none font-bold" placeholder="0">
                                 </div>
                                 <div>
                                     <label class="block text-xs text-zinc-400 mb-1">Satuan</label>
@@ -1004,6 +1021,7 @@
         /* CORE APPLICATION DATABASE STATE */
         let state = {
             activeTab: 'main',
+            activeSalesPriceType: 'UMUM', // Track price mode on the sales form
             syncSettings: {
                 scriptUrl: ''
             },
@@ -1035,20 +1053,20 @@
         };
 
         const defaultProducts = [
-            { id: "PROD1", barcode: "8991234567890", name: "INDOMIE GORENG SPESIAL", stock: 120, unit: "pcs", minStock: 40, costPrice: 2800, sellPrice: 3500 },
-            { id: "PROD2", barcode: "8992345678901", name: "TEH BOTOL SOSRO 350ML", stock: 15, unit: "pcs", minStock: 30, costPrice: 3200, sellPrice: 4000 },
-            { id: "PROD3", barcode: "8993456789012", name: "GULA PASIR GULAKU 1KG", stock: 8, unit: "pcs", minStock: 20, costPrice: 14500, sellPrice: 16000 },
-            { id: "PROD4", barcode: "8994567890123", name: "MINYAK GORENG BIMOLI 2L", stock: 45, unit: "box", minStock: 10, costPrice: 32000, sellPrice: 36000 },
-            { id: "PROD5", barcode: "8995678901234", name: "KOPI ARABIKA ARYA 250G", stock: 12, unit: "pac", minStock: 15, costPrice: 45000, sellPrice: 55000 }
+            { id: "PROD1", barcode: "8991234567890", name: "INDOMIE GORENG SPESIAL", stock: 120, unit: "pcs", minStock: 40, costPrice: 2800, sellPrice: 3500, wholesalePrice: 3200 },
+            { id: "PROD2", barcode: "8992345678901", name: "TEH BOTOL SOSRO 350ML", stock: 15, unit: "pcs", minStock: 30, costPrice: 3200, sellPrice: 4000, wholesalePrice: 3600 },
+            { id: "PROD3", barcode: "8993456789012", name: "GULA PASIR GULAKU 1KG", stock: 8, unit: "pcs", minStock: 20, costPrice: 14500, sellPrice: 16000, wholesalePrice: 15000 },
+            { id: "PROD4", barcode: "8994567890123", name: "MINYAK GORENG BIMOLI 2L", stock: 45, unit: "box", minStock: 10, costPrice: 32000, sellPrice: 36000, wholesalePrice: 34000 },
+            { id: "PROD5", barcode: "8995678901234", name: "KOPI ARABIKA ARYA 250G", stock: 12, unit: "pac", minStock: 15, costPrice: 45000, sellPrice: 55000, wholesalePrice: 50000 }
         ];
 
         const defaultExpenses = [
             { id: "EXP1", date: "2026-07-15", desc: "Bayar Listrik Toko", amount: 250000 },
-            { id: "EXP2", date: "2026-07-16", desc: "Isi Ulang Galon Toko", amount: 35000 }
+            { id: "EXP2", date: "2026-07-16", desc: "Isi Ulang Galon Toko", amount: 35005 }
         ];
 
         const defaultSales = [
-            { id: "S-10001", date: "2026-07-17", buyer: "BPK BUDI YANTO", items: [{ barcode: "8991234567890", name: "INDOMIE GORENG SPESIAL", qty: 10, unit: "pcs", sellPrice: 3500, costPrice: 2800 }], total: 35000, paid: 50000, change: 15000 }
+            { id: "S-10001", date: "2026-07-17", buyer: "BPK BUDI YANTO", items: [{ barcode: "8991234567890", name: "INDOMIE GORENG SPESIAL", qty: 10, unit: "pcs", sellPrice: 3500, costPrice: 2800, priceType: "UMUM" }], total: 35000, paid: 50000, change: 15000 }
         ];
 
         const defaultPurchases = [
@@ -1069,10 +1087,10 @@ function doPost(e) {
       // 1. Backup Catalog (Product Stock)
       var sheetStock = ss.getSheetByName("STOCK_LIST") || ss.insertSheet("STOCK_LIST");
       sheetStock.clear();
-      sheetStock.appendRow(["KODE/BARCODE", "NAMA BARANG", "STOCK", "SATUAN", "TARGET MINIMAL BARANG", "HARGA POKOK", "HARGA JUAL"]);
+      sheetStock.appendRow(["KODE/BARCODE", "NAMA BARANG", "STOCK", "SATUAN", "TARGET MINIMAL BARANG", "HARGA POKOK", "HARGA JUAL", "HARGA JUAL GROSIR"]);
       if (data.products && data.products.length > 0) {
         data.products.forEach(function(p) {
-          sheetStock.appendRow([p.barcode, p.name, p.stock, p.unit, p.minStock, p.costPrice, p.sellPrice]);
+          sheetStock.appendRow([p.barcode, p.name, p.stock, p.unit, p.minStock, p.costPrice, p.sellPrice, p.wholesalePrice || 0]);
         });
       }
 
@@ -1105,7 +1123,19 @@ function doPost(e) {
         });
       }
 
-      // 5. Backup Sales (Penjualan)
+      // 5. Backup Purchases (Belanja Barang)
+      var sheetPurchases = ss.getSheetByName("PURCHASES") || ss.insertSheet("PURCHASES");
+      sheetPurchases.clear();
+      sheetPurchases.appendRow(["ID TRANSAKSI", "TANGGAL BELANJA", "KODE/BARCODE", "NAMA BARANG", "HARGA PER ITEM", "TOTAL HARAGA"]);
+      if (data.purchases && data.purchases.length > 0) {
+        data.purchases.forEach(function(pu) {
+          pu.items.forEach(function(item) {
+            sheetPurchases.appendRow([pu.id, pu.date, item.barcode, item.name, item.costPrice, pu.total]);
+          });
+        });
+      }
+
+      // 6. Backup Sales (Penjualan)
       var sheetSales = ss.getSheetByName("SALES") || ss.insertSheet("SALES");
       sheetSales.clear();
       sheetSales.appendRow(["ID TRANSAKSI", "NAMA PEMBELI", "TANGGAL", "KODE/BARCODE", "NAMA BARANG", "HARGA PER ITEM", "TOTAL HARAGA", "DIBAYAR", "KEMBALIAN"]);
@@ -1151,7 +1181,8 @@ function doGet(e) {
           unit: String(rows[i][3] || "pcs"),
           minStock: Number(rows[i][4] || 0),
           costPrice: Number(rows[i][5] || 0),
-          sellPrice: Number(rows[i][6] || 0)
+          sellPrice: Number(rows[i][6] || 0),
+          wholesalePrice: Number(rows[i][7] || 0)
         });
       }
     }
@@ -1187,7 +1218,7 @@ function doGet(e) {
         if (!salesMap[id]) {
           salesMap[id] = { id: id, buyer: buyer, date: date, total: total, paid: paid, change: change, items: [] };
         }
-        salesMap[id].items.push({ barcode: barcode, name: name, qty: 1, unit: "pcs", sellPrice: price });
+        salesMap[id].items.push({ barcode: barcode, name: name, qty: 1, unit: "pcs", sellPrice: price, priceType: "UMUM" });
       }
       for (var key in salesMap) {
         output.sales.push(salesMap[key]);
@@ -1204,10 +1235,11 @@ function doGet(e) {
   }
 }`;
 
+        // Initialize state defaults from persistent storage if present
         function initLocalStorage() {
             try {
-                if (localStorage.getItem('arya_grosir_state_v3')) {
-                    state = JSON.parse(localStorage.getItem('arya_grosir_state_v3'));
+                if (localStorage.getItem('arya_grosir_state_v4')) {
+                    state = JSON.parse(localStorage.getItem('arya_grosir_state_v4'));
                 } else {
                     state.products = defaultProducts;
                     state.expenses = defaultExpenses;
@@ -1222,7 +1254,7 @@ function doGet(e) {
 
         function saveStateToLocalStorage() {
             try {
-                localStorage.setItem('arya_grosir_state_v3', JSON.stringify(state));
+                localStorage.setItem('arya_grosir_state_v4', JSON.stringify(state));
             } catch (err) {
                 console.error("Failed to write to persistent local database", err);
             }
@@ -1379,7 +1411,7 @@ function doGet(e) {
                 setTimeout(() => {
                     toast.remove();
                 }, 300);
-            }, 1000);
+            }, 1000); // Strict 1-second auto-dismiss rule
         }
 
         function formatRupiah(number) {
@@ -1829,7 +1861,7 @@ function doGet(e) {
             );
 
             if (filtered.length === 0) {
-                const emptyRow = `<tr><td colspan="7" class="text-center py-8 text-zinc-500">Barang tidak ditemukan / kosong.</td></tr>`;
+                const emptyRow = `<tr><td colspan="8" class="text-center py-8 text-zinc-500">Barang tidak ditemukan / kosong.</td></tr>`;
                 tableBody.innerHTML = emptyRow;
                 mobileContainer.innerHTML = `<p class="text-center text-zinc-500 text-sm py-8">Barang tidak ditemukan.</p>`;
                 return;
@@ -1839,7 +1871,7 @@ function doGet(e) {
                 const isUnderStock = p.stock <= p.minStock;
                 const stockColor = isUnderStock ? 'text-rose-500 font-black animate-pulse' : 'text-zinc-100';
                 
-                // Desktop
+                // Desktop row structure
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-zinc-900 cursor-pointer select-none transition-colors";
                 tr.innerHTML = `
@@ -1850,6 +1882,7 @@ function doGet(e) {
                     <td class="px-6 py-4 text-amber-500 font-semibold">${new Intl.NumberFormat('id-ID').format(p.minStock)}</td>
                     <td class="px-6 py-4 font-mono">${formatRupiah(p.costPrice)}</td>
                     <td class="px-6 py-4 font-mono text-emerald-400 font-bold">${formatRupiah(p.sellPrice)}</td>
+                    <td class="px-6 py-4 font-mono text-amber-400 font-bold">${formatRupiah(p.wholesalePrice || 0)}</td>
                 `;
                 registerLongPress(tr, p.id, p.name);
                 tableBody.appendChild(tr);
@@ -1861,7 +1894,10 @@ function doGet(e) {
                     <div class="space-y-1.5 flex-grow pr-4">
                         <div class="text-[10px] font-mono text-zinc-500">${p.barcode}</div>
                         <div class="text-lg md:text-xl font-extrabold uppercase text-zinc-100 leading-tight">${p.name}</div>
-                        <div class="text-xs text-zinc-400 font-semibold">Harga: <span class="text-emerald-400 font-mono font-bold">${formatRupiah(p.sellPrice)}</span></div>
+                        <div class="text-xs text-zinc-400 font-semibold flex flex-col gap-0.5">
+                            <span>Umum: <span class="text-emerald-400 font-mono font-bold">${formatRupiah(p.sellPrice)}</span></span>
+                            <span>Grosir: <span class="text-amber-400 font-mono font-bold">${formatRupiah(p.wholesalePrice || 0)}</span></span>
+                        </div>
                     </div>
                     <div class="text-right flex flex-col items-end shrink-0">
                         <div class="text-3xl md:text-4xl font-black ${stockColor}">${new Intl.NumberFormat('id-ID').format(p.stock)}</div>
@@ -1902,6 +1938,7 @@ function doGet(e) {
             document.getElementById('prod-unit').value = "pcs";
             document.getElementById('prod-cost').value = "";
             document.getElementById('prod-sell').value = "";
+            document.getElementById('prod-sell-wholesale').value = "";
 
             renderUnitOptions();
             document.getElementById('product-form-container').classList.remove('hidden');
@@ -1922,6 +1959,7 @@ function doGet(e) {
             document.getElementById('prod-min-stock').value = new Intl.NumberFormat('id-ID').format(p.minStock);
             document.getElementById('prod-cost').value = new Intl.NumberFormat('id-ID').format(p.costPrice);
             document.getElementById('prod-sell').value = new Intl.NumberFormat('id-ID').format(p.sellPrice);
+            document.getElementById('prod-sell-wholesale').value = new Intl.NumberFormat('id-ID').format(p.wholesalePrice || 0);
 
             renderUnitOptions();
             document.getElementById('prod-unit').value = p.unit;
@@ -1972,6 +2010,7 @@ function doGet(e) {
             const unit = document.getElementById('prod-unit').value;
             const costPrice = cleanNumber(document.getElementById('prod-cost').value);
             const sellPrice = cleanNumber(document.getElementById('prod-sell').value);
+            const wholesalePrice = cleanNumber(document.getElementById('prod-sell-wholesale').value);
 
             if (!barcode || !name) {
                 showNotification("Barcode dan Nama Barang harus diisi!", "error");
@@ -1988,6 +2027,7 @@ function doGet(e) {
                     p.unit = unit;
                     p.costPrice = costPrice;
                     p.sellPrice = sellPrice;
+                    p.wholesalePrice = wholesalePrice;
                 }
                 showNotification("Barang berhasil diperbarui!");
             } else {
@@ -1996,7 +2036,7 @@ function doGet(e) {
                     return;
                 }
                 const newId = "PROD-" + Date.now();
-                state.products.push({ id: newId, barcode, name, stock, unit, minStock, costPrice, sellPrice });
+                state.products.push({ id: newId, barcode, name, stock, unit, minStock, costPrice, sellPrice, wholesalePrice });
                 showNotification("Barang baru berhasil disimpan!");
             }
 
@@ -2160,18 +2200,22 @@ function doGet(e) {
                     const catItem = state.products.find(p => p.barcode === barcode);
                     const cost = catItem ? catItem.costPrice : (item.sellPrice * 0.8);
                     const profitPerItem = item.sellPrice - cost;
+                    const pricingType = item.priceType || "UMUM";
 
-                    if (!itemMap[barcode]) {
-                        itemMap[barcode] = {
-                            name: item.name,
+                    // Group by barcode AND pricing type to show differences in wholesale/retail margins
+                    const groupKey = `${barcode}_${pricingType}`;
+
+                    if (!itemMap[groupKey]) {
+                        itemMap[groupKey] = {
+                            name: `${item.name} (${pricingType})`,
                             qty: 0,
                             unit: item.unit || 'pcs',
                             profitPerItem: profitPerItem,
                             totalProfit: 0
                         };
                     }
-                    itemMap[barcode].qty += item.qty;
-                    itemMap[barcode].totalProfit += (item.qty * profitPerItem);
+                    itemMap[groupKey].qty += item.qty;
+                    itemMap[groupKey].totalProfit += (item.qty * profitPerItem);
                 });
             });
 
@@ -2513,6 +2557,11 @@ function doGet(e) {
             updatePurchaseSubtotal();
             renderPurchaseCartTable();
             switchTab('purchase_form');
+
+            // Smart Focus: Focus automatically on product name field instead of barcode scan field
+            setTimeout(() => {
+                document.getElementById('pform-name').focus();
+            }, 300);
         }
 
         function handlePurchaseBarcodeChange() {
@@ -2601,7 +2650,7 @@ function doGet(e) {
             updatePurchaseSubtotal();
             renderPurchaseCartTable();
             showNotification("Dimasukkan!");
-            document.getElementById('pform-barcode').focus();
+            document.getElementById('pform-name').focus(); // smart focus cycle
         }
 
         function removePurchaseCartItem(index) {
@@ -2672,7 +2721,8 @@ function doGet(e) {
                         unit: cartItem.unit,
                         minStock: 10,
                         costPrice: cartItem.costPrice,
-                        sellPrice: Math.ceil(cartItem.costPrice * 1.25)
+                        sellPrice: Math.ceil(cartItem.costPrice * 1.25),
+                        wholesalePrice: Math.ceil(cartItem.costPrice * 1.15)
                     });
                 }
             });
@@ -2726,7 +2776,7 @@ function doGet(e) {
                         <td class="px-6 py-4">${s.date}</td>
                         <td class="px-6 py-4 font-mono font-bold text-emerald-400">${formatRupiah(s.total)}</td>
                         <td class="px-6 py-4 text-right space-x-2">
-                            <!-- Premium PDF print actions styled with prominent visual yellow backgrounds -->
+                            <!-- High priority yellow highlighting on the PDF Action -->
                             <button onclick="previewInvoiceAction('${s.id}')" class="px-3.5 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-extrabold rounded-xl transition-all inline-flex items-center gap-1.5 shadow-lg shadow-yellow-500/20" title="Cetak Faktur PDF"><i data-lucide="printer" class="w-4 h-4"></i> Cetak</button>
                             <button onclick="editSalesTransaction('${s.id}')" class="p-2 bg-zinc-800 hover:bg-zinc-700 text-amber-500 rounded-xl inline-flex"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
                             <button onclick="deleteSalesTransaction('${s.id}')" class="p-2 bg-zinc-800 hover:bg-zinc-700 text-rose-500 rounded-xl inline-flex"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -2753,8 +2803,43 @@ function doGet(e) {
             lucide.createIcons();
         }
 
+        function setSalesPriceType(priceType) {
+            state.activeSalesPriceType = priceType;
+            
+            // Adjust segmented button background designs
+            const buttonUmum = document.getElementById('sform-type-umum');
+            const buttonGrosir = document.getElementById('sform-type-grosir');
+            
+            if (priceType === 'UMUM') {
+                buttonUmum.className = "py-2.5 text-xs font-bold rounded-lg transition-all bg-amber-500 text-black";
+                buttonGrosir.className = "py-2.5 text-xs font-bold rounded-lg transition-all text-zinc-400 hover:text-white";
+                showNotification("Harga Umum Aktif", "info");
+            } else {
+                buttonUmum.className = "py-2.5 text-xs font-bold rounded-lg transition-all text-zinc-400 hover:text-white";
+                buttonGrosir.className = "py-2.5 text-xs font-bold rounded-lg transition-all bg-amber-500 text-black";
+                showNotification("Harga Grosir Aktif", "info");
+            }
+
+            // Recalculate price fields instantly if there is an loaded barcode matching items in stock
+            const barcodeVal = document.getElementById('sform-barcode').value.trim();
+            if (barcodeVal) {
+                const prod = state.products.find(p => p.barcode === barcodeVal);
+                if (prod) {
+                    const price = (priceType === 'GROSIR' && prod.wholesalePrice) ? prod.wholesalePrice : prod.sellPrice;
+                    document.getElementById('sform-sell').value = new Intl.NumberFormat('id-ID').format(price);
+                    updateSalesSubtotal();
+                }
+            }
+        }
+
         function openNewSalesForm() {
             state.salesCart = [];
+            state.activeSalesPriceType = 'UMUM'; // Reset price mode on opening
+            
+            // Update Toggle Button styles visually
+            document.getElementById('sform-type-umum').className = "py-2.5 text-xs font-bold rounded-lg transition-all bg-amber-500 text-black";
+            document.getElementById('sform-type-grosir').className = "py-2.5 text-xs font-bold rounded-lg transition-all text-zinc-400 hover:text-white";
+
             document.getElementById('sform-id').value = "S-" + (Math.floor(Math.random() * 90000) + 10000);
             document.getElementById('sform-buyer').value = "UMUM";
             document.getElementById('sform-barcode').value = "";
@@ -2768,6 +2853,11 @@ function doGet(e) {
             updateSalesSubtotal();
             renderSalesCartTable();
             switchTab('sales_form');
+
+            // Smart Focus: Set cursor focus to Nama Barang automatically
+            setTimeout(() => {
+                document.getElementById('sform-name').focus();
+            }, 300);
         }
 
         function handleSalesBarcodeChange() {
@@ -2776,7 +2866,10 @@ function doGet(e) {
             if (product) {
                 document.getElementById('sform-name').value = product.name;
                 document.getElementById('sform-unit').value = product.unit;
-                document.getElementById('sform-sell').value = new Intl.NumberFormat('id-ID').format(product.sellPrice);
+                
+                // Option 1 pricing determination
+                const price = (state.activeSalesPriceType === 'GROSIR' && product.wholesalePrice) ? product.wholesalePrice : product.sellPrice;
+                document.getElementById('sform-sell').value = new Intl.NumberFormat('id-ID').format(price);
                 document.getElementById('sform-qty').focus();
             } else {
                 document.getElementById('sform-unit').value = "";
@@ -2804,7 +2897,10 @@ function doGet(e) {
                         document.getElementById('sform-name').value = p.name;
                         document.getElementById('sform-barcode').value = p.barcode;
                         document.getElementById('sform-unit').value = p.unit;
-                        document.getElementById('sform-sell').value = new Intl.NumberFormat('id-ID').format(p.sellPrice);
+                        
+                        // Option 1 pricing determination
+                        const price = (state.activeSalesPriceType === 'GROSIR' && p.wholesalePrice) ? p.wholesalePrice : p.sellPrice;
+                        document.getElementById('sform-sell').value = new Intl.NumberFormat('id-ID').format(price);
                         box.classList.add('hidden');
                         document.getElementById('sform-qty').focus();
                         updateSalesSubtotal();
@@ -2828,6 +2924,7 @@ function doGet(e) {
             const qty = cleanNumber(document.getElementById('sform-qty').value);
             const unit = document.getElementById('sform-unit').value || "pcs";
             const sellPrice = cleanNumber(document.getElementById('sform-sell').value);
+            const priceType = state.activeSalesPriceType; // Track whether wholesale or retail
 
             if (!name || qty <= 0 || sellPrice <= 0) {
                 showNotification("Lengkapi input barang!", "error");
@@ -2839,7 +2936,7 @@ function doGet(e) {
                 showNotification(`Peringatan: Stok hanya sisa ${cat.stock}!`, "info");
             }
 
-            state.salesCart.push({ barcode, name, qty, unit, sellPrice });
+            state.salesCart.push({ barcode, name, qty, unit, sellPrice, priceType });
 
             document.getElementById('sform-barcode').value = "";
             document.getElementById('sform-name').value = "";
@@ -2850,7 +2947,7 @@ function doGet(e) {
             updateSalesSubtotal();
             renderSalesCartTable();
             showNotification("Dimasukkan!");
-            document.getElementById('sform-barcode').focus();
+            document.getElementById('sform-name').focus(); // smart focus cycle
         }
 
         function removeSalesCartItem(idx) {
@@ -2868,7 +2965,7 @@ function doGet(e) {
                 grandTotal += sub;
                 tbody.innerHTML += `
                     <tr class="hover:bg-zinc-900 border-b border-zinc-800">
-                        <td class="px-4 py-3 font-semibold uppercase text-zinc-100">${item.name}</td>
+                        <td class="px-4 py-3 font-semibold uppercase text-zinc-100">${item.name} <span class="text-[9px] text-amber-500 font-bold font-mono">(${item.priceType || 'UMUM'})</span></td>
                         <td class="px-4 py-3 text-center font-bold font-mono">${new Intl.NumberFormat('id-ID').format(item.qty)}</td>
                         <td class="px-4 py-3 uppercase text-zinc-400 text-[10px]">${item.unit}</td>
                         <td class="px-4 py-3 font-mono">${new Intl.NumberFormat('id-ID').format(item.sellPrice)}</td>
@@ -2952,7 +3049,7 @@ function doGet(e) {
             
             updateSalesSubtotal();
             renderSalesCartTable();
-            switchTab('sform_id');
+            switchTab('sales_form');
         }
 
         function deleteSalesTransaction(sId) {
@@ -2991,7 +3088,6 @@ function doGet(e) {
             if (el) el.remove();
         }
 
-        /* Fixed PDF generation to avoid window popup blocking issues entirely */
         function printInvoiceNow() {
             const pContent = document.getElementById('invoice-preview-container').innerHTML;
             
