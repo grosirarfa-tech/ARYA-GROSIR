@@ -1,671 +1,446 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Arya Grosir - POS System</title>
-  
-  <!-- Library External -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
-  <style>
-    /* RESET & LAYOUT FULLSCREEN */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-    }
-
-    html, body {
-      width: 100vw;
-      height: 100vh;
-      background-color: #f4f6f9;
-      color: #333;
-      overflow-x: hidden;
-    }
-
-    .app-container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      min-height: 100vh;
-      padding: 10px;
-    }
-
-    /* HEADER & LOGO UTAMA */
-    .header-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #ffffff;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-      margin-bottom: 10px;
-    }
-
-    .logo-container {
-      margin-bottom: 8px;
-    }
-
-    .logo-container img {
-      max-height: 60px;
-      width: auto;
-      object-fit: contain;
-    }
-
-    .nav-buttons {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .btn-nav {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-nav:active {
-      background-color: #0056b3;
-    }
-
-    /* MENU UTAMA GRID FULL SCREEN & RESPONSIVE */
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 10px;
-      width: 100%;
-      margin-bottom: 15px;
-    }
-
-    .menu-card {
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 16px 10px;
-      text-align: center;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      cursor: pointer;
-      border: 1px solid #e2e8f0;
-      transition: all 0.1s ease;
-      font-size: 14px;
-    }
-
-    .menu-card:active {
-      transform: scale(0.97);
-      background-color: #007bff;
-      color: #fff;
-    }
-
-    /* POSISI HP MENDATAR (ANDROID LANDSCAPE) & PC */
-    @media screen and (orientation: landscape) {
-      .header-section {
-        padding: 5px;
-      }
-      .logo-container img {
-        max-height: 40px;
-      }
-      .menu-grid {
-        grid-template-columns: repeat(6, 1fr);
-      }
-    }
-
-    /* FORM & INPUT */
-    .section-card {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-      margin-bottom: 15px;
-      width: 100%;
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-
-    .form-group label {
-      display: block;
-      font-weight: 600;
-      font-size: 13px;
-      margin-bottom: 4px;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 15px;
-    }
-
-    .form-control:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-
-    /* TABEL & LIST DATA */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 13px;
-    }
-
-    .data-table th, .data-table td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-
-    .data-table th {
-      background-color: #f2f2f2;
-    }
-
-    .history-item {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 12px;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-
-    .history-date {
-      font-size: 16px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .history-total {
-      font-size: 18px;
-      font-weight: bold;
-      color: #28a745;
-    }
-
-    /* MENU SINKRON SPREADSHEET PALING BAWAH */
-    .sync-footer {
-      margin-top: auto;
-      padding: 10px 0;
-      width: 100%;
-    }
-
-    .btn-sync {
-      width: 100%;
-      padding: 14px;
-      background-color: #28a745;
-      color: white;
-      font-weight: bold;
-      border: none;
-      border-radius: 6px;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .btn-sync:active {
-      background-color: #1e7e34;
-    }
-
-    /* MODAL POPUP */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-
-    .modal-content {
-      background: white;
-      width: 90%;
-      max-width: 500px;
-      border-radius: 8px;
-      padding: 20px;
-      max-height: 85vh;
-      overflow-y: auto;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .btn-danger { background: #dc3545; color: white; border: none; padding: 10px; border-radius: 5px; flex: 1; font-weight: bold; }
-    .btn-print { background: #17a2b8; color: white; border: none; padding: 10px; border-radius: 5px; flex: 1; font-weight: bold; }
-  </style>
-</head>
-<body>
-
-  <div class="app-container">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ARYA GROSIR - POS System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- HTML5 QR Code Barcode Scanner -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
-    <!-- LOGO DI PANGAT ATAS & TOMBOL NAVIGASI DI BAWAH LOGO -->
-    <div class="header-section">
-      <div class="logo-container">
-        <img src="logo arya grosir.png" alt="Arya Grosir" onerror="this.src='https://via.placeholder.com/180x60?text=Arya+Grosir'">
-      </div>
-      <div class="nav-buttons">
-        <button class="btn-nav" onclick="showSection('menuMain')">Home</button>
-        <button class="btn-nav" onclick="goBack()">Kembali</button>
-      </div>
-    </div>
-
-    <!-- MENU UTAMA FULL SCREEN -->
-    <div id="menuMain" class="menu-grid">
-      <div class="menu-card" onclick="showSection('secPenjualan')">Penjualan</div>
-      <div class="menu-card" onclick="showSection('secBelanja')">Belanja Barang</div>
-      <div class="menu-card" onclick="showSection('secStok')">Katalog Stok</div>
-      <div class="menu-card" onclick="showSection('secRiwayat')">Riwayat Penjualan</div>
-      <div class="menu-card" onclick="showSection('secKeuntungan')">Keuntungan</div>
-      <div class="menu-card" onclick="showSection('secPerkiraan')">Perkiraan Belanja</div>
-    </div>
-
-    <!-- FORM INPUT PENJUALAN -->
-    <div id="secPenjualan" class="section-card" style="display:none;">
-      <h3>Form Penjualan</h3>
-      <form id="formPenjualan" onsubmit="event.preventDefault(); simpanKeranjang();">
-        <div class="form-group">
-          <label>Nama Barang</label>
-          <input type="text" id="pjNamaBarang" class="form-control" list="listBarang" placeholder="Pilih / ketik barang..." oninput="checkSelectBarang(this, 'pjJumlah')">
-          <datalist id="listBarang">
-            <option value="Minyak Goreng 1L"></option>
-            <option value="Beras 5kg"></option>
-            <option value="Gula Pasir 1kg"></option>
-            <option value="Telur Ayam 1kg"></option>
-          </datalist>
-        </div>
-
-        <div class="form-group">
-          <label>Jumlah Barang</label>
-          <input type="number" id="pjJumlah" class="form-control" inputmode="numeric" pattern="[0-9]*" placeholder="0" onkeydown="checkEnterKey(event, 'pjHargaJualGrosir')">
-        </div>
-
-        <div class="form-group">
-          <label>Harga Jual Grosir</label>
-          <input type="number" id="pjHargaJualGrosir" class="form-control" inputmode="numeric" pattern="[0-9]*" placeholder="0" onkeydown="checkEnterKey(event, 'pjHargaJualRetail')">
-        </div>
-
-        <div class="form-group">
-          <label>Harga Jual Retail</label>
-          <input type="number" id="pjHargaJualRetail" class="form-control" inputmode="numeric" pattern="[0-9]*" placeholder="0" onkeydown="checkEnterKey(event, 'btnSimpanPj')">
-        </div>
-
-        <button type="submit" id="btnSimpanPj" class="btn-nav" style="width: 100%; padding: 12px;">Masukkan Keranjang</button>
-      </form>
-    </div>
-
-    <!-- FORM INPUT BELANJA BARANG -->
-    <div id="secBelanja" class="section-card" style="display:none;">
-      <h3>Form Belanja Barang</h3>
-      <form id="formBelanja" onsubmit="event.preventDefault(); simpanBelanja();">
-        <div class="form-group">
-          <label>Nama Barang</label>
-          <input type="text" id="blNamaBarang" class="form-control" list="listBarang" placeholder="Nama barang..." oninput="checkSelectBarang(this, 'blHargaPokok')">
-        </div>
-        <div class="form-group">
-          <label>Harga Pokok (Modal)</label>
-          <input type="number" id="blHargaPokok" class="form-control" inputmode="numeric" pattern="[0-9]*" placeholder="0" onkeydown="checkEnterKey(event, 'blJumlah')">
-        </div>
-        <div class="form-group">
-          <label>Jumlah Belanja</label>
-          <input type="number" id="blJumlah" class="form-control" inputmode="numeric" pattern="[0-9]*" placeholder="0" onkeydown="checkEnterKey(event, 'btnSimpanBl')">
-        </div>
-        <button type="submit" id="btnSimpanBl" class="btn-nav" style="width: 100%; padding: 12px;">Simpan Belanja</button>
-      </form>
-    </div>
-
-    <!-- MENU KATALOG STOK -->
-    <div id="secStok" class="section-card" style="display:none;">
-      <h3>Katalog Stok Barang</h3>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Nama Barang</th>
-            <th>Stok Sekarang</th>
-            <th>Stok Minimal</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyStok">
-          <!-- Rendered dynamically -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- MENU KEUNTUNGAN -->
-    <div id="secKeuntungan" class="section-card" style="display:none;">
-      <h3>Laporan Keuntungan</h3>
-      
-      <h4 style="margin-top: 10px;">Daftar Rekap Keuntungan Daily</h4>
-      <div style="overflow-x: auto;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Keuntungan Kotor</th>
-              <th>Pengeluaran</th>
-              <th>Keuntungan Bersih</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyKeuntungan">
-            <tr>
-              <td>22/07/2026</td>
-              <td>Rp 500.000</td>
-              <td>Rp 100.000</td>
-              <td><b>Rp 400.000</b></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="text-align: center; margin: 20px 0 10px 0;">
-        <h4>Total Keuntungan Bersih (Tahun Ini)</h4>
-        <h2 style="color: #28a745;" id="txtTotalKeuntungan">Rp 4.800.000</h2>
-      </div>
-
-      <div>
-        <canvas id="chartKeuntungan" style="width:100%; max-height:250px;"></canvas>
-      </div>
-    </div>
-
-    <!-- MENU PERKIRAAN BELANJA (SEBELAH KANAN KEUNTUNGAN) -->
-    <div id="secPerkiraan" class="section-card" style="display:none;">
-      <h3>Perkiraan Belanja Restok</h3>
-      <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Daftar barang yang harus dibeli (Restok = Stok Minimal - Stok Saat Ini)</p>
-      
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Nama Barang</th>
-            <th>Stok Saat Ini</th>
-            <th>Minimal Stok</th>
-            <th>Harus Restok</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyPerkiraan">
-          <!-- Populated from Katalog Data -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- MENU RIWAYAT PENJUALAN -->
-    <div id="secRiwayat" class="section-card" style="display:none;">
-      <h3>Riwayat Penjualan</h3>
-      <div id="listRiwayatPenjualan"></div>
-    </div>
-
-    <!-- MENU SINKRON SPREADSHEET (BERADA DI PALING BAWAH) -->
-    <div class="sync-footer">
-      <button class="btn-sync" onclick="sinkronSpreadsheet()">Sync / Sinkronkan Spreadsheet</button>
-    </div>
-
-  </div>
-
-  <!-- MODAL DETAIL TRANSAKSI & KERANJANG -->
-  <div id="modalDetail" class="modal">
-    <div class="modal-content">
-      <h3>Detail Transaksi</h3>
-      <hr style="margin: 10px 0;">
-      <div id="modalContentBody"></div>
-      
-      <div class="modal-actions">
-        <button class="btn-danger" onclick="hapusTransaksi()">Delete</button>
-        <button class="btn-print" onclick="cetakPDF()">Cetak PDF Faktur</button>
-      </div>
-      <button onclick="closeModal()" style="width:100%; margin-top:10px; padding:8px; border:none; background:#ccc; border-radius:5px;">Tutup</button>
-    </div>
-  </div>
-
-  <script>
-    // DATA DUMMY & STATE MANAGEMENT
-    let sampleKatalog = [
-      { nama: "Minyak Goreng 1L", stok: 3, stokMin: 10 },
-      { nama: "Beras 5kg", stok: 2, stokMin: 5 },
-      { nama: "Gula Pasir 1kg", stok: 12, stokMin: 10 },
-      { nama: "Telur Ayam 1kg", stok: 1, stokMin: 8 }
-    ];
-
-    let sampleRiwayat = [
-      { id: "TRX002", tanggal: "2026-07-22 10:30", total: 150000, items: [{ nama: "Minyak Goreng 1L", qty: 5, harga: 20000 }] },
-      { id: "TRX001", tanggal: "2026-07-21 14:15", total: 85000, items: [{ nama: "Gula Pasir 1kg", qty: 3, harga: 15000 }] }
-    ];
-
-    let activeTrxId = null;
-
-    // NAVIGASI SECTION
-    function showSection(secId) {
-      const sections = ['menuMain', 'secPenjualan', 'secBelanja', 'secStok', 'secKeuntungan', 'secPerkiraan', 'secRiwayat'];
-      sections.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.style.display = (id === secId) ? 'block' : 'none';
-      });
-
-      if (secId === 'secStok') renderStok();
-      if (secId === 'secPerkiraan') renderPerkiraanBelanja();
-      if (secId === 'secKeuntungan') renderChart();
-      if (secId === 'secRiwayat') renderRiwayat();
-    }
-
-    function goBack() {
-      showSection('menuMain');
-    }
-
-    // AUTO-FOCUS & KEYBOARD VIRTUAL ANDROID
-    function focusNext(nextId) {
-      const nextEl = document.getElementById(nextId);
-      if(nextEl) {
-        nextEl.focus();
-        nextEl.click(); // Memastikan keyboard Android tetap aktif
-      }
-    }
-
-    function checkSelectBarang(inputEl, nextId) {
-      // Jika input sudah terisi dari memilih referensi/datalist
-      if(inputEl.value.trim() !== "") {
-        // Cek jika mencocokkan salah satu list
-        focusNext(nextId);
-      }
-    }
-
-    function checkEnterKey(event, nextId) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        const val = event.target.value.trim();
-        if (val === "") {
-          alert("Data harus di isi");
-        } else {
-          focusNext(nextId);
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
-      }
-    }
-
-    // SIMPAN KE KERANJANG (FORM PENJUALAN)
-    function simpanKeranjang() {
-      const nama = document.getElementById('pjNamaBarang').value.trim();
-      const qty = document.getElementById('pjJumlah').value.trim();
-
-      if (!nama || !qty) {
-        alert("Data harus di isi");
-        return;
-      }
-
-      // Notifikasi Sesuai Instruksi
-      alert("berhasil simpan ke keranjang");
-
-      // Reset form & otomatis kembalikan kursor ke Nama Barang dengan Virtual Keyboard
-      document.getElementById('formPenjualan').reset();
-      const inputNama = document.getElementById('pjNamaBarang');
-      inputNama.focus();
-      inputNama.click();
-    }
-
-    // FORM BELANJA
-    function simpanBelanja() {
-      const nama = document.getElementById('blNamaBarang').value.trim();
-      const harga = document.getElementById('blHargaPokok').value.trim();
-
-      if (!nama || !harga) {
-        alert("Data harus di isi");
-        return;
-      }
-
-      alert("berhasil simpan belanja barang");
-      document.getElementById('formBelanja').reset();
-      const inputNama = document.getElementById('blNamaBarang');
-      inputNama.focus();
-      inputNama.click();
-    }
-
-    // PERKIRAAN BELANJA (JUMLAH MINIMAL - STOK SEKARANG)
-    function renderPerkiraanBelanja() {
-      const tbody = document.getElementById('tbodyPerkiraan');
-      tbody.innerHTML = '';
-      
-      sampleKatalog.forEach(item => {
-        if (item.stok <= item.stokMin) {
-          const jumlahRestok = item.stokMin - item.stok;
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><b>${item.nama}</b></td>
-            <td>${item.stok}</td>
-            <td>${item.stokMin}</td>
-            <td style="color:red; font-weight:bold; font-size:15px;">${jumlahRestok}</td>
-          `;
-          tbody.appendChild(tr);
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
-      });
-    }
-
-    function renderStok() {
-      const tbody = document.getElementById('tbodyStok');
-      tbody.innerHTML = '';
-      sampleKatalog.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td><b>${item.nama}</b></td><td>${item.stok}</td><td>${item.stokMin}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // RIWAYAT PENJUALAN (URUT TERBARU & UKURAN BESAR)
-    function renderRiwayat() {
-      const container = document.getElementById('listRiwayatPenjualan');
-      container.innerHTML = '';
-
-      sampleRiwayat.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'history-item';
-        div.onclick = () => openModalDetail(item.id);
-        div.innerHTML = `
-          <div class="history-date">${item.tanggal}</div>
-          <div class="history-total">Total: Rp ${item.total.toLocaleString('id-ID')}</div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function openModalDetail(trxId) {
-      activeTrxId = trxId;
-      const data = sampleRiwayat.find(x => x.id === trxId);
-      if(!data) return;
-
-      let html = `<p><b>ID Transaksi:</b> ${data.id}</p><p><b>Tanggal:</b> ${data.tanggal}</p><br><ul>`;
-      data.items.forEach(i => {
-        html += `<li>${i.nama} x ${i.qty} = Rp ${(i.harga * i.qty).toLocaleString('id-ID')}</li>`;
-      });
-      html += `</ul><br><h4>Total Bayar: Rp ${data.total.toLocaleString('id-ID')}</h4>`;
-
-      document.getElementById('modalContentBody').innerHTML = html;
-      document.getElementById('modalDetail').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('modalDetail').style.display = 'none';
-    }
-
-    function hapusTransaksi() {
-      if(confirm("Hapus transaksi ini dan kembalikan stok?")) {
-        sampleRiwayat = sampleRiwayat.filter(x => x.id !== activeTrxId);
-        closeModal();
-        renderRiwayat();
-        alert("Transaksi berhasil dihapus.");
-      }
-    }
-
-    function cetakPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const data = sampleRiwayat.find(x => x.id === activeTrxId);
-
-      doc.setFontSize(16);
-      doc.text("FAKTUR PENJUALAN - ARYA GROSIR", 10, 20);
-      doc.setFontSize(11);
-      doc.text(`ID Transaksi : ${data.id}`, 10, 30);
-      doc.text(`Tanggal      : ${data.tanggal}`, 10, 37);
-
-      let y = 48;
-      data.items.forEach(i => {
-        doc.text(`- ${i.nama} (${i.qty}x) = Rp ${i.harga * i.qty}`, 10, y);
-        y += 8;
-      });
-
-      doc.text(`TOTAL: Rp ${data.total.toLocaleString('id-ID')}`, 10, y + 8);
-      doc.output('dataurlnewwindow');
-    }
-
-    // CHART KEUNTUNGAN BULANAN
-    function renderChart() {
-      const ctx = document.getElementById('chartKeuntungan').getContext('2d');
-      if (window.myChart) window.myChart.destroy();
-
-      const monthlyData = [1200000, 2500000, 1800000, 3100000, 900000, 2100000];
-      const maxVal = Math.max(...monthlyData);
-      const minVal = Math.min(...monthlyData);
-
-      const colors = monthlyData.map(val => {
-        if (val === maxVal) return '#28a745'; // Hijau (Tertinggi)
-        if (val === minVal) return '#dc3545'; // Merah (Terendah)
-        return '#ffc107'; // Kuning
-      });
-
-      window.myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-          datasets: [{
-            label: 'Keuntungan Bersih (Rp)',
-            data: monthlyData,
-            backgroundColor: colors
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } }
+        body {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #000000;
+            color: #f8fafc;
+            touch-action: manipulation;
         }
-      });
-    }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body class="bg-black text-slate-100 flex flex-col h-screen overflow-hidden">
 
-    // SINKRON SPREADSHEET (PALING BAWAH)
-    function sinkronSpreadsheet() {
-      if (typeof google !== 'undefined' && google.script) {
-        google.script.run
-          .withSuccessHandler(() => alert("Sinkronisasi spreadsheet berhasil!"))
-          .withFailureHandler((err) => alert("Gagal Sinkron: " + err.message))
-          .getPerkiraanBelanja();
-      } else {
-        alert("Menyinkronkan data dengan Google Spreadsheet...");
-      }
-    }
-  </script>
+    <!-- MAIN HEADER: bersih dari tulisan selamat datang & keterangan -->
+    <header class="bg-zinc-950 border-b border-amber-500/30 px-3 py-2 flex flex-col items-center justify-center shrink-0 z-10 shadow-lg relative">
+        <div class="flex items-center justify-center py-0.5">
+            <img src="logo web arya.png" alt="Logo ARYA GROSIR" onerror="this.onerror=null; this.src='https://placehold.co/300x70/000000/fbbf24?text=ARYA+GROSIR';" class="h-9 sm:h-11 object-contain filter drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">
+        </div>
+
+        <div class="w-full flex justify-between items-center mt-1 pt-1 border-t border-zinc-800/80">
+            <div class="flex items-center space-x-2">
+                <button id="navHomeBtn" onclick="goToHome()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 px-3 py-1 rounded-xl transition active:scale-95 border border-amber-500/30 flex items-center space-x-1.5 text-xs font-bold">
+                    <i class="fa-solid fa-house text-sm"></i>
+                    <span>Home</span>
+                </button>
+                <button id="navBackBtn" onclick="handleAndroidBack()" class="hidden bg-zinc-800 hover:bg-zinc-700 text-slate-200 px-3 py-1 rounded-xl transition active:scale-95 border border-zinc-700 text-xs font-bold flex items-center space-x-1">
+                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                    <span>Kembali</span>
+                </button>
+                <span id="headerTitle" class="text-xs sm:text-sm font-black tracking-wide text-amber-400 pl-1">ARYA GROSIR</span>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <div id="syncStatusBadge" title="Status Sinkronisasi Spreadsheet" class="flex items-center space-x-1 text-[10px] bg-zinc-900 px-2 py-1 rounded-full border border-zinc-800 text-slate-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="syncBadgeText" class="hidden sm:inline">Auto-Sync</span>
+                </div>
+                <div id="headerDate" class="text-[11px] font-semibold text-slate-300"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main id="appContainer" class="flex-1 relative overflow-hidden bg-black">
+
+        <!-- VIEW 1: HOME (MENU UTAMA ANDROID) -->
+        <section id="viewHome" class="w-full h-full p-3 sm:p-5 flex flex-col justify-between overflow-y-auto no-scrollbar">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 my-auto py-2 max-w-4xl mx-auto w-full">
+                
+                <!-- Menu 1: Belanja Barang (Kulakan) -->
+                <button onclick="navigateTo('viewBelanjaBarang')" class="bg-gradient-to-br from-amber-600/90 to-orange-800/90 hover:from-amber-500 hover:to-orange-700 rounded-2xl p-4 flex flex-col items-center justify-center border border-amber-400/40 shadow-xl active:scale-95 transition group min-h-[110px] sm:min-h-[130px]">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-black/40 border border-amber-300/40 flex items-center justify-center text-amber-300 group-hover:scale-110 transition duration-200 shadow-inner mb-2">
+                        <i class="fa-solid fa-truck-ramp-box text-2xl sm:text-3xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm font-black text-amber-100 text-center leading-tight tracking-wide">BELANJA BARANG</span>
+                </button>
+
+                <!-- Menu 2: Penjualan -->
+                <button onclick="navigateTo('viewPenjualan')" class="bg-gradient-to-br from-emerald-600/90 to-teal-800/90 hover:from-emerald-500 hover:to-teal-700 rounded-2xl p-4 flex flex-col items-center justify-center border border-emerald-400/40 shadow-xl active:scale-95 transition group min-h-[110px] sm:min-h-[130px]">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-black/40 border border-emerald-300/40 flex items-center justify-center text-emerald-300 group-hover:scale-110 transition duration-200 shadow-inner mb-2">
+                        <i class="fa-solid fa-cash-register text-2xl sm:text-3xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm font-black text-emerald-100 text-center leading-tight tracking-wide">PENJUALAN</span>
+                </button>
+
+                <!-- Menu 3: Katalog Stok -->
+                <button onclick="navigateTo('viewKatalog')" class="bg-gradient-to-br from-blue-600/90 to-indigo-800/90 hover:from-blue-500 hover:to-indigo-700 rounded-2xl p-4 flex flex-col items-center justify-center border border-blue-400/40 shadow-xl active:scale-95 transition group min-h-[110px] sm:min-h-[130px]">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-black/40 border border-blue-300/40 flex items-center justify-center text-blue-300 group-hover:scale-110 transition duration-200 shadow-inner mb-2">
+                        <i class="fa-solid fa-boxes-stacked text-2xl sm:text-3xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm font-black text-blue-100 text-center leading-tight tracking-wide">KATALOG STOK</span>
+                </button>
+
+                <!-- Menu 4: Perkiraan Belanja Restock -->
+                <button onclick="navigateTo('viewRestock')" class="bg-gradient-to-br from-red-600/90 to-rose-800/90 hover:from-red-500 hover:to-rose-700 rounded-2xl p-4 flex flex-col items-center justify-center border border-rose-400/40 shadow-xl active:scale-95 transition group min-h-[110px] sm:min-h-[130px]">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-black/40 border border-rose-300/40 flex items-center justify-center text-rose-300 group-hover:scale-110 transition duration-200 shadow-inner mb-2">
+                        <i class="fa-solid fa-clipboard-list text-2xl sm:text-3xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm font-black text-rose-100 text-center leading-tight tracking-wide">ESTIMASI RESTOCK</span>
+                </button>
+
+                <!-- Menu 5: Pengeluaran Lain -->
+                <button onclick="navigateTo('viewPengeluaran')" class="bg-gradient-to-br from-purple-600/90 to-pink-800/90 hover:from-purple-500 hover:to-pink-700 rounded-2xl p-4 flex flex-col items-center justify-center border border-purple-400/40 shadow-xl active:scale-95 transition group min-h-[110px] sm:min-h-[130px]">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-black/40 border border-purple-300/40 flex items-center justify-center text-purple-300 group-hover:scale-110 transition duration-200 shadow-inner mb-2">
+                        <i class="fa-solid fa-hand-holding-dollar text-2xl sm:text-3xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm font-black text-purple-100 text-center leading-tight tracking-wide">PENGELUARAN LAIN</span>
+                </button>
+
+                <!-- Menu 6: Keuntungan -->
+                <button onclick="navigateTo('viewKeuntungan')" class="bg-gradient-to-br from-cyan-600/90 to-blue-800/90 hover:from-cyan-500 hover:to-blue-700 rounded-2xl p-4 flex flex-col items-center justify-center border border-cyan-400/40 shadow-xl active:scale-95 transition group min-h-[110px] sm:min-h-[130px]">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-black/40 border border-cyan-300/40 flex items-center justify-center text-cyan-300 group-hover:scale-110 transition duration-200 shadow-inner mb-2">
+                        <i class="fa-solid fa-chart-pie text-2xl sm:text-3xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm font-black text-cyan-100 text-center leading-tight tracking-wide">KEUNTUNGAN</span>
+                </button>
+
+            </div>
+            <div class="text-center text-[10px] text-zinc-600 py-1">
+                ARYA GROSIR POS &bull; Optimized for Android Handheld
+            </div>
+        </section>
+
+        <!-- VIEW 2: KATALOG STOK (NAMA BARANG & JUMLAH STOK BESAR) -->
+        <section id="viewKatalog" class="hidden w-full h-full p-3 flex flex-col overflow-hidden max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-3 gap-2 shrink-0">
+                <input type="text" id="katalogSearchInput" oninput="renderKatalogList()" placeholder="Cari nama barang atau barcode..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+            </div>
+
+            <div id="katalogContainer" class="flex-1 overflow-y-auto space-y-2.5 pr-1 no-scrollbar">
+                <!-- Tampilan Card Katalog Di-render via JS dengan Nama Paling Besar dan Jumlah Stok Menjolak -->
+            </div>
+        </section>
+
+        <!-- VIEW 3: BELANJA BARANG / KULAKAN (NO HORIZONTAL SCROLL) -->
+        <section id="viewBelanjaBarang" class="hidden w-full h-full p-3 flex flex-col overflow-hidden max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-3 shrink-0">
+                <span class="text-xs text-amber-400 font-bold uppercase tracking-wider">Riwayat Belanja / Kulakan</span>
+                <button onclick="openFormBelanjaBaru()" class="bg-amber-500 text-zinc-950 font-black px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 shadow-lg active:scale-95">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>BELANJA BARU</span>
+                </button>
+            </div>
+
+            <div id="belanjaHistoryContainer" class="flex-1 overflow-y-auto space-y-2 pr-1 no-scrollbar">
+                <!-- List Riwayat Belanja (Atas-Bawah Only) -->
+            </div>
+        </section>
+
+        <!-- VIEW 4: RIWAYAT PENJUALAN (NO HORIZONTAL SCROLL) -->
+        <section id="viewPenjualan" class="hidden w-full h-full p-3 flex flex-col overflow-hidden max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-3 shrink-0">
+                <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Riwayat Penjualan Kasir</span>
+                <button onclick="openFormPenjualanBaru()" class="bg-emerald-500 text-zinc-950 font-black px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 shadow-lg active:scale-95">
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span>TRANSAKSI BARU</span>
+                </button>
+            </div>
+
+            <div id="penjualanHistoryContainer" class="flex-1 overflow-y-auto space-y-2 pr-1 no-scrollbar">
+                <!-- List Riwayat Penjualan (Full Screen Vertikal) -->
+            </div>
+        </section>
+
+        <!-- VIEW 5: PERKIRAAN BELANJA RESTOCK (NAMA PALING BESAR & FULL SCREEN VERTICAL NO HORIZONTAL SCROLL) -->
+        <section id="viewRestock" class="hidden w-full h-full p-3 flex flex-col overflow-hidden max-w-3xl mx-auto">
+            <div class="bg-red-950/40 border border-red-500/30 p-2.5 rounded-xl mb-2 shrink-0 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xs font-black text-rose-400 uppercase tracking-wide">Daftar Perkiraan Restock</h2>
+                    <p class="text-[10px] text-zinc-400">Barang menipis / perlu dibeli ulang</p>
+                </div>
+                <i class="fa-solid fa-triangle-exclamation text-rose-500 text-lg"></i>
+            </div>
+
+            <!-- Container Restock: Tanpa Scroll Kanan-Kiri, Hanya Atas-Bawah -->
+            <div id="restockContainer" class="flex-1 overflow-y-auto overflow-x-hidden space-y-3 pr-1 no-scrollbar w-full">
+                <!-- Dynamic Items with Big Titles -->
+            </div>
+        </section>
+
+        <!-- VIEW 6: PENGELUARAN LAIN -->
+        <section id="viewPengeluaran" class="hidden w-full h-full p-3 flex flex-col overflow-hidden max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-3 shrink-0">
+                <span class="text-xs text-purple-400 font-bold uppercase">Riwayat Pengeluaran Operasional</span>
+            </div>
+            <div id="pengeluaranContainer" class="flex-1 overflow-y-auto space-y-2 no-scrollbar">
+                <!-- Dynamic List Pengeluaran -->
+            </div>
+        </section>
+
+        <!-- VIEW 7: KEUNTUNGAN -->
+        <section id="viewKeuntungan" class="hidden w-full h-full p-3 flex flex-col overflow-y-auto no-scrollbar max-w-3xl mx-auto">
+            <div class="bg-zinc-900 border border-cyan-500/30 p-4 rounded-2xl text-center">
+                <span class="text-xs text-zinc-400 block mb-1">Total Estimasi Keuntungan Bersih</span>
+                <span id="totalLabaText" class="text-2xl font-black text-cyan-400">Rp 0</span>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC WITH ANDROID BACK BUTTON & FULL RESPONSIVE FIXES -->
+    <script>
+        // Sample Data Mockup
+        let sampleKatalog = [
+            { id: "B1", barcode: "8991001", nama: "MINYAK GORENG 2L", stok: 3, satuan: "Pcs", hargaBeli: 28000, hargaJual: 32000, minStok: 5 },
+            { id: "B2", barcode: "8991002", nama: "BERAS PREMIUM 5KG", stok: 12, satuan: "Pcs", hargaBeli: 65000, hargaJual: 72000, minStok: 10 },
+            { id: "B3", barcode: "8991003", nama: "GULA PASIR 1KG", stok: 2, satuan: "Pcs", hargaBeli: 14000, hargaJual: 16000, minStok: 8 },
+            { id: "B4", barcode: "8991004", nama: "MIE INSTANT GORENG", stok: 85, satuan: "Dus", hargaBeli: 102000, hargaJual: 112000, minStok: 20 }
+        ];
+
+        let sampleBelanja = [
+            { id: "BLK-001", tanggal: "2026-07-20", supplier: "DISTRIBUTOR AGUNG", total: 1250000, totalItem: 15 },
+            { id: "BLK-002", tanggal: "2026-07-18", supplier: "GROSIR SEJAHTERA", total: 840000, totalItem: 8 }
+        ];
+
+        let samplePenjualan = [
+            { id: "PJL-101", tanggal: "2026-07-22", pembeli: "UMUM", total: 144000, bayar: 150000, kembali: 6000 },
+            { id: "PJL-102", tanggal: "2026-07-21", pembeli: "TOKO BU SITI", total: 520000, bayar: 520000, kembali: 0 }
+        ];
+
+        let currentView = 'viewHome';
+
+        // 1. DUKUNGAN TOMBOL FISIK BACK ANDROID
+        window.addEventListener('DOMContentLoaded', () => {
+            // Push initial state
+            history.pushState({ view: 'viewHome' }, '', '');
+            updateHeaderDate();
+            renderAllViews();
+        });
+
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.view) {
+                switchView(event.state.view, false);
+            } else {
+                switchView('viewHome', false);
+            }
+        });
+
+        function handleAndroidBack() {
+            if (currentView !== 'viewHome') {
+                history.back();
+            }
+        }
+
+        function navigateTo(viewId) {
+            if (currentView !== viewId) {
+                history.pushState({ view: viewId }, '', '');
+                switchView(viewId, false);
+            }
+        }
+
+        function goToHome() {
+            if (currentView !== 'viewHome') {
+                history.pushState({ view: 'viewHome' }, '', '');
+                switchView('viewHome', false);
+            }
+        }
+
+        function switchView(viewId, pushHistory = true) {
+            const views = ['viewHome', 'viewKatalog', 'viewBelanjaBarang', 'viewPenjualan', 'viewRestock', 'viewPengeluaran', 'viewKeuntungan'];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+
+            const targetEl = document.getElementById(viewId);
+            if (targetEl) targetEl.classList.remove('hidden');
+
+            currentView = viewId;
+
+            // Nav back button display logic
+            const backBtn = document.getElementById('navBackBtn');
+            const titleEl = document.getElementById('headerTitle');
+
+            if (viewId === 'viewHome') {
+                if (backBtn) backBtn.classList.add('hidden');
+                if (titleEl) titleEl.textContent = 'ARYA GROSIR';
+            } else {
+                if (backBtn) backBtn.classList.remove('hidden');
+                if (titleEl) {
+                    const titles = {
+                        'viewKatalog': 'KATALOG STOK',
+                        'viewBelanjaBarang': 'BELANJA KULAKAN',
+                        'viewPenjualan': 'KASIR PENJUALAN',
+                        'viewRestock': 'ESTIMASI RESTOCK',
+                        'viewPengeluaran': 'PENGELUARAN LAIN',
+                        'viewKeuntungan': 'KEUNTUNGAN'
+                    };
+                    titleEl.textContent = titles[viewId] || 'ARYA GROSIR';
+                }
+            }
+
+            renderAllViews();
+        }
+
+        function updateHeaderDate() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            const dateEl = document.getElementById('headerDate');
+            if (dateEl) dateEl.textContent = dateStr;
+        }
+
+        function renderAllViews() {
+            renderKatalogList();
+            renderBelanjaHistory();
+            renderPenjualanHistory();
+            renderRestockList();
+        }
+
+        // 2. KATALOG STOK: Nama Barang Paling Besar + Jumlah Stok Menjolak
+        function renderKatalogList() {
+            const container = document.getElementById('katalogContainer');
+            if (!container) return;
+            const search = (document.getElementById('katalogSearchInput')?.value || '').toLowerCase();
+
+            const filtered = sampleKatalog.filter(item => 
+                item.nama.toLowerCase().includes(search) || item.barcode.includes(search)
+            );
+
+            container.innerHTML = filtered.map(item => `
+                <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg">
+                    <div class="border-b border-zinc-800 pb-2 mb-2">
+                        <!-- NAMA BARANG PALING BESAR -->
+                        <h3 class="text-base sm:text-lg font-black text-amber-400 uppercase tracking-wide leading-tight">${item.nama}</h3>
+                        <span class="text-[10px] text-zinc-500 font-mono">BC: ${item.barcode}</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <span class="text-[10px] text-zinc-400 block">Harga Jual:</span>
+                            <span class="text-sm font-bold text-emerald-400">Rp ${item.hargaJual.toLocaleString('id-ID')}</span>
+                        </div>
+                        <!-- TAMPILAN JUMLAH STOK BARANG SANGAT MENJOLAK -->
+                        <div class="text-right bg-zinc-950 px-3 py-1.5 rounded-xl border border-zinc-800">
+                            <span class="text-[9px] text-zinc-400 block uppercase font-semibold">Sisa Stok</span>
+                            <span class="text-xl sm:text-2xl font-black ${item.stok <= item.minStok ? 'text-rose-500' : 'text-amber-400'}">${item.stok} <span class="text-xs text-zinc-300 font-normal">${item.satuan}</span></span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 3. LIST RIWAYAT BELANJA (KULAKAN)
+        function renderBelanjaHistory() {
+            const container = document.getElementById('belanjaHistoryContainer');
+            if (!container) return;
+
+            container.innerHTML = sampleBelanja.map(item => `
+                <div class="bg-zinc-900 border border-amber-500/20 p-3 rounded-2xl shadow flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-black text-amber-400">${item.id}</div>
+                        <div class="text-[11px] text-zinc-300 font-semibold">${item.supplier}</div>
+                        <div class="text-[10px] text-zinc-500">${item.tanggal} &bull; ${item.totalItem} Item</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-zinc-400 block">Total Kulakan</span>
+                        <span class="text-sm font-black text-amber-400">Rp ${item.total.toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 4. LIST RIWAYAT PENJUALAN
+        function renderPenjualanHistory() {
+            const container = document.getElementById('penjualanHistoryContainer');
+            if (!container) return;
+
+            container.innerHTML = samplePenjualan.map(item => `
+                <div class="bg-zinc-900 border border-emerald-500/20 p-3 rounded-2xl shadow flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-black text-emerald-400">${item.id}</div>
+                        <div class="text-[11px] text-zinc-300 font-semibold">Pembeli: ${item.pembeli}</div>
+                        <div class="text-[10px] text-zinc-500">${item.tanggal}</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-zinc-400 block">Total Transaksi</span>
+                        <span class="text-sm font-black text-emerald-400">Rp ${item.total.toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 5. PERKIRAAN BELANJA RESTOCK: NAMA PALING BESAR & FULL VERTICAL NO SIDE-SCROLL
+        function renderRestockList() {
+            const container = document.getElementById('restockContainer');
+            if (!container) return;
+
+            // Filter items with low stock
+            const lowStockItems = sampleKatalog.filter(item => item.stok <= item.minStok);
+
+            if (lowStockItems.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-zinc-500 text-xs">
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-3xl mb-2 block"></i>
+                        Semua stok barang aman/mencukupi.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = lowStockItems.map(item => {
+                const estimasiBeli = (item.minStok * 2) - item.stok;
+                const estBiaya = estimasiBeli * item.hargaBeli;
+
+                return `
+                    <div class="w-full bg-zinc-900/95 border-2 border-rose-500/40 rounded-2xl p-4 shadow-xl flex flex-col justify-between space-y-3">
+                        <!-- NAMA BARANG PALING BESAR DI TAMPILAN RESTOCK -->
+                        <div>
+                            <span class="text-[9px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-black tracking-wider uppercase mb-1 inline-block">PERLU RESTOCK</span>
+                            <h2 class="text-lg sm:text-xl font-black text-amber-300 uppercase tracking-wide leading-tight">${item.nama}</h2>
+                        </div>
+
+                        <!-- DETAIL HARUS BELI FULL-WIDTH TAMPILAN VERTIKAL -->
+                        <div class="grid grid-cols-2 gap-2 bg-black/60 p-3 rounded-xl border border-zinc-800">
+                            <div>
+                                <span class="text-[10px] text-zinc-400 block">Sisa Stok Sekarang:</span>
+                                <span class="text-lg font-black text-rose-400">${item.stok} ${item.satuan}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] text-zinc-400 block">Estimasi Harus Beli:</span>
+                                <span class="text-lg font-black text-emerald-400">+${estimasiBeli} ${item.satuan}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-1 text-xs">
+                            <span class="text-zinc-400">Est. Modal Restock:</span>
+                            <span class="text-sm font-black text-amber-400">Rp ${estBiaya.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Placeholder helper functions
+        function openFormBelanjaBaru() { alert("Form Belanja Baru dibuka"); }
+        function openFormPenjualanBaru() { alert("Form Transaksi Penjualan dibuka"); }
+    </script>
 </body>
 </html>
