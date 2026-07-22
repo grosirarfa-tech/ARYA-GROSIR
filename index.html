@@ -7,78 +7,117 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .nav-active { ring: 4px solid #f59e0b; border-color: #f59e0b; transform: scale(1.02); }
-    /* Hide scrollbars for app-like fullscreen feel */
     ::-webkit-scrollbar { display: none; }
     * { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col justify-between overflow-hidden select-none">
+<body class="bg-black text-slate-100 font-sans min-h-screen flex flex-col justify-between overflow-hidden select-none">
 
-  <!-- HEADER GLOBAL -->
-  <header class="bg-slate-800 border-b border-slate-700 px-4 py-2 flex justify-between items-center h-14 shrink-0">
-    <button onclick="navHome()" class="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded-lg shadow transition active:scale-95">
-      <i data-lucide="home" class="w-5 h-5"></i>
-      <span class="text-sm">Home</span>
-    </button>
-    <div id="live-date" class="text-amber-400 font-extrabold text-sm md:text-base tracking-wider">--/--/----</div>
+  <!-- HEADER / LOGO BAR -->
+  <header class="bg-black pt-3 pb-1 px-4 flex flex-col items-center justify-center shrink-0">
+    <!-- LOGO AG -->
+    <div class="flex items-center gap-1">
+      <span class="text-3xl font-black text-emerald-500 italic tracking-tighter">Arya</span>
+      <span class="text-3xl font-black text-amber-500 tracking-tighter">AG</span>
+      <span class="text-xs bg-emerald-600 text-black font-extrabold px-1 rounded">Grosir</span>
+    </div>
   </header>
 
-  <!-- MAIN CONTAINER / PAGE VIEWS -->
-  <main class="flex-1 relative overflow-y-auto p-2 md:p-4">
-
-    <!-- 1. MENU UTAMA (DASHBOARD GRID) -->
-    <section id="view-dashboard" class="h-full flex flex-col justify-between max-w-5xl mx-auto">
-      <div class="text-center my-1 md:my-2 shrink-0">
-        <h1 class="text-xl md:text-3xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200 uppercase">
-          ARYA GROSIR
-        </h1>
+  <!-- BAR STATUS SYSTEM & HOME -->
+  <div class="bg-black px-4 py-2 flex items-center justify-between border-b border-slate-900 shrink-0 text-xs">
+    <!-- KIRI: PREMIUM POS SYSTEM -->
+    <div class="flex items-center gap-1.5 text-emerald-400 font-bold tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+      <div class="leading-tight">
+        <div>PREMIUM POS</div>
+        <div>SYSTEM</div>
       </div>
+    </div>
 
-      <!-- 2x4 GRID LAYOUT FOR ANDROID LANDSCAPE/PORTRAIT FULLSCREEN -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 flex-1 items-stretch my-auto">
+    <!-- TENGAH: TOMBOL HOME -->
+    <button onclick="navHome()" class="flex items-center gap-1.5 border-2 border-amber-500/80 bg-amber-950/20 text-amber-400 font-bold px-4 py-1.5 rounded-xl shadow transition active:scale-95">
+      <i data-lucide="home" class="w-4 h-4"></i>
+      <span class="text-xs tracking-wider">HOME</span>
+    </button>
+
+    <!-- KANAN: TANGGAL & WAKTU REALTIME -->
+    <div id="live-datetime" class="text-slate-400 font-mono text-[10px] text-right leading-tight">
+      -- ---- ----<br>--.--.--
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER / PAGE VIEWS -->
+  <main class="flex-1 relative overflow-y-auto p-3">
+
+    <!-- 1. MENU UTAMA (SEPERTI GAMBAR CONTOH) -->
+    <section id="view-dashboard" class="h-full flex flex-col justify-center max-w-2xl mx-auto">
+      <div class="grid grid-cols-2 gap-3 my-auto">
         
-        <button onclick="openFormPenjualan()" id="btn-menu-0" class="menu-btn bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-amber-500 rounded-2xl p-2 md:p-4 flex flex-col items-center justify-center gap-2 transition shadow-lg group">
-          <i data-lucide="shopping-cart" class="w-12 h-12 md:w-16 md:h-16 text-amber-400 group-hover:scale-110 transition"></i>
-          <span class="font-bold text-sm md:text-lg text-slate-200">Kasir / Penjualan</span>
+        <!-- 1. BELANJA BARANG -->
+        <button onclick="openFormBelanja()" id="btn-menu-0" class="menu-btn bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col items-start justify-between h-32 transition shadow-lg group">
+          <div class="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-500/30 flex items-center justify-center">
+            <i data-lucide="shopping-bag" class="w-5 h-5 text-purple-400"></i>
+          </div>
+          <span class="font-black text-sm text-slate-100 tracking-wide text-left uppercase leading-tight">BELANJA BARANG</span>
         </button>
 
-        <button onclick="navTo('view-riwayat-penjualan')" id="btn-menu-1" class="menu-btn bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-amber-500 rounded-2xl p-2 md:p-4 flex flex-col items-center justify-center gap-2 transition shadow-lg group">
-          <i data-lucide="receipt" class="w-12 h-12 md:w-16 md:h-16 text-amber-400 group-hover:scale-110 transition"></i>
-          <span class="font-bold text-sm md:text-lg text-slate-200">Riwayat Penjualan</span>
+        <!-- 2. PENJUALAN -->
+        <button onclick="openFormPenjualan()" id="btn-menu-1" class="menu-btn bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col items-start justify-between h-32 transition shadow-lg group">
+          <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-500/30 flex items-center justify-center">
+            <i data-lucide="shopping-cart" class="w-5 h-5 text-amber-500"></i>
+          </div>
+          <span class="font-black text-sm text-slate-100 tracking-wide text-left uppercase leading-tight">PENJUALAN</span>
         </button>
 
-        <button onclick="openFormBelanja()" id="btn-menu-2" class="menu-btn bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-amber-500 rounded-2xl p-2 md:p-4 flex flex-col items-center justify-center gap-2 transition shadow-lg group">
-          <i data-lucide="shopping-bag" class="w-12 h-12 md:w-16 md:h-16 text-amber-400 group-hover:scale-110 transition"></i>
-          <span class="font-bold text-sm md:text-lg text-slate-200">Belanja Kulakan</span>
+        <!-- 3. STOK BARANG -->
+        <button onclick="navTo('view-katalog-stok')" id="btn-menu-2" class="menu-btn bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col items-start justify-between h-32 transition shadow-lg group">
+          <div class="w-10 h-10 rounded-xl bg-blue-950/60 border border-blue-500/30 flex items-center justify-center">
+            <i data-lucide="boxes" class="w-5 h-5 text-blue-400"></i>
+          </div>
+          <span class="font-black text-sm text-slate-100 tracking-wide text-left uppercase leading-tight">STOK BARANG</span>
         </button>
 
-        <button onclick="navTo('view-riwayat-belanja')" id="btn-menu-3" class="menu-btn bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-amber-500 rounded-2xl p-2 md:p-4 flex flex-col items-center justify-center gap-2 transition shadow-lg group">
-          <i data-lucide="history" class="w-12 h-12 md:w-16 md:h-16 text-amber-400 group-hover:scale-110 transition"></i>
-          <span class="font-bold text-sm md:text-lg text-slate-200">Riwayat Belanja</span>
+        <!-- 4. PERKIRAAN BELANJA -->
+        <button onclick="navTo('view-riwayat-belanja')" id="btn-menu-3" class="menu-btn bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col items-start justify-between h-32 transition shadow-lg group">
+          <div class="w-10 h-10 rounded-xl bg-indigo-950/60 border border-indigo-500/30 flex items-center justify-center">
+            <i data-lucide="trending-up" class="w-5 h-5 text-indigo-400"></i>
+          </div>
+          <span class="font-black text-sm text-slate-100 tracking-wide text-left uppercase leading-tight">PERKIRAAN BELANJA</span>
         </button>
 
-        <button onclick="navTo('view-katalog-stok')" id="btn-menu-4" class="menu-btn bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-amber-500 rounded-2xl p-2 md:p-4 flex flex-col items-center justify-center gap-2 transition shadow-lg group">
-          <i data-lucide="boxes" class="w-12 h-12 md:w-16 md:h-16 text-amber-400 group-hover:scale-110 transition"></i>
-          <span class="font-bold text-sm md:text-lg text-slate-200">Katalog Stok</span>
+        <!-- 5. PENGELUARAN LAIN -->
+        <button onclick="navTo('view-pengeluaran-lain')" id="btn-menu-4" class="menu-btn bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col items-start justify-between h-32 transition shadow-lg group">
+          <div class="w-10 h-10 rounded-xl bg-teal-950/60 border border-teal-500/30 flex items-center justify-center">
+            <i data-lucide="receipt" class="w-5 h-5 text-teal-400"></i>
+          </div>
+          <span class="font-black text-sm text-slate-100 tracking-wide text-left uppercase leading-tight">PENGELUARAN LAIN</span>
         </button>
 
-        <button onclick="navTo('view-laporan-keuangan')" id="btn-menu-5" class="menu-btn bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-amber-500 rounded-2xl p-2 md:p-4 flex flex-col items-center justify-center gap-2 transition shadow-lg group">
-          <i data-lucide="line-chart" class="w-12 h-12 md:w-16 md:h-16 text-amber-400 group-hover:scale-110 transition"></i>
-          <span class="font-bold text-sm md:text-lg text-slate-200">Laporan Keuangan</span>
+        <!-- 6. KEUNTUNGAN -->
+        <button onclick="navTo('view-laporan-keuangan')" id="btn-menu-5" class="menu-btn bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col items-start justify-between h-32 transition shadow-lg group">
+          <div class="w-10 h-10 rounded-xl bg-rose-950/60 border border-rose-500/30 flex items-center justify-center">
+            <i data-lucide="wallet" class="w-5 h-5 text-rose-400"></i>
+          </div>
+          <span class="font-black text-sm text-slate-100 tracking-wide text-left uppercase leading-tight">KEUNTUNGAN</span>
         </button>
 
-        <button onclick="navTo('view-pengeluaran-lain')" id="btn-menu-6" class="menu-btn bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-amber-500 rounded-2xl p-2 md:p-4 flex flex-col items-center justify-center gap-2 transition shadow-lg group">
-          <i data-lucide="wallet" class="w-12 h-12 md:w-16 md:h-16 text-amber-400 group-hover:scale-110 transition"></i>
-          <span class="font-bold text-sm md:text-lg text-slate-200">Pengeluaran Lain</span>
+        <!-- 7. PENGATURAN FAKTUR -->
+        <button onclick="navTo('view-riwayat-penjualan')" id="btn-menu-6" class="menu-btn bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col items-start justify-between h-32 transition shadow-lg group">
+          <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-500/30 flex items-center justify-center">
+            <i data-lucide="file-spreadsheet" class="w-5 h-5 text-amber-400"></i>
+          </div>
+          <span class="font-black text-sm text-slate-100 tracking-wide text-left uppercase leading-tight">PENGATURAN FAKTUR</span>
         </button>
 
-        <button onclick="navTo('view-sinkronisasi')" id="btn-menu-7" class="menu-btn bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-amber-500 rounded-2xl p-2 md:p-4 flex flex-col items-center justify-center gap-2 transition shadow-lg group">
-          <i data-lucide="refresh-cw" class="w-12 h-12 md:w-16 md:h-16 text-amber-400 group-hover:scale-110 transition"></i>
-          <span class="font-bold text-sm md:text-lg text-slate-200">Sinkronisasi</span>
+        <!-- 8. SINKRONISASI -->
+        <button onclick="navTo('view-sinkronisasi')" id="btn-menu-7" class="menu-btn bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col items-start justify-between h-32 transition shadow-lg group">
+          <div class="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center">
+            <i data-lucide="refresh-cw" class="w-5 h-5 text-emerald-400"></i>
+          </div>
+          <span class="font-black text-sm text-slate-100 tracking-wide text-left uppercase leading-tight">SINKRONISASI</span>
         </button>
 
       </div>
@@ -86,48 +125,47 @@
 
     <!-- 2. KATALOG STOK BARANG -->
     <section id="view-katalog-stok" class="hidden max-w-4xl mx-auto space-y-4">
-      <div class="flex justify-between items-center bg-slate-800 p-3 rounded-xl border border-slate-700">
+      <div class="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
         <h2 class="text-lg font-bold text-amber-400">Katalog Stok Barang</h2>
         <button onclick="openFormBarang()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-3 py-1.5 rounded-lg text-sm flex items-center gap-1">
           <i data-lucide="plus" class="w-4 h-4"></i> Tambah Barang (F4)
         </button>
       </div>
 
-      <!-- FORM KATALOG BARANG -->
-      <form id="form-barang" onsubmit="saveBarang(event)" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+      <form id="form-barang" onsubmit="saveBarang(event)" class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
         <input type="hidden" id="barang-edit-id">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Kode / Barcode</label>
-            <input type="text" id="barang-kode" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+            <input type="text" id="barang-kode" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Nama Barang</label>
-            <input type="text" id="barang-nama" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+            <input type="text" id="barang-nama" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Stok Saat Ini</label>
-            <input type="number" id="barang-stok" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+            <input type="number" id="barang-stok" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Satuan (Pcs/Dus/dll)</label>
-            <input type="text" id="barang-satuan" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+            <input type="text" id="barang-satuan" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Target Minimal Stok</label>
-            <input type="number" id="barang-min-stok" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" value="5">
+            <input type="number" id="barang-min-stok" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" value="5">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Harga Pokok (HPP)</label>
-            <input type="number" id="barang-hpp" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+            <input type="number" id="barang-hpp" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Harga Jual Umum (Eceran)</label>
-            <input type="number" id="barang-hj-umum" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+            <input type="number" id="barang-hj-umum" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Harga Jual Grosir</label>
-            <input type="number" id="barang-hj-grosir" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+            <input type="number" id="barang-hj-grosir" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
           </div>
         </div>
         <div class="flex justify-end gap-2 pt-2">
@@ -140,14 +178,13 @@
         </div>
       </form>
 
-      <!-- LIST KATALOG STOK -->
-      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-        <div class="p-2 bg-slate-700/50">
-          <input type="text" id="search-katalog" oninput="renderKatalog()" placeholder="Cari nama barang / barcode..." class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-sm">
+      <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+        <div class="p-2 bg-slate-800/50">
+          <input type="text" id="search-katalog" oninput="renderKatalog()" placeholder="Cari nama barang / barcode..." class="w-full bg-black border border-slate-700 rounded p-2 text-sm">
         </div>
         <div class="overflow-x-auto max-h-80">
           <table class="w-full text-left text-xs md:text-sm">
-            <thead class="bg-slate-700 text-amber-400 uppercase font-bold sticky top-0">
+            <thead class="bg-slate-800 text-amber-400 uppercase font-bold sticky top-0">
               <tr>
                 <th class="p-2">Kode</th>
                 <th class="p-2">Nama Barang</th>
@@ -156,7 +193,7 @@
                 <th class="p-2">HJ Grosir</th>
               </tr>
             </thead>
-            <tbody id="list-katalog" class="divide-y divide-slate-700"></tbody>
+            <tbody id="list-katalog" class="divide-y divide-slate-800"></tbody>
           </table>
         </div>
       </div>
@@ -164,32 +201,32 @@
 
     <!-- 3. RIWAYAT BELANJA KULAKAN -->
     <section id="view-riwayat-belanja" class="hidden max-w-4xl mx-auto space-y-4">
-      <div class="flex justify-between items-center bg-slate-800 p-3 rounded-xl border border-slate-700">
+      <div class="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
         <h2 class="text-lg font-bold text-amber-400">Riwayat Belanja Kulakan</h2>
         <button onclick="openFormBelanja()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-3 py-1.5 rounded-lg text-sm flex items-center gap-1">
           <i data-lucide="plus" class="w-4 h-4"></i> Input Belanja Baru (F4)
         </button>
       </div>
 
-      <div id="container-form-belanja" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+      <div id="container-form-belanja" class="hidden bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
         <input type="hidden" id="belanja-edit-id">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Tanggal</label>
-            <input type="text" id="belanja-tanggal" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <input type="text" id="belanja-tanggal" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Nama Barang</label>
-            <input type="text" id="belanja-nama" oninput="lookupBarangBelanja(this.value)" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
-            <div id="belanja-lookup-list" class="hidden bg-slate-900 border border-amber-500 rounded max-h-32 overflow-y-auto mt-1 absolute z-20 w-64"></div>
+            <input type="text" id="belanja-nama" oninput="lookupBarangBelanja(this.value)" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
+            <div id="belanja-lookup-list" class="hidden bg-black border border-amber-500 rounded max-h-32 overflow-y-auto mt-1 absolute z-20 w-64"></div>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Jumlah Belanja</label>
-            <input type="number" id="belanja-qty" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+            <input type="number" id="belanja-qty" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Harga Beli Per Item</label>
-            <input type="number" id="belanja-harga" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+            <input type="number" id="belanja-harga" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
           </div>
         </div>
         <div class="flex justify-end gap-2 pt-2">
@@ -202,14 +239,13 @@
         </div>
       </div>
 
-      <!-- LIST BELANJA URUT TERBARU DI ATAS -->
       <div id="list-riwayat-belanja" class="space-y-2 max-h-96 overflow-y-auto"></div>
     </section>
 
-    <!-- 4. KASIR / PENJUALAN & EDIT PENJUALAN -->
+    <!-- 4. KASIR / PENJUALAN -->
     <section id="view-penjualan" class="hidden max-w-4xl mx-auto space-y-4">
-      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
           <h2 class="text-lg font-bold text-amber-400" id="title-form-penjualan">Form Transaksi Kasir</h2>
           <div class="flex items-center gap-2">
             <span class="text-xs font-bold text-slate-400">Mode:</span>
@@ -225,21 +261,20 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Tanggal Transaksi</label>
-            <input type="text" id="penjualan-tanggal" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+            <input type="text" id="penjualan-tanggal" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Nama Pembeli</label>
-            <input type="text" id="penjualan-pembeli" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" value="Pelanggan Umum">
+            <input type="text" id="penjualan-pembeli" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" value="Pelanggan Umum">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Nama / Barcode Barang</label>
-            <input type="text" id="penjualan-barang" oninput="lookupBarangPenjualan(this.value)" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" placeholder="Ketik nama / scan...">
-            <div id="penjualan-lookup-list" class="hidden bg-slate-900 border border-amber-500 rounded max-h-32 overflow-y-auto mt-1 absolute z-20 w-64"></div>
+            <input type="text" id="penjualan-barang" oninput="lookupBarangPenjualan(this.value)" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" placeholder="Ketik nama / scan...">
+            <div id="penjualan-lookup-list" class="hidden bg-black border border-amber-500 rounded max-h-32 overflow-y-auto mt-1 absolute z-20 w-64"></div>
           </div>
         </div>
 
-        <!-- EDIT/ACTION BUTTONS DI ATAS KERANJANG -->
-        <div id="cart-actions-header" class="flex justify-between items-center bg-slate-700/50 p-2 rounded-lg">
+        <div id="cart-actions-header" class="flex justify-between items-center bg-slate-800/50 p-2 rounded-lg">
           <span class="font-bold text-sm text-slate-300">Keranjang Belanjaan</span>
           <div class="flex gap-2">
             <button id="btn-delete-penjualan" onclick="confirmDeletePenjualan()" class="hidden bg-red-600 hover:bg-red-500 text-white font-bold px-3 py-1 rounded text-xs">
@@ -251,10 +286,9 @@
           </div>
         </div>
 
-        <!-- TABLE KERANJANG -->
-        <div class="overflow-x-auto bg-slate-900 rounded-lg p-2 border border-slate-700">
+        <div class="overflow-x-auto bg-black rounded-lg p-2 border border-slate-800">
           <table class="w-full text-left text-xs md:text-sm">
-            <thead class="text-amber-400 border-b border-slate-700">
+            <thead class="text-amber-400 border-b border-slate-800">
               <tr>
                 <th class="p-1">Barang</th>
                 <th class="p-1">Harga</th>
@@ -276,59 +310,55 @@
 
     <!-- 5. RIWAYAT PENJUALAN BARANG -->
     <section id="view-riwayat-penjualan" class="hidden max-w-4xl mx-auto space-y-4">
-      <div class="flex justify-between items-center bg-slate-800 p-3 rounded-xl border border-slate-700">
+      <div class="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
         <h2 class="text-lg font-bold text-amber-400">Riwayat Penjualan Barang</h2>
         <button onclick="openFormPenjualan()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-3 py-1.5 rounded-lg text-sm flex items-center gap-1">
           <i data-lucide="plus" class="w-4 h-4"></i> Input Penjualan (F4)
         </button>
       </div>
 
-      <!-- LIST PENJUALAN TANGGAL TERBARU DI ATAS -->
       <div id="list-riwayat-penjualan" class="space-y-3 max-h-[80vh] overflow-y-auto"></div>
     </section>
 
     <!-- 6. LAPORAN KEUANGAN DAN LABA -->
     <section id="view-laporan-keuangan" class="hidden max-w-4xl mx-auto space-y-4">
-      <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-center">
+      <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
         <h2 class="text-lg font-bold text-amber-400">Laporan Keuangan & Laba</h2>
       </div>
 
-      <!-- KARTU STATISTIK DENGAN DATA TANGGAL KEMARIN -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700">
+        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
           <div class="text-xs text-slate-400">Laba Bersih Kemarin</div>
           <div id="stat-laba-kemarin" class="text-lg md:text-xl font-black text-emerald-400 mt-1">Rp 0</div>
         </div>
-        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700">
+        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
           <div class="text-xs text-slate-400">Pengeluaran Kemarin</div>
           <div id="stat-pengeluaran-kemarin" class="text-lg md:text-xl font-black text-rose-400 mt-1">Rp 0</div>
         </div>
-        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700">
+        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
           <div class="text-xs text-slate-400">Laba Bersih Bulan Ini</div>
           <div id="stat-laba-bulan" class="text-lg md:text-xl font-black text-amber-400 mt-1">Rp 0</div>
         </div>
-        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700">
+        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
           <div class="text-xs text-slate-400">Total Pengeluaran Bulan Ini</div>
           <div id="stat-pengeluaran-bulan" class="text-lg md:text-xl font-black text-rose-400 mt-1">Rp 0</div>
         </div>
       </div>
 
-      <!-- DIAGRAM BULANAN DENGAN GRADASIL WAKTU/NOMINAL -->
-      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
         <h3 class="text-sm font-bold text-slate-300 mb-3">Rekapitulasi Keuntungan Bulanan</h3>
         <div class="h-48">
           <canvas id="profitChart"></canvas>
         </div>
       </div>
 
-      <!-- DAFTAR KEUNTUNGAN PER TANGGAL (BARU KE LAMA) -->
-      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-        <div class="p-3 bg-slate-700/50 font-bold text-amber-400 text-sm">
+      <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+        <div class="p-3 bg-slate-800/50 font-bold text-amber-400 text-sm">
           Daftar Rincian Laba Per Tanggal
         </div>
         <div class="overflow-x-auto max-h-60">
           <table class="w-full text-left text-xs md:text-sm">
-            <thead class="bg-slate-700 text-slate-300 border-b border-slate-600">
+            <thead class="bg-slate-800 text-slate-300 border-b border-slate-700">
               <tr>
                 <th class="p-2">Tanggal</th>
                 <th class="p-2">Laba Kotor</th>
@@ -336,7 +366,7 @@
                 <th class="p-2">Keuntungan Bersih</th>
               </tr>
             </thead>
-            <tbody id="list-laba-harian" class="divide-y divide-slate-700"></tbody>
+            <tbody id="list-laba-harian" class="divide-y divide-slate-800"></tbody>
           </table>
         </div>
       </div>
@@ -344,19 +374,19 @@
 
     <!-- 7. PENGELUARAN LAIN -->
     <section id="view-pengeluaran-lain" class="hidden max-w-2xl mx-auto space-y-4">
-      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
         <h2 class="text-lg font-bold text-amber-400">Input Pengeluaran Operasional</h2>
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Tanggal</label>
-          <input type="text" id="pengeluaran-tanggal" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm">
+          <input type="text" id="pengeluaran-tanggal" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Nominal (Rp)</label>
-          <input type="number" id="pengeluaran-nominal" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" required>
+          <input type="number" id="pengeluaran-nominal" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" required>
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Keterangan Pengeluaran</label>
-          <input type="text" id="pengeluaran-ket" class="form-input w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" placeholder="Contoh: Bayar Listrik, Plastik..." required>
+          <input type="text" id="pengeluaran-ket" class="form-input w-full bg-black border border-slate-800 rounded p-2 text-sm" placeholder="Contoh: Bayar Listrik, Plastik..." required>
         </div>
         <button onclick="savePengeluaran()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold p-2 rounded-lg text-sm">
           Simpan Pengeluaran
@@ -366,11 +396,11 @@
 
     <!-- 8. SINKRONISASI GOOGLE SPREADSHEET -->
     <section id="view-sinkronisasi" class="hidden max-w-2xl mx-auto space-y-4">
-      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
         <h2 class="text-lg font-bold text-amber-400">Integrasi Google Spreadsheet</h2>
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Web App URL Google Apps Script</label>
-          <input type="url" id="sync-url" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm" placeholder="https://script.google.com/macros/s/.../exec">
+          <input type="url" id="sync-url" class="w-full bg-black border border-slate-800 rounded p-2 text-sm" placeholder="https://script.google.com/macros/s/.../exec">
         </div>
         <div class="grid grid-cols-2 gap-2 pt-2">
           <button onclick="syncBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-2 rounded-lg text-sm flex items-center justify-center gap-1">
@@ -385,12 +415,12 @@
 
   </main>
 
-  <!-- MODAL DIALOG KONFIRMASI HAPUS & EXIT -->
+  <!-- MODAL DIALOG KONFIRMASI -->
   <div id="modal-confirm" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 max-w-sm w-full space-y-4 text-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-sm w-full space-y-4 text-center">
       <div id="modal-confirm-msg" class="text-slate-200 font-semibold text-base">Apakah Anda yakin?</div>
       <div class="flex justify-center gap-3">
-        <button onclick="closeModalConfirm(false)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-5 py-2 rounded-xl font-bold text-sm">Tidak</button>
+        <button onclick="closeModalConfirm(false)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-2 rounded-xl font-bold text-sm">Tidak</button>
         <button id="modal-confirm-yes" onclick="closeModalConfirm(true)" class="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-xl font-bold text-sm">Ya, Yakin</button>
       </div>
     </div>
@@ -398,7 +428,6 @@
 
   <!-- SCRIPT LOGIKA APLIKASI -->
   <script>
-    // INITIAL DATABASE LOCALSTORAGE
     let db = {
       katalog: JSON.parse(localStorage.getItem('arya_katalog') || '[]'),
       belanja: JSON.parse(localStorage.getItem('arya_belanja') || '[]'),
@@ -412,15 +441,14 @@
     let pendingConfirmAction = null;
     let chartInstance = null;
 
-    // INITIALIZATION
     window.onload = () => {
       lucide.createIcons();
-      updateDateHeader();
+      updateDateTimeHeader();
+      setInterval(updateDateTimeHeader, 1000);
       document.getElementById('sync-url').value = db.syncUrl;
       setupKeyboardNavigation();
       renderAll();
 
-      // PHYSICAL ANDROID BACK BUTTON LISTENER
       window.addEventListener('popstate', handleAndroidBack);
       history.pushState({ page: 'dashboard' }, '');
     };
@@ -441,11 +469,19 @@
       return `${dd}-${mm}-${yyyy}`;
     }
 
-    function updateDateHeader() {
-      document.getElementById('live-date').innerText = formatDateFormatted();
+    function updateDateTimeHeader() {
+      const now = new Date();
+      const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      const d = now.getDate();
+      const m = bulanIndo[now.getMonth()];
+      const y = now.getFullYear();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      
+      document.getElementById('live-datetime').innerHTML = `${d} ${m} ${y} pukul<br>${hh}.${mm}.${ss}`;
     }
 
-    // NAVIGATION SYSTEM
     function navTo(viewId) {
       document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
       document.getElementById(viewId).classList.remove('hidden');
@@ -466,14 +502,11 @@
         });
       } else if (activeSection === 'view-penjualan') {
         navTo('view-riwayat-penjualan');
-      } else if (activeSection === 'view-riwayat-belanja') {
-        navHome();
       } else {
         navHome();
       }
     }
 
-    // CONFIRMATION MODAL HELPER
     function openConfirmModal(msg, actionYes) {
       document.getElementById('modal-confirm-msg').innerText = msg;
       document.getElementById('modal-confirm').classList.remove('hidden');
@@ -488,12 +521,10 @@
       pendingConfirmAction = null;
     }
 
-    // KEYBOARD SHORTCUTS & FORM FOCUS PROGRESSION
     function setupKeyboardNavigation() {
       document.addEventListener('keydown', (e) => {
         const activeSection = document.querySelector('main > section:not(.hidden)').id;
 
-        // F4 Shortcut
         if (e.key === 'F4') {
           e.preventDefault();
           if (activeSection === 'view-katalog-stok') openFormBarang();
@@ -501,7 +532,6 @@
           else if (activeSection === 'view-riwayat-penjualan') openFormPenjualan();
         }
 
-        // F8 Shortcut
         if (e.key === 'F8') {
           e.preventDefault();
           if (activeSection === 'view-katalog-stok') document.getElementById('form-barang').requestSubmit();
@@ -509,21 +539,19 @@
           else if (activeSection === 'view-penjualan') savePenjualan();
         }
 
-        // Dashboard Arrow Grid Navigation
         if (activeSection === 'view-dashboard') {
           const btns = document.querySelectorAll('.menu-btn');
           btns.forEach(b => b.classList.remove('nav-active'));
           
           if (e.key === 'ArrowRight') currentNavIndex = (currentNavIndex + 1) % btns.length;
           if (e.key === 'ArrowLeft') currentNavIndex = (currentNavIndex - 1 + btns.length) % btns.length;
-          if (e.key === 'ArrowDown') currentNavIndex = (currentNavIndex + 4) % btns.length;
-          if (e.key === 'ArrowUp') currentNavIndex = (currentNavIndex - 4 + btns.length) % btns.length;
+          if (e.key === 'ArrowDown') currentNavIndex = (currentNavIndex + 2) % btns.length;
+          if (e.key === 'ArrowUp') currentNavIndex = (currentNavIndex - 2 + btns.length) % btns.length;
           if (e.key === 'Enter') btns[currentNavIndex].click();
 
           btns[currentNavIndex].classList.add('nav-active');
         }
 
-        // Enter Key Focus Shift in Inputs
         if (e.key === 'Enter' && e.target.classList.contains('form-input')) {
           e.preventDefault();
           const inputs = Array.from(document.querySelectorAll(`#${activeSection} .form-input`));
@@ -599,7 +627,7 @@
       db.katalog.filter(x => x.nama.toLowerCase().includes(q) || x.kode.toLowerCase().includes(q))
         .forEach(item => {
           const tr = document.createElement('tr');
-          tr.className = "hover:bg-slate-700/50 cursor-pointer transition";
+          tr.className = "hover:bg-slate-800 cursor-pointer transition";
           tr.onclick = () => openFormBarang(item);
           tr.innerHTML = `
             <td class="p-2 text-slate-400 font-mono">${item.kode}</td>
@@ -614,6 +642,7 @@
 
     // 2. RIWAYAT BELANJA MODULE
     function openFormBelanja(item = null) {
+      navTo('view-riwayat-belanja');
       document.getElementById('container-form-belanja').classList.remove('hidden');
       if(item) {
         document.getElementById('belanja-edit-id').value = item.id;
@@ -647,7 +676,6 @@
         if(idx > -1) db.belanja[idx] = { id: editId, tanggal, nama, qty, harga, total: qty * harga };
       } else {
         db.belanja.push({ id: 'B-' + Date.now(), tanggal, nama, qty, harga, total: qty * harga });
-        // Update stok katalog jika ada
         const kat = db.katalog.find(x => x.nama.toLowerCase() === nama.toLowerCase());
         if(kat) kat.stok += qty;
       }
@@ -669,13 +697,11 @@
     function renderRiwayatBelanja() {
       const list = document.getElementById('list-riwayat-belanja');
       list.innerHTML = '';
-
-      // URUT DARI TANGGAL TERBARU
       const sorted = [...db.belanja].reverse();
 
       sorted.forEach(item => {
         const div = document.createElement('div');
-        div.className = "bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-center cursor-pointer hover:border-amber-500 transition";
+        div.className = "bg-slate-900 p-3 rounded-xl border border-slate-800 flex justify-between items-center cursor-pointer hover:border-amber-500 transition";
         div.onclick = () => openFormBelanja(item);
         div.innerHTML = `
           <div>
@@ -757,7 +783,7 @@
         tr.innerHTML = `
           <td class="p-1 font-bold text-slate-200">${c.nama}</td>
           <td class="p-1">Rp ${c.harga.toLocaleString()}</td>
-          <td class="p-1"><input type="number" value="${c.qty}" min="1" onchange="updateCartQty(${idx}, this.value)" class="w-12 bg-slate-800 border border-slate-700 rounded text-center"></td>
+          <td class="p-1"><input type="number" value="${c.qty}" min="1" onchange="updateCartQty(${idx}, this.value)" class="w-12 bg-black border border-slate-800 rounded text-center"></td>
           <td class="p-1 font-bold text-amber-400">Rp ${c.subtotal.toLocaleString()}</td>
           <td class="p-1 text-center"><button onclick="removeFromCart(${idx})" class="text-red-400 font-bold">X</button></td>
         `;
@@ -791,7 +817,6 @@
         if(idx > -1) db.penjualan[idx] = { id: editId, tanggal, pembeli, tipe, cart: [...cart], total };
       } else {
         db.penjualan.push({ id: 'P-' + Date.now(), tanggal, pembeli, tipe, cart: [...cart], total });
-        // Potong Stok
         cart.forEach(c => {
           const kat = db.katalog.find(x => x.kode === c.kode);
           if(kat) kat.stok -= c.qty;
@@ -815,16 +840,14 @@
     function renderRiwayatPenjualan() {
       const list = document.getElementById('list-riwayat-penjualan');
       list.innerHTML = '';
-
-      // URUT DARI TANGGAL TERBARU
       const sorted = [...db.penjualan].reverse();
 
       sorted.forEach(item => {
         const div = document.createElement('div');
-        div.className = "bg-slate-800 p-3 rounded-xl border border-slate-700 space-y-2 cursor-pointer hover:border-amber-500 transition";
+        div.className = "bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2 cursor-pointer hover:border-amber-500 transition";
         div.onclick = () => openFormPenjualan(item);
         div.innerHTML = `
-          <div class="flex justify-between items-center text-sm md:text-base border-b border-slate-700 pb-1">
+          <div class="flex justify-between items-center text-sm md:text-base border-b border-slate-800 pb-1">
             <span class="font-bold text-slate-300">${item.tanggal}</span>
             <span class="bg-amber-500/20 text-amber-400 font-extrabold text-xs px-2 py-0.5 rounded border border-amber-500/30">${item.tipe || 'UMUM'}</span>
             <span class="text-xl font-black text-amber-400">Rp ${item.total.toLocaleString()}</span>
@@ -835,27 +858,23 @@
       });
     }
 
-    // 4. LAPORAN KEUANGAN & LABA MODULE
+    // 4. LAPORAN KEUANGAN MODULE
     function renderLaporanKeuangan() {
-      // Hitung Tanggal Kemarin
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       const strKemarin = formatDateFormatted(yesterday);
 
-      // Laba Bersih Kemarin
       let labaKemarin = 0;
       db.penjualan.filter(x => x.tanggal === strKemarin).forEach(p => {
         p.cart.forEach(c => { labaKemarin += (c.harga - (c.hpp || 0)) * c.qty; });
       });
 
-      // Pengeluaran Kemarin
       let expKemarin = 0;
       db.pengeluaran.filter(x => x.tanggal === strKemarin).forEach(x => expKemarin += x.nominal);
 
       document.getElementById('stat-laba-kemarin').innerText = `Rp ${(labaKemarin - expKemarin).toLocaleString()}`;
       document.getElementById('stat-pengeluaran-kemarin').innerText = `Rp ${expKemarin.toLocaleString()}`;
 
-      // Re-render Chart Gradasi
       renderChartProfit();
       renderLabaHarian();
     }
@@ -863,8 +882,6 @@
     function renderLabaHarian() {
       const tbody = document.getElementById('list-laba-harian');
       tbody.innerHTML = '';
-
-      // Group By Tanggal
       const mapLaba = {};
 
       db.penjualan.forEach(p => {
@@ -879,7 +896,6 @@
         mapLaba[e.tanggal].exp += e.nominal;
       });
 
-      // URUT TANGGAL TERBARU DI ATAS
       const sortedDates = Object.keys(mapLaba).reverse();
 
       sortedDates.forEach(tgl => {
@@ -903,13 +919,12 @@
       const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
       const dummyData = [1200000, 1900000, 300000, 5000000, 2000000, 3000000, 4500000, 1000000, 2500000, 3500000, 4000000, 2800000];
 
-      // GRADASI WARNA DARI MERAH - KUNING - HIJAU BERDASARKAN NOMINAL
       const maxVal = Math.max(...dummyData);
       const bgColors = dummyData.map(val => {
         const ratio = val / maxVal;
-        if(ratio < 0.33) return '#ef4444'; // Red
-        if(ratio < 0.66) return '#eab308'; // Yellow
-        return '#10b981'; // Green
+        if(ratio < 0.33) return '#ef4444';
+        if(ratio < 0.66) return '#eab308';
+        return '#10b981';
       });
 
       chartInstance = new Chart(ctx, {
@@ -981,7 +996,7 @@
         });
         alert('Backup Berhasil dikirim ke Google Spreadsheet!');
       } catch(err) {
-        alert('GagalBackup: ' + err.message);
+        alert('Gagal Backup: ' + err.message);
       }
     }
 
