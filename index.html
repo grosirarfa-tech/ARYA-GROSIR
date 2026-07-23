@@ -176,7 +176,7 @@
         .icon-faktur { background-color: rgba(255, 193, 7, 0.08); border-color: rgba(255, 213, 79, 0.4); color: #ffd54f; }
         .icon-sinkronisasi { background-color: rgba(76, 175, 80, 0.08); border-color: rgba(129, 199, 132, 0.4); color: #81c784; }
 
-        /* --- SUB-MENU GENERAL STYLES --- */
+        /* --- SUB-MENU STYLES --- */
         .submenu-header {
             display: flex;
             justify-content: space-between;
@@ -208,11 +208,6 @@
             gap: 6px;
         }
 
-        .btn-action:active {
-            opacity: 0.8;
-        }
-
-        /* LIST & TABLE CONTAINER (SCROLLABLE INTERNAL ONLY) */
         .list-container {
             flex-grow: 1;
             overflow-y: auto;
@@ -222,35 +217,56 @@
             padding-right: 4px;
         }
 
-        .list-item {
+        /* --- HARIZONTAL FLEX-ROW UNTUK PERMINTAAN TAMPILAN KIRI KE KANAN --- */
+        .list-row {
             background: #141414;
             border: 1px solid #222;
             padding: 12px 14px;
             border-radius: 12px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: row;
             align-items: center;
+            justify-content: space-between;
+            gap: 10px;
         }
 
-        .list-item-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #eee;
+        .list-row .col {
+            display: flex;
+            flex-direction: column;
         }
 
-        .list-item-sub {
-            font-size: 0.75rem;
-            color: #888;
-            margin-top: 2px;
-        }
-
-        .list-item-value {
+        /* PERUSAHAAN UKURAN FONT SPESIFIK */
+        .font-lg-date {
+            font-size: 1.05rem;
             font-weight: 700;
-            font-size: 0.95rem;
-            color: #00e676;
+            color: #ffffff;
         }
 
-        /* KEUNTUNGAN SPECIFIC STYLES */
+        .font-lg-price {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #00e676;
+            text-align: right;
+        }
+
+        .font-medium-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .font-medium-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #dddddd;
+        }
+
+        .text-sub {
+            font-size: 0.8rem;
+            color: #888888;
+        }
+
+        /* KEUNTUNGAN STYLES */
         .grid-2x2 {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -272,33 +288,36 @@
         .text-green { color: #00e676; }
         .text-red { color: #ff5252; }
 
+        /* DIAGRAM BULANAN (12 BULAN FULL) */
         .chart-container {
             background: #141414;
             border: 1px solid #222;
             padding: 10px;
             border-radius: 12px;
-            margin-top: 10px;
+            margin-top: 8px;
             flex-shrink: 0;
         }
 
         .chart-title {
             font-size: 0.75rem;
             color: #aaa;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: center;
         }
 
-        .chart-bars {
+        .chart-bars-12 {
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
-            height: 90px;
-            gap: 4px;
+            height: 100px;
+            gap: 2px;
             padding-top: 15px;
+            overflow-x: auto;
         }
 
-        .bar-wrapper {
+        .bar-wrapper-12 {
             flex: 1;
+            min-width: 22px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -306,21 +325,22 @@
             justify-content: flex-end;
         }
 
-        .bar-val {
-            font-size: 0.55rem;
+        .bar-val-12 {
+            font-size: 0.48rem;
             color: #ccc;
             margin-bottom: 2px;
+            white-space: nowrap;
         }
 
-        .bar {
+        .bar-12 {
             width: 100%;
-            border-radius: 4px 4px 0 0;
+            border-radius: 3px 3px 0 0;
             min-height: 4px;
         }
 
-        .bar-month {
-            font-size: 0.6rem;
-            color: #777;
+        .bar-month-12 {
+            font-size: 0.55rem;
+            color: #888;
             margin-top: 4px;
         }
 
@@ -328,12 +348,12 @@
         .bar-mid { background: linear-gradient(to top, #ffb74d, #ffe082); }
         .bar-high { background: linear-gradient(to top, #00e676, #b9f6ca); }
 
-        /* FORM INPUT STYLES */
+        /* FORM & APPSCRIPT CODE AREA */
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
         .form-group label {
@@ -352,7 +372,7 @@
 
         .btn-full {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background: #ff9800;
             color: #000;
             border: none;
@@ -363,7 +383,53 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
-            margin-top: 6px;
+            margin-top: 4px;
+        }
+
+        .code-box-container {
+            background: #0d0d0d;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .code-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .code-box-header span {
+            font-size: 0.75rem;
+            color: #ff9800;
+            font-weight: 700;
+        }
+
+        .btn-copy {
+            background: #2196f3;
+            color: #fff;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        textarea.code-area {
+            width: 100%;
+            height: 110px;
+            background: #000;
+            color: #00e676;
+            font-family: monospace;
+            font-size: 0.7rem;
+            padding: 8px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            resize: none;
+            white-space: pre;
         }
 
         @media (min-width: 768px) {
@@ -443,19 +509,18 @@
                 <button class="btn-action"><i class="fa-solid fa-plus"></i> Transaksi Baru</button>
             </div>
             <div class="list-container">
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Belanja Stok Toko</div>
-                        <div class="list-item-sub">23 Juli 2026 - 14:20</div>
-                    </div>
-                    <div class="list-item-value">Rp 1.500.000</div>
+                <!-- Urutan Kiri Ke Kanan: Tanggal, ID Belanja, Total Barang, Harga Total -->
+                <div class="list-row">
+                    <div class="col font-lg-date">23/07/2026</div>
+                    <div class="col text-sub">ID: #BL-8821</div>
+                    <div class="col font-medium-text">15 Item</div>
+                    <div class="col font-lg-price">Rp 1.500.000</div>
                 </div>
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Pembelian Minyak & Gula</div>
-                        <div class="list-item-sub">22 Juli 2026 - 09:15</div>
-                    </div>
-                    <div class="list-item-value">Rp 850.000</div>
+                <div class="list-row">
+                    <div class="col font-lg-date">22/07/2026</div>
+                    <div class="col text-sub">ID: #BL-8820</div>
+                    <div class="col font-medium-text">8 Item</div>
+                    <div class="col font-lg-price">Rp 850.000</div>
                 </div>
             </div>
         </section>
@@ -467,19 +532,18 @@
                 <button class="btn-action"><i class="fa-solid fa-plus"></i> Transaksi Baru</button>
             </div>
             <div class="list-container">
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Pembeli: Budi Santoso</div>
-                        <div class="list-item-sub">23 Juli 2026 - 16:05</div>
-                    </div>
-                    <div class="list-item-value">Rp 125.000</div>
+                <!-- Urutan Kiri Ke Kanan: Tanggal, Nama Pembeli, Total Barang, Harga Total -->
+                <div class="list-row">
+                    <div class="col font-lg-date">23/07/2026</div>
+                    <div class="col font-medium-text">Budi Santoso</div>
+                    <div class="col text-sub">3 Item</div>
+                    <div class="col font-lg-price">Rp 125.000</div>
                 </div>
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Pembeli: Umum</div>
-                        <div class="list-item-sub">23 Juli 2026 - 11:30</div>
-                    </div>
-                    <div class="list-item-value">Rp 45.000</div>
+                <div class="list-row">
+                    <div class="col font-lg-date">23/07/2026</div>
+                    <div class="col font-medium-text">Umum</div>
+                    <div class="col text-sub">1 Item</div>
+                    <div class="col font-lg-price">Rp 45.000</div>
                 </div>
             </div>
         </section>
@@ -491,26 +555,17 @@
                 <button class="btn-action"><i class="fa-solid fa-plus"></i> Tambah Barang</button>
             </div>
             <div class="list-container">
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Beras Pandan Wangi 5kg</div>
-                        <div class="list-item-sub">Kategori: Sembako</div>
-                    </div>
-                    <div class="list-item-value" style="color:#64b5f6;">Stok: 24 Pcs</div>
+                <div class="list-row">
+                    <div class="col font-medium-title">Beras Pandan Wangi 5kg</div>
+                    <div class="col font-lg-price" style="color:#64b5f6;">Stok: 24 Pcs</div>
                 </div>
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Gula Pasir 1kg</div>
-                        <div class="list-item-sub">Kategori: Sembako</div>
-                    </div>
-                    <div class="list-item-value" style="color:#64b5f6;">Stok: 50 Pcs</div>
+                <div class="list-row">
+                    <div class="col font-medium-title">Gula Pasir 1kg</div>
+                    <div class="col font-lg-price" style="color:#64b5f6;">Stok: 50 Pcs</div>
                 </div>
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Minyak Goreng 2L</div>
-                        <div class="list-item-sub">Kategori: Sembako</div>
-                    </div>
-                    <div class="list-item-value" style="color:#64b5f6;">Stok: 12 Pcs</div>
+                <div class="list-row">
+                    <div class="col font-medium-title">Minyak Goreng 2L</div>
+                    <div class="col font-lg-price" style="color:#64b5f6;">Stok: 12 Pcs</div>
                 </div>
             </div>
         </section>
@@ -521,19 +576,16 @@
                 <div class="submenu-title"><i class="fa-solid fa-chart-line"></i> Perkiraan Belanja / Restock</div>
             </div>
             <div class="list-container">
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Garam Dapur 250g</div>
-                        <div class="list-item-sub">Stok Saat Ini: 2 Pcs</div>
-                    </div>
-                    <div class="list-item-value" style="color:#ffb74d;">Beli: 20 Pcs</div>
+                <!-- Urutan Kiri Ke Kanan: Nama Barang, Stok Saat Ini, Harus Dibeli -->
+                <div class="list-row">
+                    <div class="col font-medium-title">Garam Dapur 250g</div>
+                    <div class="col text-sub font-medium-text">Stok: 2 Pcs</div>
+                    <div class="col font-lg-price" style="color:#ffb74d;">Harus Beli: 20 Pcs</div>
                 </div>
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Minyak Goreng 2L</div>
-                        <div class="list-item-sub">Stok Saat Ini: 3 Pcs</div>
-                    </div>
-                    <div class="list-item-value" style="color:#ffb74d;">Beli: 15 Pcs</div>
+                <div class="list-row">
+                    <div class="col font-medium-title">Minyak Goreng 2L</div>
+                    <div class="col text-sub font-medium-text">Stok: 3 Pcs</div>
+                    <div class="col font-lg-price" style="color:#ffb74d;">Harus Beli: 15 Pcs</div>
                 </div>
             </div>
         </section>
@@ -545,19 +597,16 @@
                 <button class="btn-action"><i class="fa-solid fa-plus"></i> Tambah Pengeluaran</button>
             </div>
             <div class="list-container">
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Bayar Listrik Toko</div>
-                        <div class="list-item-sub">20 Juli 2026</div>
-                    </div>
-                    <div class="list-item-value" style="color:#ff5252;">Rp 350.000</div>
+                <!-- Urutan Kiri Ke Kanan: Tanggal, Jumlah, Keterangan -->
+                <div class="list-row">
+                    <div class="col font-lg-date">20/07/2026</div>
+                    <div class="col font-lg-price" style="color:#ff5252;">Rp 350.000</div>
+                    <div class="col font-medium-text">Bayar Listrik Toko</div>
                 </div>
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">Beli Kantong Plastik</div>
-                        <div class="list-item-sub">18 Juli 2026</div>
-                    </div>
-                    <div class="list-item-value" style="color:#ff5252;">Rp 45.000</div>
+                <div class="list-row">
+                    <div class="col font-lg-date">18/07/2026</div>
+                    <div class="col font-lg-price" style="color:#ff5252;">Rp 45.000</div>
+                    <div class="col font-medium-text">Beli Kantong Plastik</div>
                 </div>
             </div>
         </section>
@@ -568,7 +617,6 @@
                 <div class="submenu-title"><i class="fa-solid fa-wallet"></i> Laporan Keuntungan</div>
             </div>
             
-            <!-- 2x2 Grid Stats -->
             <div class="grid-2x2">
                 <div class="card-stat">
                     <div class="title">Laba Kemarin</div>
@@ -589,35 +637,30 @@
             </div>
 
             <!-- List Keuntungan Harian -->
-            <div class="list-container" style="max-height: 120px;">
-                <div class="list-item">
-                    <div>
-                        <div class="list-item-title">22 Juli 2026</div>
-                        <div class="list-item-sub">Pengeluaran: Rp 50.000 | Kotor: Rp 500.000</div>
-                    </div>
-                    <div class="list-item-value">Rp 450.000</div>
+            <div class="list-container" style="max-height: 80px;">
+                <div class="list-row">
+                    <div class="col font-lg-date">22/07/2026</div>
+                    <div class="col text-sub">Kotor: Rp 500rb | Keluar: Rp 50rb</div>
+                    <div class="col font-lg-price">Laba: Rp 450.000</div>
                 </div>
             </div>
 
-            <!-- Diagram Bulanan -->
+            <!-- Diagram Bulanan (JANUARI - DESEMBER FULL) -->
             <div class="chart-container">
-                <div class="chart-title">DIAGRAM KEUNTUNGAN BULANAN (2026)</div>
-                <div class="chart-bars">
-                    <div class="bar-wrapper">
-                        <span class="bar-val">2.1M</span>
-                        <div class="bar bar-low" style="height: 30%;"></div>
-                        <span class="bar-month">Jan</span>
-                    </div>
-                    <div class="bar-wrapper">
-                        <span class="bar-val">4.5M</span>
-                        <div class="bar bar-mid" style="height: 60%;"></div>
-                        <span class="bar-month">Feb</span>
-                    </div>
-                    <div class="bar-wrapper">
-                        <span class="bar-val">8.2M</span>
-                        <div class="bar bar-high" style="height: 90%;"></div>
-                        <span class="bar-month">Mar</span>
-                    </div>
+                <div class="chart-title">DIAGRAM KEUNTUNGAN BULANAN (JAN - DES 2026)</div>
+                <div class="chart-bars-12">
+                    <div class="bar-wrapper-12"><span class="bar-val-12">2.1M</span><div class="bar-12 bar-low" style="height: 25%;"></div><span class="bar-month-12">Jan</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">4.5M</span><div class="bar-12 bar-mid" style="height: 50%;"></div><span class="bar-month-12">Feb</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">8.2M</span><div class="bar-12 bar-high" style="height: 90%;"></div><span class="bar-month-12">Mar</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">5.0M</span><div class="bar-12 bar-mid" style="height: 55%;"></div><span class="bar-month-12">Apr</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">3.1M</span><div class="bar-12 bar-low" style="height: 35%;"></div><span class="bar-month-12">Mei</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">6.8M</span><div class="bar-12 bar-mid" style="height: 75%;"></div><span class="bar-month-12">Jun</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">7.5M</span><div class="bar-12 bar-high" style="height: 82%;"></div><span class="bar-month-12">Jul</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Agu</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Sep</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Okt</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Nov</span></div>
+                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Des</span></div>
                 </div>
             </div>
         </section>
@@ -657,6 +700,25 @@
                 <button class="btn-full" style="background:#00e676; color:#000;"><i class="fa-solid fa-link"></i> Simpan URL</button>
                 <button class="btn-full" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cloud-arrow-down"></i> Download Data dari Spreadsheet</button>
                 <button class="btn-full" style="background:#ff9800; color:#000;"><i class="fa-solid fa-cloud-arrow-up"></i> Backup Data ke Spreadsheet</button>
+                
+                <!-- KOLOM COPY KODE APPSCRIPT -->
+                <div class="code-box-container">
+                    <div class="code-box-header">
+                        <span>KODE GOOGLE APPSCRIPT (SPREADSHEET)</span>
+                        <button class="btn-copy" onclick="copyAppScript()"><i class="fa-regular fa-copy"></i> Copy Kode</button>
+                    </div>
+                    <textarea id="appscript-code" class="code-area" readonly>
+function doGet(e) {
+  return ContentService.createTextOutput("POS System Ready");
+}
+
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet();
+  var data = JSON.parse(e.postData.contents);
+  return ContentService.createTextOutput("Success");
+}
+                    </textarea>
+                </div>
             </div>
         </section>
 
@@ -691,6 +753,15 @@
             if (targetView) {
                 targetView.classList.add('active');
             }
+        }
+
+        // FUNGSI COPY KODE APPSCRIPT
+        function copyAppScript() {
+            const copyText = document.getElementById("appscript-code");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            alert("Kode AppScript berhasil disalin!");
         }
     </script>
 </body>
