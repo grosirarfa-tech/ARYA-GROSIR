@@ -18,7 +18,7 @@
         html, body {
             width: 100vw;
             height: 100vh;
-            overflow: hidden; /* Mengunci layar tanpa scroll */
+            overflow: hidden;
             background-color: #080808;
             color: #ffffff;
         }
@@ -45,7 +45,7 @@
         }
 
         .logo-container img {
-            height: clamp(40px, 7vh, 70px);
+            height: clamp(35px, 6vh, 60px);
             object-fit: contain;
         }
 
@@ -97,15 +97,30 @@
             font-family: monospace;
         }
 
-        /* --- MENU GRID SECTION --- */
-        main.menu-grid {
+        /* --- VIEWS CONTAINER --- */
+        .view-content {
             width: 100%;
             flex-grow: 1;
-            display: grid;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            margin-top: 1vh;
+        }
+
+        .view-content.active {
+            display: flex;
+        }
+
+        /* --- MENU UTAMA GRID --- */
+        #view-main-menu {
+            display: none;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(4, 1fr);
             gap: 1.2vh 1.2vw;
-            margin-top: 1vh;
+        }
+
+        #view-main-menu.active {
+            display: grid;
         }
 
         .menu-card {
@@ -115,8 +130,8 @@
             padding: 1.5vh 1vw;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Rata tengah secara horizontal */
-            justify-content: center; /* Rata tengah secara vertikal */
+            align-items: center;
+            justify-content: center;
             gap: 1.2vh;
             height: 100%;
             cursor: pointer;
@@ -130,74 +145,229 @@
             background: #1a1a1a;
         }
 
-        /* KOTAK IKON DIBERSIHKAN DAN DIPERBESAR */
         .icon-box {
-            width: clamp(55px, 9vh, 85px);
-            height: clamp(55px, 9vh, 85px);
+            width: clamp(50px, 8vh, 75px);
+            height: clamp(50px, 8vh, 75px);
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(1.6rem, 3.8vh, 2.4rem); /* Ukuran ikon diperbesar */
+            font-size: clamp(1.4rem, 3.2vh, 2.2rem);
             border: 1.5px solid transparent;
         }
 
-        /* TEKS MENU RATA TENGAH */
         .menu-title {
-            font-size: clamp(0.7rem, 1.4vh, 0.9rem);
+            font-size: clamp(0.7rem, 1.3vh, 0.85rem);
             font-weight: 800;
             color: #ffffff;
             letter-spacing: 0.5px;
             line-height: 1.2;
             text-transform: uppercase;
-            text-align: center; /* Teks Rata Tengah */
+            text-align: center;
         }
 
-        /* --- WARNA BORDER & BACKGROUND KOTAK IKON --- */
-        .icon-belanja { 
-            background-color: rgba(63, 81, 181, 0.08); 
-            border-color: rgba(121, 134, 203, 0.4); 
-            color: #7986cb; 
-        }
-        .icon-penjualan { 
-            background-color: rgba(255, 152, 0, 0.08); 
-            border-color: rgba(255, 183, 77, 0.4); 
-            color: #ffb74d; 
-        }
-        .icon-stok { 
-            background-color: rgba(33, 150, 243, 0.08); 
-            border-color: rgba(100, 181, 246, 0.4); 
-            color: #64b5f6; 
-        }
-        .icon-perkiraan { 
-            background-color: rgba(156, 39, 176, 0.08); 
-            border-color: rgba(186, 104, 200, 0.4); 
-            color: #ba68c8; 
-        }
-        .icon-pengeluaran { 
-            background-color: rgba(0, 188, 212, 0.08); 
-            border-color: rgba(77, 208, 225, 0.4); 
-            color: #4dd0e1; 
-        }
-        .icon-keuntungan { 
-            background-color: rgba(233, 30, 99, 0.08); 
-            border-color: rgba(240, 98, 146, 0.4); 
-            color: #f06292; 
-        }
-        .icon-faktur { 
-            background-color: rgba(255, 193, 7, 0.08); 
-            border-color: rgba(255, 213, 79, 0.4); 
-            color: #ffd54f; 
-        }
-        .icon-sinkronisasi { 
-            background-color: rgba(76, 175, 80, 0.08); 
-            border-color: rgba(129, 199, 132, 0.4); 
-            color: #81c784; 
+        /* WARNA IKON MENU UTAMA */
+        .icon-belanja { background-color: rgba(63, 81, 181, 0.08); border-color: rgba(121, 134, 203, 0.4); color: #7986cb; }
+        .icon-penjualan { background-color: rgba(255, 152, 0, 0.08); border-color: rgba(255, 183, 77, 0.4); color: #ffb74d; }
+        .icon-stok { background-color: rgba(33, 150, 243, 0.08); border-color: rgba(100, 181, 246, 0.4); color: #64b5f6; }
+        .icon-perkiraan { background-color: rgba(156, 39, 176, 0.08); border-color: rgba(186, 104, 200, 0.4); color: #ba68c8; }
+        .icon-pengeluaran { background-color: rgba(0, 188, 212, 0.08); border-color: rgba(77, 208, 225, 0.4); color: #4dd0e1; }
+        .icon-keuntungan { background-color: rgba(233, 30, 99, 0.08); border-color: rgba(240, 98, 146, 0.4); color: #f06292; }
+        .icon-faktur { background-color: rgba(255, 193, 7, 0.08); border-color: rgba(255, 213, 79, 0.4); color: #ffd54f; }
+        .icon-sinkronisasi { background-color: rgba(76, 175, 80, 0.08); border-color: rgba(129, 199, 132, 0.4); color: #81c784; }
+
+        /* --- SUB-MENU GENERAL STYLES --- */
+        .submenu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-shrink: 0;
         }
 
-        /* --- RESPONSIVE TABLET & DESKTOP --- */
+        .submenu-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ff9800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action {
+            background: #00e676;
+            color: #000;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action:active {
+            opacity: 0.8;
+        }
+
+        /* LIST & TABLE CONTAINER (SCROLLABLE INTERNAL ONLY) */
+        .list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .list-item {
+            background: #141414;
+            border: 1px solid #222;
+            padding: 12px 14px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-item-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #eee;
+        }
+
+        .list-item-sub {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .list-item-value {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #00e676;
+        }
+
+        /* KEUNTUNGAN SPECIFIC STYLES */
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .card-stat {
+            background: #141414;
+            border: 1px solid #222;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .card-stat .title { font-size: 0.65rem; color: #aaa; text-transform: uppercase; }
+        .card-stat .val { font-size: 0.95rem; font-weight: 700; margin-top: 4px; }
+        .text-green { color: #00e676; }
+        .text-red { color: #ff5252; }
+
+        .chart-container {
+            background: #141414;
+            border: 1px solid #222;
+            padding: 10px;
+            border-radius: 12px;
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+
+        .chart-title {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 90px;
+            gap: 4px;
+            padding-top: 15px;
+        }
+
+        .bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar-val {
+            font-size: 0.55rem;
+            color: #ccc;
+            margin-bottom: 2px;
+        }
+
+        .bar {
+            width: 100%;
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+        }
+
+        .bar-month {
+            font-size: 0.6rem;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        .bar-low { background: linear-gradient(to top, #ff5252, #ff7979); }
+        .bar-mid { background: linear-gradient(to top, #ffb74d, #ffe082); }
+        .bar-high { background: linear-gradient(to top, #00e676, #b9f6ca); }
+
+        /* FORM INPUT STYLES */
+        .form-group {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .form-group input, .form-group textarea {
+            background: #141414;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 12px;
+            background: #ff9800;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
         @media (min-width: 768px) {
-            main.menu-grid {
+            #view-main-menu {
                 grid-template-columns: repeat(4, 1fr);
                 grid-template-rows: repeat(2, 1fr);
                 gap: 2vh 2vw;
@@ -208,7 +378,7 @@
 <body>
 
     <div class="app-container">
-        <!-- Header -->
+        <!-- HEADER -->
         <header>
             <div class="logo-container">
                 <img src="logo web arya.png" alt="Arya Grosir Logo">
@@ -220,7 +390,7 @@
                     <span>PREMIUM POS<br>SYSTEM</span>
                 </div>
 
-                <button class="btn-home">
+                <button class="btn-home" onclick="showView('view-main-menu')">
                     <i class="fa-solid fa-house"></i> HOME
                 </button>
 
@@ -230,70 +400,270 @@
             </div>
         </header>
 
-        <!-- Grid Menu Utama -->
-        <main class="menu-grid">
-            
-            <div class="menu-card" onclick="navigateTo('belanja')">
-                <div class="icon-box icon-belanja">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                </div>
+        <!-- 0. MENU UTAMA -->
+        <main class="view-content active" id="view-main-menu">
+            <div class="menu-card" onclick="showView('view-belanja')">
+                <div class="icon-box icon-belanja"><i class="fa-solid fa-bag-shopping"></i></div>
                 <div class="menu-title">Belanja Barang</div>
             </div>
-
-            <div class="menu-card" onclick="navigateTo('penjualan')">
-                <div class="icon-box icon-penjualan">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                </div>
+            <div class="menu-card" onclick="showView('view-penjualan')">
+                <div class="icon-box icon-penjualan"><i class="fa-solid fa-cart-shopping"></i></div>
                 <div class="menu-title">Penjualan</div>
             </div>
-
-            <div class="menu-card" onclick="navigateTo('stok')">
-                <div class="icon-box icon-stok">
-                    <i class="fa-solid fa-cubes"></i>
-                </div>
+            <div class="menu-card" onclick="showView('view-stok')">
+                <div class="icon-box icon-stok"><i class="fa-solid fa-cubes"></i></div>
                 <div class="menu-title">Stok Barang</div>
             </div>
-
-            <div class="menu-card" onclick="navigateTo('perkiraan')">
-                <div class="icon-box icon-perkiraan">
-                    <i class="fa-solid fa-chart-line"></i>
-                </div>
+            <div class="menu-card" onclick="showView('view-perkiraan')">
+                <div class="icon-box icon-perkiraan"><i class="fa-solid fa-chart-line"></i></div>
                 <div class="menu-title">Perkiraan Belanja</div>
             </div>
-
-            <div class="menu-card" onclick="navigateTo('pengeluaran')">
-                <div class="icon-box icon-pengeluaran">
-                    <i class="fa-solid fa-file-invoice"></i>
-                </div>
+            <div class="menu-card" onclick="showView('view-pengeluaran')">
+                <div class="icon-box icon-pengeluaran"><i class="fa-solid fa-file-invoice"></i></div>
                 <div class="menu-title">Pengeluaran Lain</div>
             </div>
-
-            <div class="menu-card" onclick="navigateTo('keuntungan')">
-                <div class="icon-box icon-keuntungan">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
+            <div class="menu-card" onclick="showView('view-keuntungan')">
+                <div class="icon-box icon-keuntungan"><i class="fa-solid fa-wallet"></i></div>
                 <div class="menu-title">Keuntungan</div>
             </div>
-
-            <div class="menu-card" onclick="navigateTo('faktur')">
-                <div class="icon-box icon-faktur">
-                    <i class="fa-solid fa-money-bill-wave"></i>
-                </div>
+            <div class="menu-card" onclick="showView('view-faktur')">
+                <div class="icon-box icon-faktur"><i class="fa-solid fa-money-bill-wave"></i></div>
                 <div class="menu-title">Pengaturan Faktur</div>
             </div>
-
-            <div class="menu-card" onclick="navigateTo('sinkronisasi')">
-                <div class="icon-box icon-sinkronisasi">
-                    <i class="fa-solid fa-rotate"></i>
-                </div>
+            <div class="menu-card" onclick="showView('view-sinkronisasi')">
+                <div class="icon-box icon-sinkronisasi"><i class="fa-solid fa-rotate"></i></div>
                 <div class="menu-title">Sinkronisasi</div>
             </div>
-
         </main>
+
+        <!-- 1. SUB MENU: BELANJA BARANG -->
+        <section class="view-content" id="view-belanja">
+            <div class="submenu-header">
+                <div class="submenu-title"><i class="fa-solid fa-bag-shopping"></i> Riwayat Belanja</div>
+                <button class="btn-action"><i class="fa-solid fa-plus"></i> Transaksi Baru</button>
+            </div>
+            <div class="list-container">
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Belanja Stok Toko</div>
+                        <div class="list-item-sub">23 Juli 2026 - 14:20</div>
+                    </div>
+                    <div class="list-item-value">Rp 1.500.000</div>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Pembelian Minyak & Gula</div>
+                        <div class="list-item-sub">22 Juli 2026 - 09:15</div>
+                    </div>
+                    <div class="list-item-value">Rp 850.000</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. SUB MENU: PENJUALAN -->
+        <section class="view-content" id="view-penjualan">
+            <div class="submenu-header">
+                <div class="submenu-title"><i class="fa-solid fa-cart-shopping"></i> Riwayat Penjualan</div>
+                <button class="btn-action"><i class="fa-solid fa-plus"></i> Transaksi Baru</button>
+            </div>
+            <div class="list-container">
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Pembeli: Budi Santoso</div>
+                        <div class="list-item-sub">23 Juli 2026 - 16:05</div>
+                    </div>
+                    <div class="list-item-value">Rp 125.000</div>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Pembeli: Umum</div>
+                        <div class="list-item-sub">23 Juli 2026 - 11:30</div>
+                    </div>
+                    <div class="list-item-value">Rp 45.000</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SUB MENU: STOK BARANG -->
+        <section class="view-content" id="view-stok">
+            <div class="submenu-header">
+                <div class="submenu-title"><i class="fa-solid fa-cubes"></i> Katalog Stok</div>
+                <button class="btn-action"><i class="fa-solid fa-plus"></i> Tambah Barang</button>
+            </div>
+            <div class="list-container">
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Beras Pandan Wangi 5kg</div>
+                        <div class="list-item-sub">Kategori: Sembako</div>
+                    </div>
+                    <div class="list-item-value" style="color:#64b5f6;">Stok: 24 Pcs</div>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Gula Pasir 1kg</div>
+                        <div class="list-item-sub">Kategori: Sembako</div>
+                    </div>
+                    <div class="list-item-value" style="color:#64b5f6;">Stok: 50 Pcs</div>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Minyak Goreng 2L</div>
+                        <div class="list-item-sub">Kategori: Sembako</div>
+                    </div>
+                    <div class="list-item-value" style="color:#64b5f6;">Stok: 12 Pcs</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. SUB MENU: PERKIRAAN BELANJA -->
+        <section class="view-content" id="view-perkiraan">
+            <div class="submenu-header">
+                <div class="submenu-title"><i class="fa-solid fa-chart-line"></i> Perkiraan Belanja / Restock</div>
+            </div>
+            <div class="list-container">
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Garam Dapur 250g</div>
+                        <div class="list-item-sub">Stok Saat Ini: 2 Pcs</div>
+                    </div>
+                    <div class="list-item-value" style="color:#ffb74d;">Beli: 20 Pcs</div>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Minyak Goreng 2L</div>
+                        <div class="list-item-sub">Stok Saat Ini: 3 Pcs</div>
+                    </div>
+                    <div class="list-item-value" style="color:#ffb74d;">Beli: 15 Pcs</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. SUB MENU: PENGELUARAN LAIN -->
+        <section class="view-content" id="view-pengeluaran">
+            <div class="submenu-header">
+                <div class="submenu-title"><i class="fa-solid fa-file-invoice"></i> Pengeluaran Lain</div>
+                <button class="btn-action"><i class="fa-solid fa-plus"></i> Tambah Pengeluaran</button>
+            </div>
+            <div class="list-container">
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Bayar Listrik Toko</div>
+                        <div class="list-item-sub">20 Juli 2026</div>
+                    </div>
+                    <div class="list-item-value" style="color:#ff5252;">Rp 350.000</div>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">Beli Kantong Plastik</div>
+                        <div class="list-item-sub">18 Juli 2026</div>
+                    </div>
+                    <div class="list-item-value" style="color:#ff5252;">Rp 45.000</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. SUB MENU: KEUNTUNGAN -->
+        <section class="view-content" id="view-keuntungan">
+            <div class="submenu-header">
+                <div class="submenu-title"><i class="fa-solid fa-wallet"></i> Laporan Keuntungan</div>
+            </div>
+            
+            <!-- 2x2 Grid Stats -->
+            <div class="grid-2x2">
+                <div class="card-stat">
+                    <div class="title">Laba Kemarin</div>
+                    <div class="val text-green">Rp 450.000</div>
+                </div>
+                <div class="card-stat">
+                    <div class="title">Laba Bulan Ini</div>
+                    <div class="val text-green">Rp 8.250.000</div>
+                </div>
+                <div class="card-stat">
+                    <div class="title">Pengeluaran Kemarin</div>
+                    <div class="val text-red">Rp 50.000</div>
+                </div>
+                <div class="card-stat">
+                    <div class="title">Pengeluaran Bulan Ini</div>
+                    <div class="val text-red">Rp 1.100.000</div>
+                </div>
+            </div>
+
+            <!-- List Keuntungan Harian -->
+            <div class="list-container" style="max-height: 120px;">
+                <div class="list-item">
+                    <div>
+                        <div class="list-item-title">22 Juli 2026</div>
+                        <div class="list-item-sub">Pengeluaran: Rp 50.000 | Kotor: Rp 500.000</div>
+                    </div>
+                    <div class="list-item-value">Rp 450.000</div>
+                </div>
+            </div>
+
+            <!-- Diagram Bulanan -->
+            <div class="chart-container">
+                <div class="chart-title">DIAGRAM KEUNTUNGAN BULANAN (2026)</div>
+                <div class="chart-bars">
+                    <div class="bar-wrapper">
+                        <span class="bar-val">2.1M</span>
+                        <div class="bar bar-low" style="height: 30%;"></div>
+                        <span class="bar-month">Jan</span>
+                    </div>
+                    <div class="bar-wrapper">
+                        <span class="bar-val">4.5M</span>
+                        <div class="bar bar-mid" style="height: 60%;"></div>
+                        <span class="bar-month">Feb</span>
+                    </div>
+                    <div class="bar-wrapper">
+                        <span class="bar-val">8.2M</span>
+                        <div class="bar bar-high" style="height: 90%;"></div>
+                        <span class="bar-month">Mar</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. SUB MENU: PENGATURAN FAKTUR -->
+        <section class="view-content" id="view-faktur">
+            <div class="submenu-header">
+                <div class="submenu-title"><i class="fa-solid fa-money-bill-wave"></i> Pengaturan Tampilan Faktur</div>
+            </div>
+            <div class="list-container">
+                <div class="form-group">
+                    <label>Nama Toko pada Struk</label>
+                    <input type="text" value="ARYA GROSIR">
+                </div>
+                <div class="form-group">
+                    <label>Alamat Toko / Header</label>
+                    <input type="text" value="Jl. Pasar Raya No. 123">
+                </div>
+                <div class="form-group">
+                    <label>Pesan Garis Bawah (Footer Struk)</label>
+                    <textarea rows="2">Terima kasih telah berbelanja!</textarea>
+                </div>
+                <button class="btn-full"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan</button>
+            </div>
+        </section>
+
+        <!-- 8. SUB MENU: SINKRONISASI -->
+        <section class="view-content" id="view-sinkronisasi">
+            <div class="submenu-header">
+                <div class="submenu-title"><i class="fa-solid fa-rotate"></i> Sinkronisasi Google Sheets</div>
+            </div>
+            <div class="list-container">
+                <div class="form-group">
+                    <label>URL Web App Google AppScript</label>
+                    <input type="text" id="appscript-url" placeholder="https://script.google.com/macros/s/.../exec">
+                </div>
+                <button class="btn-full" style="background:#00e676; color:#000;"><i class="fa-solid fa-link"></i> Simpan URL</button>
+                <button class="btn-full" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cloud-arrow-down"></i> Download Data dari Spreadsheet</button>
+                <button class="btn-full" style="background:#ff9800; color:#000;"><i class="fa-solid fa-cloud-arrow-up"></i> Backup Data ke Spreadsheet</button>
+            </div>
+        </section>
+
     </div>
 
     <script>
-        // Realtime DateTime
+        // Tanggal & Waktu Realtime
         function updateDateTime() {
             const now = new Date();
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -312,8 +682,15 @@
         setInterval(updateDateTime, 1000);
         updateDateTime();
 
-        function navigateTo(menu) {
-            console.log('Navigasi ke:', menu);
+        // NAVIGASI ANTAR VIEW (SPA)
+        function showView(viewId) {
+            const views = document.querySelectorAll('.view-content');
+            views.forEach(v => v.classList.remove('active'));
+
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.add('active');
+            }
         }
     </script>
 </body>
