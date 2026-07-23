@@ -12,13 +12,13 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none; /* Mencegah seleksi teks saat disentuh */
+            user-select: none;
         }
 
         html, body {
             width: 100vw;
             height: 100vh;
-            overflow: hidden; /* Menghilangkan scrollbar secara mutlak */
+            overflow: hidden; /* Mengunci layar tanpa scroll */
             background-color: #080808;
             color: #ffffff;
         }
@@ -45,7 +45,7 @@
         }
 
         .logo-container img {
-            height: clamp(40px, 8vh, 75px); /* Logo menyesuaikan tinggi layar */
+            height: clamp(40px, 7vh, 70px);
             object-fit: contain;
         }
 
@@ -62,7 +62,7 @@
             align-items: center;
             gap: 8px;
             color: #00e676;
-            font-size: clamp(0.65rem, 1.2vh, 0.85rem);
+            font-size: clamp(0.65rem, 1.1vh, 0.85rem);
             font-weight: 700;
             letter-spacing: 0.5px;
         }
@@ -81,7 +81,7 @@
             color: #ff9800;
             padding: 0.4em 1em;
             border-radius: 20px;
-            font-size: clamp(0.7rem, 1.3vh, 0.9rem);
+            font-size: clamp(0.7rem, 1.2vh, 0.9rem);
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -91,7 +91,7 @@
 
         .datetime {
             color: #8c8c8c;
-            font-size: clamp(0.65rem, 1.2vh, 0.8rem);
+            font-size: clamp(0.65rem, 1.1vh, 0.8rem);
             text-align: right;
             line-height: 1.2;
             font-family: monospace;
@@ -102,7 +102,7 @@
             width: 100%;
             flex-grow: 1;
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Default HP: 2 Kolom */
+            grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(4, 1fr);
             gap: 1.2vh 1.2vw;
             margin-top: 1vh;
@@ -111,13 +111,14 @@
         .menu-card {
             background: linear-gradient(145deg, #141414, #0d0d0d);
             border: 1px solid #1f1f1f;
-            border-radius: 16px;
-            padding: 1.2vh 1.2vw;
+            border-radius: 20px;
+            padding: 1.5vh 1vw;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            justify-content: space-between;
-            height: 100%; /* Mengisi penuh area grid-nya */
+            align-items: center; /* Rata tengah secara horizontal */
+            justify-content: center; /* Rata tengah secara vertikal */
+            gap: 1.2vh;
+            height: 100%;
             cursor: pointer;
             transition: all 0.15s ease-in-out;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -129,45 +130,77 @@
             background: #1a1a1a;
         }
 
+        /* KOTAK IKON DIBERSIHKAN DAN DIPERBESAR */
         .icon-box {
-            width: clamp(32px, 5vh, 48px);
-            height: clamp(32px, 5vh, 48px);
-            border-radius: 10px;
+            width: clamp(55px, 9vh, 85px);
+            height: clamp(55px, 9vh, 85px);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(1rem, 2.2vh, 1.4rem);
+            font-size: clamp(1.6rem, 3.8vh, 2.4rem); /* Ukuran ikon diperbesar */
+            border: 1.5px solid transparent;
         }
 
+        /* TEKS MENU RATA TENGAH */
         .menu-title {
-            font-size: clamp(0.7rem, 1.5vh, 0.95rem);
+            font-size: clamp(0.7rem, 1.4vh, 0.9rem);
             font-weight: 800;
             color: #ffffff;
             letter-spacing: 0.5px;
             line-height: 1.2;
             text-transform: uppercase;
+            text-align: center; /* Teks Rata Tengah */
         }
 
-        /* --- SKEMA WARNA IKON --- */
-        .icon-belanja { background-color: rgba(63, 81, 181, 0.15); color: #7986cb; }
-        .icon-penjualan { background-color: rgba(255, 152, 0, 0.15); color: #ffb74d; }
-        .icon-stok { background-color: rgba(33, 150, 243, 0.15); color: #64b5f6; }
-        .icon-perkiraan { background-color: rgba(156, 39, 176, 0.15); color: #ba68c8; }
-        .icon-pengeluaran { background-color: rgba(0, 188, 212, 0.15); color: #4dd0e1; }
-        .icon-keuntungan { background-color: rgba(233, 30, 99, 0.15); color: #f06292; }
-        .icon-faktur { background-color: rgba(255, 193, 7, 0.15); color: #ffd54f; }
-        .icon-sinkronisasi { background-color: rgba(76, 175, 80, 0.15); color: #81c784; }
+        /* --- WARNA BORDER & BACKGROUND KOTAK IKON --- */
+        .icon-belanja { 
+            background-color: rgba(63, 81, 181, 0.08); 
+            border-color: rgba(121, 134, 203, 0.4); 
+            color: #7986cb; 
+        }
+        .icon-penjualan { 
+            background-color: rgba(255, 152, 0, 0.08); 
+            border-color: rgba(255, 183, 77, 0.4); 
+            color: #ffb74d; 
+        }
+        .icon-stok { 
+            background-color: rgba(33, 150, 243, 0.08); 
+            border-color: rgba(100, 181, 246, 0.4); 
+            color: #64b5f6; 
+        }
+        .icon-perkiraan { 
+            background-color: rgba(156, 39, 176, 0.08); 
+            border-color: rgba(186, 104, 200, 0.4); 
+            color: #ba68c8; 
+        }
+        .icon-pengeluaran { 
+            background-color: rgba(0, 188, 212, 0.08); 
+            border-color: rgba(77, 208, 225, 0.4); 
+            color: #4dd0e1; 
+        }
+        .icon-keuntungan { 
+            background-color: rgba(233, 30, 99, 0.08); 
+            border-color: rgba(240, 98, 146, 0.4); 
+            color: #f06292; 
+        }
+        .icon-faktur { 
+            background-color: rgba(255, 193, 7, 0.08); 
+            border-color: rgba(255, 213, 79, 0.4); 
+            color: #ffd54f; 
+        }
+        .icon-sinkronisasi { 
+            background-color: rgba(76, 175, 80, 0.08); 
+            border-color: rgba(129, 199, 132, 0.4); 
+            color: #81c784; 
+        }
 
-        /* --- RESPONSIVE UNTUK TABLET & DESKTOP --- */
+        /* --- RESPONSIVE TABLET & DESKTOP --- */
         @media (min-width: 768px) {
             main.menu-grid {
-                grid-template-columns: repeat(4, 1fr); /* Ubah ke 4 Kolom di Layar Lebar */
+                grid-template-columns: repeat(4, 1fr);
                 grid-template-rows: repeat(2, 1fr);
                 gap: 2vh 2vw;
-            }
-            .menu-card {
-                padding: 2vh 1.5vw;
-                border-radius: 20px;
             }
         }
     </style>
@@ -204,7 +237,7 @@
                 <div class="icon-box icon-belanja">
                     <i class="fa-solid fa-bag-shopping"></i>
                 </div>
-                <div class="menu-title">Belanja<br>Barang</div>
+                <div class="menu-title">Belanja Barang</div>
             </div>
 
             <div class="menu-card" onclick="navigateTo('penjualan')">
@@ -218,21 +251,21 @@
                 <div class="icon-box icon-stok">
                     <i class="fa-solid fa-cubes"></i>
                 </div>
-                <div class="menu-title">Stok<br>Barang</div>
+                <div class="menu-title">Stok Barang</div>
             </div>
 
             <div class="menu-card" onclick="navigateTo('perkiraan')">
                 <div class="icon-box icon-perkiraan">
                     <i class="fa-solid fa-chart-line"></i>
                 </div>
-                <div class="menu-title">Perkiraan<br>Belanja</div>
+                <div class="menu-title">Perkiraan Belanja</div>
             </div>
 
             <div class="menu-card" onclick="navigateTo('pengeluaran')">
                 <div class="icon-box icon-pengeluaran">
-                    <i class="fa-solid fa-receipt"></i>
+                    <i class="fa-solid fa-file-invoice"></i>
                 </div>
-                <div class="menu-title">Pengeluaran<br>Lain</div>
+                <div class="menu-title">Pengeluaran Lain</div>
             </div>
 
             <div class="menu-card" onclick="navigateTo('keuntungan')">
@@ -244,9 +277,9 @@
 
             <div class="menu-card" onclick="navigateTo('faktur')">
                 <div class="icon-box icon-faktur">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <i class="fa-solid fa-money-bill-wave"></i>
                 </div>
-                <div class="menu-title">Pengaturan<br>Faktur</div>
+                <div class="menu-title">Pengaturan Faktur</div>
             </div>
 
             <div class="menu-card" onclick="navigateTo('sinkronisasi')">
@@ -260,7 +293,7 @@
     </div>
 
     <script>
-        // Tanggal & Waktu Realtime
+        // Realtime DateTime
         function updateDateTime() {
             const now = new Date();
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -279,7 +312,6 @@
         setInterval(updateDateTime, 1000);
         updateDateTime();
 
-        // Navigasi
         function navigateTo(menu) {
             console.log('Navigasi ke:', menu);
         }
