@@ -2,1147 +2,905 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arya Grosir - Premium POS System</title>
-    <!-- FontAwesome & HTML5-QRCode Scanner Library -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Kasir & Inventaris</title>
+    <!-- Library html5-qrcode untuk Camera Scanner -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f4f6f9; color: #333; padding: 15px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2, h3 { color: #2c3e50; margin-bottom: 15px; }
+        
+        /* Utility & Buttons */
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-success { background: #2ecc71; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-warning { background: #f1c40f; color: #333; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn:hover { opacity: 0.9; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        
+        /* Navigation & Screens */
+        .screen { display: none; }
+        .screen.active { display: block; }
+        
+        /* Form Inputs */
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; }
+        .form-control { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .form-control:focus { outline: none; border-color: #3498db; box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); }
+        .uppercase { text-transform: uppercase; }
+        
+        /* Toggle Switch Customer Type */
+        .type-toggle { display: flex; gap: 10px; margin-bottom: 12px; }
+        .type-toggle button { flex: 1; padding: 10px; border: 1px solid #3498db; background: #fff; color: #3498db; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        .type-toggle button.active { background: #3498db; color: #fff; }
 
-        html, body {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background-color: #080808;
-            color: #ffffff;
-        }
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 13px; }
+        th { background-color: #f8f9fa; }
+        .text-right { text-align: right; }
+        
+        /* Camera Modal Fullscreen */
+        #scanner-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+        #reader { width: 100%; max-width: 500px; }
+        .scanner-controls { margin-top: 15px; display: flex; gap: 10px; }
 
-        .app-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 1.5vh 2vw;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* HEADER SECTION */
-        header {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1vh;
-            flex-shrink: 0;
-        }
-
-        .logo-container img {
-            height: clamp(35px, 6vh, 60px);
-            object-fit: contain;
-        }
-
-        .header-bar {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 0.5rem;
-        }
-
-        .system-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #00e676;
-            font-size: clamp(0.65rem, 1.1vh, 0.85rem);
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            background-color: #00e676;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #00e676;
-        }
-
-        .btn-home {
-            background-color: transparent;
-            border: 1px solid #d48806;
-            color: #ff9800;
-            padding: 0.4em 1em;
-            border-radius: 20px;
-            font-size: clamp(0.7rem, 1.2vh, 0.9rem);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .datetime {
-            color: #8c8c8c;
-            font-size: clamp(0.65rem, 1.1vh, 0.8rem);
-            text-align: right;
-            line-height: 1.2;
-            font-family: monospace;
-        }
-
-        /* VIEWS CONTAINER */
-        .view-content {
-            width: 100%;
-            flex-grow: 1;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            margin-top: 1vh;
-        }
-
-        .view-content.active {
-            display: flex;
-        }
-
-        /* MENU UTAMA GRID */
-        #view-main-menu {
-            display: none;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 1.2vh 1.2vw;
-        }
-
-        #view-main-menu.active {
-            display: grid;
-        }
-
-        .menu-card {
-            background: linear-gradient(145deg, #141414, #0d0d0d);
-            border: 1px solid #1f1f1f;
-            border-radius: 20px;
-            padding: 1.5vh 1vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1.2vh;
-            height: 100%;
-            cursor: pointer;
-            transition: all 0.15s ease-in-out;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        }
-
-        .menu-card:active {
-            transform: scale(0.96);
-            border-color: #333;
-            background: #1a1a1a;
-        }
-
-        .icon-box {
-            width: clamp(50px, 8vh, 75px);
-            height: clamp(50px, 8vh, 75px);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(1.4rem, 3.2vh, 2.2rem);
-            border: 1.5px solid transparent;
-        }
-
-        .menu-title {
-            font-size: clamp(0.7rem, 1.3vh, 0.85rem);
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: 0.5px;
-            line-height: 1.2;
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        /* WARNA IKON MENU UTAMA */
-        .icon-belanja { background-color: rgba(63, 81, 181, 0.08); border-color: rgba(121, 134, 203, 0.4); color: #7986cb; }
-        .icon-penjualan { background-color: rgba(255, 152, 0, 0.08); border-color: rgba(255, 183, 77, 0.4); color: #ffb74d; }
-        .icon-stok { background-color: rgba(33, 150, 243, 0.08); border-color: rgba(100, 181, 246, 0.4); color: #64b5f6; }
-        .icon-perkiraan { background-color: rgba(156, 39, 176, 0.08); border-color: rgba(186, 104, 200, 0.4); color: #ba68c8; }
-        .icon-pengeluaran { background-color: rgba(0, 188, 212, 0.08); border-color: rgba(77, 208, 225, 0.4); color: #4dd0e1; }
-        .icon-keuntungan { background-color: rgba(233, 30, 99, 0.08); border-color: rgba(240, 98, 146, 0.4); color: #f06292; }
-        .icon-faktur { background-color: rgba(255, 193, 7, 0.08); border-color: rgba(255, 213, 79, 0.4); color: #ffd54f; }
-        .icon-sinkronisasi { background-color: rgba(76, 175, 80, 0.08); border-color: rgba(129, 199, 132, 0.4); color: #81c784; }
-
-        /* SUB-MENU STYLES */
-        .submenu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            flex-shrink: 0;
-        }
-
-        .submenu-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #ff9800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-action {
-            background: #00e676;
-            color: #000;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .list-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding-right: 4px;
-        }
-
-        .list-row {
-            background: #141414;
-            border: 1px solid #222;
-            padding: 12px 14px;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .list-row .col {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .font-lg-date { font-size: 1.05rem; font-weight: 700; color: #ffffff; }
-        .font-lg-price { font-size: 1.15rem; font-weight: 800; color: #00e676; text-align: right; }
-        .font-medium-title { font-size: 1.05rem; font-weight: 700; color: #ffffff; }
-        .font-medium-text { font-size: 0.95rem; font-weight: 600; color: #dddddd; }
-        .text-sub { font-size: 0.8rem; color: #888888; }
-
-        /* KEUNTUNGAN STYLES */
-        .grid-2x2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 10px;
-            flex-shrink: 0;
-        }
-
-        .card-stat { background: #141414; border: 1px solid #222; padding: 10px; border-radius: 10px; text-align: center; }
-        .card-stat .title { font-size: 0.65rem; color: #aaa; text-transform: uppercase; }
-        .card-stat .val { font-size: 0.95rem; font-weight: 700; margin-top: 4px; }
-        .text-green { color: #00e676; }
-        .text-red { color: #ff5252; }
-
-        .chart-container { background: #141414; border: 1px solid #222; padding: 10px; border-radius: 12px; margin-top: 8px; flex-shrink: 0; }
-        .chart-title { font-size: 0.75rem; color: #aaa; margin-bottom: 6px; text-align: center; }
-        .chart-bars-12 { display: flex; align-items: flex-end; justify-content: space-between; height: 100px; gap: 2px; padding-top: 15px; overflow-x: auto; }
-        .bar-wrapper-12 { flex: 1; min-width: 22px; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
-        .bar-val-12 { font-size: 0.48rem; color: #ccc; margin-bottom: 2px; white-space: nowrap; }
-        .bar-12 { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px; }
-        .bar-month-12 { font-size: 0.55rem; color: #888; margin-top: 4px; }
-        .bar-low { background: linear-gradient(to top, #ff5252, #ff7979); }
-        .bar-mid { background: linear-gradient(to top, #ffb74d, #ffe082); }
-        .bar-high { background: linear-gradient(to top, #00e676, #b9f6ca); }
-
-        /* FORM & APPSCRIPT */
-        .form-group { margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; position: relative; }
-        .form-group label { font-size: 0.8rem; color: #aaa; }
-        .form-group input, .form-group textarea, .form-group select {
-            background: #141414; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.85rem; outline: none;
-        }
-        .form-group input:focus { border-color: #00e676; }
-
-        .btn-full {
-            width: 100%; padding: 10px; background: #ff9800; color: #000; border: none; border-radius: 8px;
-            font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 4px;
-        }
-
-        .code-box-container { background: #0d0d0d; border: 1px solid #222; border-radius: 8px; padding: 10px; margin-top: 10px; }
-        .code-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .code-box-header span { font-size: 0.75rem; color: #ff9800; font-weight: 700; }
-        .btn-copy { background: #2196f3; color: #fff; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
-        textarea.code-area { width: 100%; height: 110px; background: #000; color: #00e676; font-family: monospace; font-size: 0.7rem; padding: 8px; border: 1px solid #333; border-radius: 6px; resize: none; white-space: pre; }
-
-        /* MODAL FORM OVERLAY (TAMPILAN INPUT FORM TRANSAKSI) */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.9); z-index: 999; display: none;
-            flex-direction: column; padding: 15px; overflow-y: auto;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-title { font-size: 1.1rem; font-weight: 700; color: #00e676; }
-        .btn-close { background: #ff5252; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-
-        /* TYPE CUSTOMER BUTTONS */
-        .cust-type-container { display: flex; gap: 10px; margin-bottom: 8px; }
-        .btn-cust-type { flex: 1; padding: 10px; border: 1px solid #333; background: #141414; color: #fff; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .btn-cust-type.active { background: #ff9800; color: #000; border-color: #ff9800; }
-
-        /* INPUT ROW WITH CAMERA BUTTON */
-        .input-with-btn { display: flex; gap: 8px; }
-        .input-with-btn input { flex: 1; }
-        .btn-scan { background: #2196f3; color: #fff; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
-
-        /* AUTOCOMPLETE SUGGESTION BOX */
-        .autocomplete-list {
-            position: absolute; top: 100%; left: 0; right: 0; background: #1f1f1f;
-            border: 1px solid #333; border-radius: 0 0 8px 8px; max-height: 140px;
-            overflow-y: auto; z-index: 100; display: none;
-        }
-        .autocomplete-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #2a2a2a; font-size: 0.85rem; }
-        .autocomplete-item:hover { background: #00e676; color: #000; }
-
-        /* LIST KERANJANG TABLE */
-        .cart-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .cart-table th, .cart-table td { padding: 8px; text-align: left; font-size: 0.8rem; border-bottom: 1px solid #222; }
-        .cart-table th { color: #888; text-transform: uppercase; }
-        .btn-del-item { color: #ff5252; background: transparent; border: none; cursor: pointer; font-size: 0.9rem; }
-
-        .cart-summary { display: flex; justify-content: space-between; background: #141414; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: 700; }
-
-        /* FULLSCREEN CAMERA SCANNER OVERLAY */
-        #scanner-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000; z-index: 9999; display: none; flex-direction: column;
-            align-items: center; justify-content: center;
-        }
-        #interactive-reader { width: 100%; max-width: 500px; height: 100%; }
-        .scanner-controls {
-            position: absolute; bottom: 30px; display: flex; gap: 20px; z-index: 10000;
-        }
-        .btn-scanner-ctrl { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid #fff; padding: 12px 24px; border-radius: 30px; font-weight: bold; backdrop-filter: blur(5px); }
-
-        @media (min-width: 768px) {
-            #view-main-menu { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 2vh 2vw; }
-        }
+        /* Auto Suggest Box */
+        .suggest-box { border: 1px solid #ccc; max-height: 120px; overflow-y: auto; background: #fff; position: absolute; width: calc(100% - 70px); z-index: 1000; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .suggest-item { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .suggest-item:hover { background: #eef; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <!-- HEADER -->
-        <header>
-            <div class="logo-container">
-                <img src="logo web arya.png" alt="Arya Grosir Logo">
-            </div>
-            
-            <div class="header-bar">
-                <div class="system-title">
-                    <span class="dot"></span>
-                    <span>PREMIUM POS<br>SYSTEM</span>
-                </div>
+<div class="container">
 
-                <button class="btn-home" onclick="navBackHome()">
-                    <i class="fa-solid fa-house"></i> HOME (F7)
-                </button>
-
-                <div class="datetime" id="datetime">Loading...</div>
-            </div>
-        </header>
-
-        <!-- 0. MENU UTAMA -->
-        <main class="view-content active" id="view-main-menu">
-            <div class="menu-card" onclick="showView('view-belanja')">
-                <div class="icon-box icon-belanja"><i class="fa-solid fa-bag-shopping"></i></div>
-                <div class="menu-title">Belanja Barang</div>
-            </div>
-            <div class="menu-card" onclick="showView('view-penjualan')">
-                <div class="icon-box icon-penjualan"><i class="fa-solid fa-cart-shopping"></i></div>
-                <div class="menu-title">Penjualan</div>
-            </div>
-            <div class="menu-card" onclick="showView('view-stok')">
-                <div class="icon-box icon-stok"><i class="fa-solid fa-cubes"></i></div>
-                <div class="menu-title">Stok Barang</div>
-            </div>
-            <div class="menu-card" onclick="showView('view-perkiraan')">
-                <div class="icon-box icon-perkiraan"><i class="fa-solid fa-chart-line"></i></div>
-                <div class="menu-title">Perkiraan Belanja</div>
-            </div>
-            <div class="menu-card" onclick="showView('view-pengeluaran')">
-                <div class="icon-box icon-pengeluaran"><i class="fa-solid fa-file-invoice"></i></div>
-                <div class="menu-title">Pengeluaran Lain</div>
-            </div>
-            <div class="menu-card" onclick="showView('view-keuntungan')">
-                <div class="icon-box icon-keuntungan"><i class="fa-solid fa-wallet"></i></div>
-                <div class="menu-title">Keuntungan</div>
-            </div>
-            <div class="menu-card" onclick="showView('view-faktur')">
-                <div class="icon-box icon-faktur"><i class="fa-solid fa-money-bill-wave"></i></div>
-                <div class="menu-title">Pengaturan Faktur</div>
-            </div>
-            <div class="menu-card" onclick="showView('view-sinkronisasi')">
-                <div class="icon-box icon-sinkronisasi"><i class="fa-solid fa-rotate"></i></div>
-                <div class="menu-title">Sinkronisasi</div>
-            </div>
-        </main>
-
-        <!-- 1. SUB MENU: BELANJA BARANG -->
-        <section class="view-content" id="view-belanja">
-            <div class="submenu-header">
-                <div class="submenu-title"><i class="fa-solid fa-bag-shopping"></i> Riwayat Belanja</div>
-                <button class="btn-action" onclick="openFormBelanja()"><i class="fa-solid fa-plus"></i> Transaksi Baru (F5)</button>
-            </div>
-            <div class="list-container" id="list-riwayat-belanja">
-                <div class="list-row">
-                    <div class="col font-lg-date">23/07/2026</div>
-                    <div class="col text-sub">ID: #BL-8821</div>
-                    <div class="col font-medium-text">15 Item</div>
-                    <div class="col font-lg-price">Rp 1.500.000</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. SUB MENU: PENJUALAN -->
-        <section class="view-content" id="view-penjualan">
-            <div class="submenu-header">
-                <div class="submenu-title"><i class="fa-solid fa-cart-shopping"></i> Riwayat Penjualan</div>
-                <button class="btn-action" onclick="openFormPenjualan()"><i class="fa-solid fa-plus"></i> Transaksi Baru (F5)</button>
-            </div>
-            <div class="list-container" id="list-riwayat-penjualan">
-                <div class="list-row">
-                    <div class="col font-lg-date">23/07/2026</div>
-                    <div class="col font-medium-text">Budi Santoso</div>
-                    <div class="col text-sub">3 Item</div>
-                    <div class="col font-lg-price">Rp 125.000</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. SUB MENU: STOK BARANG -->
-        <section class="view-content" id="view-stok">
-            <div class="submenu-header">
-                <div class="submenu-title"><i class="fa-solid fa-cubes"></i> Katalog Stok</div>
-                <button class="btn-action" onclick="openFormStok()"><i class="fa-solid fa-plus"></i> Tambah Barang (F5)</button>
-            </div>
-            <div class="list-container" id="list-katalog-stok">
-                <!-- Rendered Dynamically -->
-            </div>
-        </section>
-
-        <!-- 4. SUB MENU: PERKIRAAN BELANJA -->
-        <section class="view-content" id="view-perkiraan">
-            <div class="submenu-header">
-                <div class="submenu-title"><i class="fa-solid fa-chart-line"></i> Perkiraan Belanja / Restock</div>
-            </div>
-            <div class="list-container" id="list-perkiraan-belanja">
-                <!-- Rendered Dynamically -->
-            </div>
-        </section>
-
-        <!-- 5. SUB MENU: PENGELUARAN LAIN -->
-        <section class="view-content" id="view-pengeluaran">
-            <div class="submenu-header">
-                <div class="submenu-title"><i class="fa-solid fa-file-invoice"></i> Pengeluaran Lain</div>
-                <button class="btn-action" onclick="openFormPengeluaran()"><i class="fa-solid fa-plus"></i> Tambah Pengeluaran (F5)</button>
-            </div>
-            <div class="list-container" id="list-pengeluaran-lain">
-                <div class="list-row">
-                    <div class="col font-lg-date">20/07/2026</div>
-                    <div class="col font-lg-price" style="color:#ff5252;">Rp 350.000</div>
-                    <div class="col font-medium-text">Bayar Listrik Toko</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 6. SUB MENU: KEUNTUNGAN -->
-        <section class="view-content" id="view-keuntungan">
-            <div class="submenu-header">
-                <div class="submenu-title"><i class="fa-solid fa-wallet"></i> Laporan Keuntungan</div>
-            </div>
-            <div class="grid-2x2">
-                <div class="card-stat"><div class="title">Laba Kemarin</div><div class="val text-green">Rp 450.000</div></div>
-                <div class="card-stat"><div class="title">Laba Bulan Ini</div><div class="val text-green">Rp 8.250.000</div></div>
-                <div class="card-stat"><div class="title">Pengeluaran Kemarin</div><div class="val text-red">Rp 50.000</div></div>
-                <div class="card-stat"><div class="title">Pengeluaran Bulan Ini</div><div class="val text-red">Rp 1.100.000</div></div>
-            </div>
-            <div class="chart-container">
-                <div class="chart-title">DIAGRAM KEUNTUNGAN BULANAN (JAN - DES 2026)</div>
-                <div class="chart-bars-12">
-                    <div class="bar-wrapper-12"><span class="bar-val-12">2.1M</span><div class="bar-12 bar-low" style="height: 25%;"></div><span class="bar-month-12">Jan</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">4.5M</span><div class="bar-12 bar-mid" style="height: 50%;"></div><span class="bar-month-12">Feb</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">8.2M</span><div class="bar-12 bar-high" style="height: 90%;"></div><span class="bar-month-12">Mar</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">5.0M</span><div class="bar-12 bar-mid" style="height: 55%;"></div><span class="bar-month-12">Apr</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">3.1M</span><div class="bar-12 bar-low" style="height: 35%;"></div><span class="bar-month-12">Mei</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">6.8M</span><div class="bar-12 bar-mid" style="height: 75%;"></div><span class="bar-month-12">Jun</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">7.5M</span><div class="bar-12 bar-high" style="height: 82%;"></div><span class="bar-month-12">Jul</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Agu</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Sep</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Okt</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Nov</span></div>
-                    <div class="bar-wrapper-12"><span class="bar-val-12">0.0</span><div class="bar-12 bar-low" style="height: 5%;"></div><span class="bar-month-12">Des</span></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 7. SUB MENU: FAKTUR -->
-        <section class="view-content" id="view-faktur">
-            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-money-bill-wave"></i> Pengaturan Tampilan Faktur</div></div>
-            <div class="list-container">
-                <div class="form-group"><label>Nama Toko</label><input type="text" value="ARYA GROSIR"></div>
-                <div class="form-group"><label>Alamat Toko</label><input type="text" value="Jl. Pasar Raya No. 123"></div>
-                <div class="form-group"><label>Footer Struk</label><textarea rows="2">Terima kasih telah berbelanja!</textarea></div>
-                <button class="btn-full"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan</button>
-            </div>
-        </section>
-
-        <!-- 8. SUB MENU: SINKRONISASI -->
-        <section class="view-content" id="view-sinkronisasi">
-            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-rotate"></i> Sinkronisasi Google Sheets</div></div>
-            <div class="list-container">
-                <div class="form-group"><label>URL Web App Google AppScript</label><input type="text" placeholder="https://script.google.com/macros/s/.../exec"></div>
-                <button class="btn-full" style="background:#00e676; color:#000;"><i class="fa-solid fa-link"></i> Simpan URL</button>
-                <button class="btn-full" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cloud-arrow-down"></i> Download Data</button>
-                <button class="btn-full" style="background:#ff9800; color:#000;"><i class="fa-solid fa-cloud-arrow-up"></i> Backup Data</button>
-                <div class="code-box-container">
-                    <div class="code-box-header"><span>KODE GOOGLE APPSCRIPT</span><button class="btn-copy" onclick="copyAppScript()">Copy Kode</button></div>
-                    <textarea id="appscript-code" class="code-area" readonly>
-function doGet(e) { return ContentService.createTextOutput("POS System Ready"); }
-function doPost(e) { return ContentService.createTextOutput("Success"); }
-                    </textarea>
-                </div>
-            </div>
-        </section>
-
+    <!-- ==================== MENU UTAMA ==================== -->
+    <div id="screen-main-menu" class="screen active">
+        <h2>Menu Utama Kasir</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px;">
+            <button class="btn btn-primary" style="height:80px;" onclick="navigateTo('sub-belanja')">Riwayat Belanja</button>
+            <button class="btn btn-primary" style="height:80px;" onclick="navigateTo('sub-penjualan')">Riwayat Penjualan</button>
+            <button class="btn btn-primary" style="height:80px;" onclick="navigateTo('sub-katalog')">Katalog Stok</button>
+            <button class="btn btn-primary" style="height:80px;" onclick="navigateTo('sub-pengeluaran')">Pengeluaran Lain</button>
+        </div>
     </div>
 
-    <!-- ================= MODAL TRANSAKSI BELANJA BARU ================= -->
-    <div class="modal-overlay" id="modal-belanja">
-        <div class="modal-header">
-            <div class="modal-title">FORM TRANSAKSI BELANJA BARU</div>
-            <button class="btn-close" onclick="closeModal('modal-belanja')">X</button>
+    <!-- ==================== SUB MENU BELANJA ==================== -->
+    <div id="screen-sub-belanja" class="screen">
+        <h3>Sub Menu Data List Belanja</h3>
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="openFormBelanja()">+ Transaksi Baru (F5)</button>
+            <button class="btn btn-secondary" onclick="handleBack()">Kembali (F7)</button>
         </div>
-        <form class="enter-chain" onsubmit="return false;">
-            <div class="form-group"><label>ID Belanja</label><input type="text" id="bl-id" readonly></div>
-            <div class="form-group"><label>Tanggal</label><input type="date" id="bl-tanggal"></div>
-            <div class="form-group">
-                <label>Barcode</label>
-                <div class="input-with-btn">
-                    <input type="text" id="bl-barcode" placeholder="Scan/Ketik Barcode">
-                    <button class="btn-scan" onclick="startScanner('bl')"><i class="fa-solid fa-camera"></i></button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Nama Barang</label>
-                <input type="text" id="bl-nama" placeholder="Ketik nama barang..." oninput="searchAutocomplete(this.value, 'bl')">
-                <div class="autocomplete-list" id="bl-auto-list"></div>
-            </div>
-            <div class="form-group"><label>Satuan</label><input type="text" id="bl-satuan" readonly></div>
-            <div class="form-group"><label>QTY</label><input type="text" inputmode="numeric" id="bl-qty" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('bl');"></div>
-            <div class="form-group"><label>Total Harga Per Item</label><input type="text" id="bl-subtotal" readonly></div>
-            
-            <button class="btn-full chain-submit" onclick="addToCart('bl')" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cart-plus"></i> Masukkan ke Keranjang</button>
-        </form>
-
-        <table class="cart-table">
+        <table>
             <thead>
-                <tr><th>Nama Barang</th><th>QTY</th><th>Subtotal</th><th>Aksi</th></tr>
+                <tr>
+                    <th>ID Belanja</th>
+                    <th>Tanggal</th>
+                    <th>Total Belanja</th>
+                    <th>Aksi</th>
+                </tr>
             </thead>
-            <tbody id="bl-cart-body"></tbody>
+            <tbody id="list-belanja-body"></tbody>
+        </table>
+    </div>
+
+    <!-- FORM TRANSAKSI BELANJA -->
+    <div id="screen-form-belanja" class="screen">
+        <h3>Form Transaksi Belanja Baru</h3>
+        <div class="form-group"><label>ID Belanja</label><input type="text" id="belanja-id" class="form-control" readonly></div>
+        <div class="form-group"><label>Tanggal (dd/mm/yy)</label><input type="date" id="belanja-tgl" class="form-control nav-belanja"></div>
+        <div class="form-group" style="position:relative;">
+            <label>Barcode / Kamera Scanner</label>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="belanja-barcode" class="form-control nav-belanja" inputmode="numeric" placeholder="Ketik barcode / Scan">
+                <button class="btn btn-warning" onclick="openScanner('belanja')">📷 Scan</button>
+            </div>
+        </div>
+        <div class="form-group" style="position:relative;">
+            <label>Nama Barang</label>
+            <input type="text" id="belanja-nama" class="form-control uppercase nav-belanja" placeholder="Ketik nama barang..." autocomplete="off">
+            <div id="suggest-belanja" class="suggest-box" style="display:none;"></div>
+        </div>
+        <div class="form-group"><label>Satuan</label><input type="text" id="belanja-satuan" class="form-control nav-belanja" readonly></div>
+        <div class="form-group"><label>Qty</label><input type="text" id="belanja-qty" class="form-control nav-belanja" inputmode="numeric" placeholder="0"></div>
+        <div class="form-group"><label>Total Harga Per Item</label><input type="text" id="belanja-total-item" class="form-control nav-belanja" readonly></div>
+
+        <button id="btn-add-belanja" class="btn btn-primary nav-belanja" style="width:100%; margin-top:10px;" onclick="addCartBelanja()">Masukkan ke Keranjang (Enter)</button>
+
+        <h4 style="margin-top:20px;">Daftar Barang Keranjang</h4>
+        <table>
+            <thead>
+                <tr><th>Nama Barang</th><th>Qty</th><th>Total Harga</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="cart-belanja-body"></tbody>
         </table>
 
-        <div class="cart-summary">
-            <span>Total QTY: <span id="bl-total-qty">0</span></span>
-            <span>Total: <span id="bl-total-harga" style="color:#00e676;">Rp 0</span></span>
+        <div style="margin-top:15px; font-weight:bold; display:flex; justify-shadow:space-between;">
+            <div>Total Qty: <span id="cart-belanja-total-qty">0</span></div>
+            <div style="margin-left:20px;">Harga Total Keseluruhan: Rp <span id="cart-belanja-grand-total">0</span></div>
         </div>
 
-        <button class="btn-full" onclick="saveBelanja()" style="background:#00e676; color:#000; margin-top:15px;"><i class="fa-solid fa-floppy-disk"></i> Simpan & Update Stok (F8)</button>
+        <button class="btn btn-success" style="width:100%; margin-top:20px; padding:12px;" onclick="simpanBelanja()">Simpan & Update Stok (F8)</button>
     </div>
 
-    <!-- ================= MODAL TRANSAKSI PENJUALAN BARU ================= -->
-    <div class="modal-overlay" id="modal-penjualan">
-        <div class="modal-header">
-            <div class="modal-title">FORM TRANSAKSI PENJUALAN BARU</div>
-            <button class="btn-close" onclick="closeModal('modal-penjualan')">X</button>
+    <!-- ==================== SUB MENU PENJUALAN ==================== -->
+    <div id="screen-sub-penjualan" class="screen">
+        <h3>Sub Menu Data List Penjualan</h3>
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="openFormPenjualan()">+ Transaksi Baru (F5)</button>
+            <button class="btn btn-secondary" onclick="handleBack()">Kembali (F7)</button>
         </div>
-        <form class="enter-chain" onsubmit="return false;">
-            <div class="form-group"><label>ID Penjualan</label><input type="text" id="pj-id" readonly></div>
-            <div class="form-group"><label>Tanggal</label><input type="date" id="pj-tanggal"></div>
-            <div class="form-group">
-                <label>Tipe Customer</label>
-                <div class="cust-type-container">
-                    <button type="button" class="btn-cust-type active" id="btn-cust-grosir" onclick="setCustType('grosir')">GROSIR</button>
-                    <button type="button" class="btn-cust-type" id="btn-cust-retail" onclick="setCustType('retail')">RETAIL</button>
-                </div>
-            </div>
-            <div class="form-group"><label>Nama Pembeli</label><input type="text" id="pj-pembeli" value="Umum"></div>
-            <div class="form-group">
-                <label>Barcode</label>
-                <div class="input-with-btn">
-                    <input type="text" id="pj-barcode" placeholder="Scan/Ketik Barcode">
-                    <button class="btn-scan" onclick="startScanner('pj')"><i class="fa-solid fa-camera"></i></button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Nama Barang</label>
-                <input type="text" id="pj-nama" placeholder="Ketik nama barang..." oninput="searchAutocomplete(this.value, 'pj')">
-                <div class="autocomplete-list" id="pj-auto-list"></div>
-            </div>
-            <div class="form-group"><label>Satuan</label><input type="text" id="pj-satuan" readonly></div>
-            <div class="form-group"><label>QTY</label><input type="text" inputmode="numeric" id="pj-qty" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('pj');"></div>
-            <div class="form-group"><label>Total Harga Per Item</label><input type="text" id="pj-subtotal" readonly></div>
-            
-            <button class="btn-full chain-submit" onclick="addToCart('pj')" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cart-plus"></i> Masukkan ke Keranjang</button>
-        </form>
-
-        <table class="cart-table">
+        <table>
             <thead>
-                <tr><th>Nama Barang</th><th>QTY</th><th>Subtotal</th><th>Aksi</th></tr>
+                <tr>
+                    <th>ID Penjualan</th>
+                    <th>Tanggal</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Aksi</th>
+                </tr>
             </thead>
-            <tbody id="pj-cart-body"></tbody>
+            <tbody id="list-penjualan-body"></tbody>
+        </table>
+    </div>
+
+    <!-- FORM TRANSAKSI PENJUALAN -->
+    <div id="screen-form-penjualan" class="screen">
+        <h3>Form Transaksi Penjualan Baru</h3>
+        <div class="form-group"><label>ID Penjualan</label><input type="text" id="jual-id" class="form-control" readonly></div>
+        <div class="form-group"><label>Tanggal (dd/mm/yy)</label><input type="date" id="jual-tgl" class="form-control nav-jual"></div>
+        <div class="form-group">
+            <label>Tipe Customer</label>
+            <div class="type-toggle">
+                <button id="btn-retail" class="active" onclick="setCustomerType('retail')">Retail</button>
+                <button id="btn-grosir" onclick="setCustomerType('grosir')">Grosir</button>
+            </div>
+        </div>
+        <div class="form-group"><label>Nama Pembeli</label><input type="text" id="jual-pembeli" class="form-control nav-jual uppercase"></div>
+        <div class="form-group" style="position:relative;">
+            <label>Barcode / Kamera Scanner</label>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="jual-barcode" class="form-control nav-jual" inputmode="numeric" placeholder="Ketik barcode / Scan">
+                <button class="btn btn-warning" onclick="openScanner('penjualan')">📷 Scan</button>
+            </div>
+        </div>
+        <div class="form-group" style="position:relative;">
+            <label>Nama Barang</label>
+            <input type="text" id="jual-nama" class="form-control uppercase nav-jual" placeholder="Ketik nama barang..." autocomplete="off">
+            <div id="suggest-jual" class="suggest-box" style="display:none;"></div>
+        </div>
+        <div class="form-group"><label>Satuan</label><input type="text" id="jual-satuan" class="form-control nav-jual" readonly></div>
+        <div class="form-group"><label>Qty</label><input type="text" id="jual-qty" class="form-control nav-jual" inputmode="numeric" placeholder="0"></div>
+        <div class="form-group"><label>Total Harga Per Item</label><input type="text" id="jual-total-item" class="form-control nav-jual" readonly></div>
+
+        <button id="btn-add-jual" class="btn btn-primary nav-jual" style="width:100%; margin-top:10px;" onclick="addCartJual()">Masukkan ke Keranjang (Enter)</button>
+
+        <h4 style="margin-top:20px;">Daftar Barang Keranjang</h4>
+        <table>
+            <thead>
+                <tr><th>Nama Barang</th><th>Qty</th><th>Total Harga</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="cart-jual-body"></tbody>
         </table>
 
-        <div class="cart-summary">
-            <span>Total QTY: <span id="pj-total-qty">0</span></span>
-            <span>Total: <span id="pj-total-harga" style="color:#00e676;">Rp 0</span></span>
+        <div style="margin-top:15px; font-weight:bold; display:flex;">
+            <div>Total Qty: <span id="cart-jual-total-qty">0</span></div>
+            <div style="margin-left:20px;">Harga Total Keseluruhan: Rp <span id="cart-jual-grand-total">0</span></div>
         </div>
 
-        <button class="btn-full" onclick="savePenjualan()" style="background:#00e676; color:#000; margin-top:15px;"><i class="fa-solid fa-floppy-disk"></i> Simpan & Update Stok (F8)</button>
+        <button class="btn btn-success" style="width:100%; margin-top:20px; padding:12px;" onclick="simpanPenjualan()">Simpan & Update Stok (F8)</button>
     </div>
 
-    <!-- ================= MODAL TAMBAH BARANG (STOK) ================= -->
-    <div class="modal-overlay" id="modal-stok">
-        <div class="modal-header">
-            <div class="modal-title">FORM TAMBAH BARANG BARU</div>
-            <button class="btn-close" onclick="closeModal('modal-stok')">X</button>
+    <!-- ==================== SUB MENU KATALOG STOK ==================== -->
+    <div id="screen-sub-katalog" class="screen">
+        <h3>Sub Menu Katalog Stok</h3>
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="openFormBarangBaru()">+ Tambah Barang Baru (F5)</button>
+            <button class="btn btn-secondary" onclick="handleBack()">Kembali (F7)</button>
         </div>
-        <div class="form-group"><label>Nama Barang</label><input type="text" id="stok-nama"></div>
-        <div class="form-group"><label>Barcode / Kode</label><input type="text" id="stok-barcode" placeholder="Optional"></div>
-        <div class="form-group"><label>Satuan (Pcs/Kg/Dus dll)</label><input type="text" id="stok-satuan"></div>
-        <div class="form-group"><label>QTY Stok</label><input type="text" inputmode="numeric" id="stok-qty" oninput="formatNumberInput(this)"></div>
-        <div class="form-group"><label>Stok Minimal Restock</label><input type="text" inputmode="numeric" id="stok-min" oninput="formatNumberInput(this)"></div>
-        <div class="form-group"><label>Harga Pokok (Beli)</label><input type="text" inputmode="numeric" id="stok-hpokok" oninput="formatNumberInput(this)"></div>
-        <div class="form-group"><label>Harga Grosir</label><input type="text" inputmode="numeric" id="stok-hgrosir" oninput="formatNumberInput(this)"></div>
-        <div class="form-group"><label>Harga Retail</label><input type="text" inputmode="numeric" id="stok-hretail" oninput="formatNumberInput(this)"></div>
-        <button class="btn-full" onclick="saveStokBarang()" style="background:#00e676; color:#000; margin-top:15px;"><i class="fa-solid fa-floppy-disk"></i> Simpan Barang (F8)</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Barcode</th>
+                    <th>Nama Barang</th>
+                    <th>Stok</th>
+                    <th>Harga Pokok</th>
+                    <th>Harga Grosir</th>
+                    <th>Harga Retail</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="katalog-body"></tbody>
+        </table>
     </div>
 
-    <!-- ================= MODAL PENGELUARAN LAIN ================= -->
-    <div class="modal-overlay" id="modal-pengeluaran">
-        <div class="modal-header">
-            <div class="modal-title">FORM PENGELUARAN LAIN</div>
-            <button class="btn-close" onclick="closeModal('modal-pengeluaran')">X</button>
+    <!-- FORM TAMBAH / EDIT BARANG -->
+    <div id="screen-form-katalog" class="screen">
+        <h3 id="katalog-form-title">Form Tambah Barang Baru</h3>
+        <div class="form-group" style="position:relative;">
+            <label>Barcode</label>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="kat-barcode" class="form-control nav-kat" inputmode="numeric">
+                <button class="btn btn-warning" onclick="openScanner('katalog')">📷 Scan</button>
+            </div>
         </div>
-        <div class="form-group"><label>Tanggal</label><input type="date" id="peng-tanggal"></div>
-        <div class="form-group"><label>Keterangan Pengeluaran</label><input type="text" id="peng-ket" placeholder="Contoh: Bayar Listrik"></div>
-        <div class="form-group"><label>Jumlah Nominal (Rp)</label><input type="text" inputmode="numeric" id="peng-jumlah" oninput="formatNumberInput(this)"></div>
-        <button class="btn-full" onclick="savePengeluaran()" style="background:#00e676; color:#000; margin-top:15px;"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengeluaran (F8)</button>
+        <div class="form-group"><label>Nama Barang</label><input type="text" id="kat-nama" class="form-control uppercase nav-kat"></div>
+        <div class="form-group"><label>Satuan</label><input type="text" id="kat-satuan" class="form-control nav-kat"></div>
+        <div class="form-group"><label>Qty Stok</label><input type="text" id="kat-stok" class="form-control nav-kat" inputmode="numeric"></div>
+        <div class="form-group"><label>Stok Minimal</label><input type="text" id="kat-stok-min" class="form-control nav-kat" inputmode="numeric"></div>
+        <div class="form-group"><label>Harga Pokok</label><input type="text" id="kat-harga-pokok" class="form-control nav-kat" inputmode="numeric"></div>
+        <div class="form-group"><label>Harga Grosir</label><input type="text" id="kat-harga-grosir" class="form-control nav-kat" inputmode="numeric"></div>
+        <div class="form-group"><label>Harga Retail</label><input type="text" id="kat-harga-retail" class="form-control nav-kat" inputmode="numeric"></div>
+
+        <button class="btn btn-success nav-kat" style="width:100%; margin-top:15px;" onclick="simpanBarang()">Simpan (F8)</button>
     </div>
 
-    <!-- ================= OVERLAY FULLSCREEN CAMERA SCANNER ================= -->
-    <div id="scanner-overlay">
-        <div id="interactive-reader"></div>
-        <div class="scanner-controls">
-            <button class="btn-scanner-ctrl" onclick="toggleFlash()"><i class="fa-solid fa-lightbulb"></i> Senter</button>
-            <button class="btn-scanner-ctrl" style="background:#ff5252;" onclick="stopScanner()"><i class="fa-solid fa-xmark"></i> Batal</button>
+    <!-- ==================== SUB MENU PENGELUARAN LAIN ==================== -->
+    <div id="screen-sub-pengeluaran" class="screen">
+        <h3>Sub Menu Riwayat Pengeluaran Lain</h3>
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="openFormPengeluaran()">+ Pengeluaran Baru (F5)</button>
+            <button class="btn btn-secondary" onclick="handleBack()">Kembali (F7)</button>
         </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Ringkasan Keterangan</th>
+                    <th>Total Pengeluaran</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="pengeluaran-body"></tbody>
+        </table>
     </div>
 
-    <script>
-        // DATA MASTER (STORAGE SIMULASI LOCAL)
-        let katalogStok = [
-            { barcode: '8991001', nama: 'Beras Pandan Wangi 5kg', satuan: 'Sack', qty: 24, min: 5, hpokok: 60000, hgrosir: 68000, hretail: 72000 },
-            { barcode: '8991002', nama: 'Gula Pasir 1kg', satuan: 'Pcs', qty: 50, min: 10, hpokok: 12000, hgrosir: 14000, hretail: 15000 },
-            { barcode: '8991003', nama: 'Minyak Goreng 2L', satuan: 'Pouch', qty: 3, min: 10, hpokok: 30000, hgrosir: 33000, hretail: 35000 }
-        ];
+    <!-- FORM PENGELUARAN LAIN -->
+    <div id="screen-form-pengeluaran" class="screen">
+        <h3>Form Input Pengeluaran Lain</h3>
+        <div class="form-group"><label>Tanggal (dd/mm/yy)</label><input type="date" id="peng-tgl" class="form-control nav-peng"></div>
+        <div class="form-group"><label>Keterangan</label><input type="text" id="peng-ket" class="form-control nav-peng"></div>
+        <div class="form-group"><label>Jumlah (Rp)</label><input type="text" id="peng-jumlah" class="form-control nav-peng" inputmode="numeric"></div>
 
-        let cartBelanja = [];
-        let cartPenjualan = [];
-        let activeCustType = 'grosir';
-        let html5QrCode = null;
-        let activeScannerTarget = '';
-        let flashState = false;
+        <button class="btn btn-success nav-peng" style="width:100%; margin-top:15px;" onclick="simpanPengeluaran()">Simpan (F8)</button>
+    </div>
 
-        // REALTIME CLOCK
-        function updateDateTime() {
-            const now = new Date();
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            document.getElementById('datetime').innerHTML = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} pukul<br>${String(now.getHours()).padStart(2, '0')}.${String(now.getMinutes()).padStart(2, '0')}.${String(now.getSeconds()).padStart(2, '0')}`;
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
+    <!-- DETAIL PENGELUARAN TANGGAL -->
+    <div id="screen-detail-pengeluaran" class="screen">
+        <h3>Detail Pengeluaran Tanggal: <span id="det-peng-tgl"></span></h3>
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="openFormPengeluaranForDate()">+ Tambah Baru</button>
+            <button class="btn btn-secondary" onclick="handleBack()">Kembali (F7)</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Keterangan</th>
+                    <th>Nominal</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="detail-pengeluaran-body"></tbody>
+        </table>
+        <h4 style="margin-top:15px;">Total Pengeluaran: Rp <span id="det-peng-total">0</span></h4>
+    </div>
 
-        // ROUTING & BACK NAVIGATION
-        function showView(viewId) {
-            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
-            const targetView = document.getElementById(viewId);
-            if (targetView) targetView.classList.add('active');
-            
-            // Push State untuk Handphone Physical Back Button
-            history.pushState({ view: viewId }, "", "#" + viewId);
-            renderKatalogStok();
-            renderPerkiraanBelanja();
-        }
+</div>
 
-        function navBackHome() {
-            showView('view-main-menu');
-        }
+<!-- ==================== FULLSCREEN SCANNER MODAL ==================== -->
+<div id="scanner-modal">
+    <div id="reader"></div>
+    <div class="scanner-controls">
+        <button class="btn btn-warning" onclick="toggleTorch()">💡 Senter</button>
+        <button class="btn btn-danger" onclick="closeScanner()">Batal / Tutup</button>
+    </div>
+</div>
 
-        // HANDLER TOMBOL FISIK BACK (ANDROID) DAN HARDWARE KEYBOARD (F7, F5, F8)
-        window.addEventListener('popstate', function (e) {
-            if (document.querySelector('.modal-overlay.active')) {
-                closeAllModals();
-            } else {
-                document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
-                document.getElementById('view-main-menu').classList.add('active');
-            }
+<script>
+    /* ================= SYSTEM STATE & DATA STORE ================= */
+    let screenHistory = ['screen-main-menu'];
+    let html5QrCode = null;
+    let activeScanTarget = null;
+    let isTorchOn = false;
+    let currentCustomerType = 'retail';
+    let editBarangIndex = null;
+    let activePengeluaranDate = null;
+
+    // Database Sederhana di LocalStorage
+    let database = JSON.parse(localStorage.getItem('APP_DB')) || {
+        katalog: [
+            { barcode: '12345', nama: 'MINYAK GORENG 1L', satuan: 'Pouch', stok: 50, stokMin: 5, hargaPokok: 14000, hargaGrosir: 15000, hargaRetail: 16000 },
+            { barcode: '67890', nama: 'BERAS PREMIUM 5KG', satuan: 'Sack', stok: 20, stokMin: 2, hargaPokok: 60000, hargaGrosir: 63000, hargaRetail: 65000 }
+        ],
+        belanja: [],
+        penjualan: [],
+        pengeluaran: []
+    };
+
+    let cartBelanja = [];
+    let cartPenjualan = [];
+
+    function saveData() {
+        localStorage.setItem('APP_DB', JSON.stringify(database));
+    }
+
+    /* ================= HELPER UTILS ================= */
+    // Format Tanggal Global dd/mm/yy
+    function formatDateDisplay(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = String(d.getFullYear()).slice(-2);
+        return `${day}/${month}/${year}`;
+    }
+
+    function getTodayInputFormat() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    // Ribuan Formatting (.)
+    function formatRibuan(val) {
+        let num = val.toString().replace(/\D/g, '');
+        return num.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function parseRibuan(val) {
+        return parseInt(val.toString().replace(/\./g, '')) || 0;
+    }
+
+    // Format otomatis saat input angka
+    document.querySelectorAll('input[inputmode="numeric"]').forEach(input => {
+        input.addEventListener('input', function() {
+            let cursor = this.selectionStart;
+            this.value = formatRibuan(this.value);
         });
+    });
 
-        window.addEventListener('keydown', function (e) {
-            // Tombol F7 -> Kembali Ke Menu Utama
-            if (e.key === 'F7') {
-                e.preventDefault();
-                if (document.querySelector('.modal-overlay.active')) {
-                    closeAllModals();
-                } else {
-                    navBackHome();
-                }
-            }
-            // Tombol F5 -> Buka Form Transaksi Baru pada Sub-menu Aktif
-            if (e.key === 'F5') {
-                e.preventDefault();
-                const activeView = document.querySelector('.view-content.active');
-                if (activeView) {
-                    const id = activeView.id;
-                    if (id === 'view-belanja') openFormBelanja();
-                    else if (id === 'view-penjualan') openFormPenjualan();
-                    else if (id === 'view-stok') openFormStok();
-                    else if (id === 'view-pengeluaran') openFormPengeluaran();
-                }
-            }
-            // Tombol F8 -> Simpan / Submit Modal Active
-            if (e.key === 'F8') {
-                e.preventDefault();
-                if (document.getElementById('modal-belanja').classList.contains('active')) saveBelanja();
-                else if (document.getElementById('modal-penjualan').classList.contains('active')) savePenjualan();
-                else if (document.getElementById('modal-stok').classList.contains('active')) saveStokBarang();
-                else if (document.getElementById('modal-pengeluaran').classList.contains('active')) savePengeluaran();
-            }
-        });
+    /* ================= SYSTEM NAVIGATION & SHORTCUTS ================= */
+    function navigateTo(screenId) {
+        const fullId = screenId.startsWith('screen-') ? screenId : 'screen-' + screenId;
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(fullId).classList.add('active');
+        screenHistory.push(fullId);
+        window.history.pushState({ screen: fullId }, '');
+        refreshSubMenuViews();
+    }
 
-        // ENTER / NEXT KEY IN-FORM NAVIGATION
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const activeForm = document.querySelector('.modal-overlay.active .enter-chain');
-                if (activeForm) {
-                    const inputs = Array.from(activeForm.querySelectorAll('input:not([readonly]), button'));
-                    const index = inputs.indexOf(document.activeElement);
-                    if (index > -1 && index < inputs.length - 1) {
-                        e.preventDefault();
-                        inputs[index + 1].focus();
+    function handleBack() {
+        if (screenHistory.length > 1) {
+            screenHistory.pop(); // Remove current
+            const prevScreen = screenHistory[screenHistory.length - 1];
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(prevScreen).classList.add('active');
+            refreshSubMenuViews();
+        }
+    }
+
+    window.addEventListener('popstate', function() {
+        handleBack();
+    });
+
+    // Event Global Keyboard Shortcuts (F5, F7, F8)
+    window.addEventListener('keydown', function(e) {
+        const activeScreen = screenHistory[screenHistory.length - 1];
+        
+        if (e.key === 'F7') {
+            e.preventDefault();
+            handleBack();
+        } else if (e.key === 'F5') {
+            e.preventDefault();
+            if (activeScreen === 'screen-sub-belanja') openFormBelanja();
+            else if (activeScreen === 'screen-sub-penjualan') openFormPenjualan();
+            else if (activeScreen === 'screen-sub-katalog') openFormBarangBaru();
+            else if (activeScreen === 'screen-sub-pengeluaran') openFormPengeluaran();
+        } else if (e.key === 'F8') {
+            e.preventDefault();
+            if (activeScreen === 'screen-form-belanja') simpanBelanja();
+            else if (activeScreen === 'screen-form-penjualan') simpanPenjualan();
+            else if (activeScreen === 'screen-form-katalog') simpanBarang();
+            else if (activeScreen === 'screen-form-pengeluaran') simpanPengeluaran();
+        }
+    });
+
+    // Enter Navigation Logic
+    function bindEnterNavigation(className, submitCallback) {
+        const elements = Array.from(document.querySelectorAll('.' + className));
+        elements.forEach((el, index) => {
+            el.onkeydown = function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (index === elements.length - 1) {
+                        submitCallback();
+                    } else {
+                        elements[index + 1].focus();
                     }
                 }
-            }
+            };
+        });
+    }
+
+    /* ================= REFRESH UI VIEWS ================= */
+    function refreshSubMenuViews() {
+        // Render List Belanja
+        const belanjaBody = document.getElementById('list-belanja-body');
+        belanjaBody.innerHTML = database.belanja.map((b, i) => `
+            <tr>
+                <td>${b.id}</td>
+                <td>${formatDateDisplay(b.tanggal)}</td>
+                <td>Rp ${formatRibuan(b.grandTotal)}</td>
+                <td><button class="btn btn-danger" onclick="deleteBelanja(${i})">Delete</button></td>
+            </tr>
+        `).join('');
+
+        // Render List Penjualan
+        const jualBody = document.getElementById('list-penjualan-body');
+        jualBody.innerHTML = database.penjualan.map((p, i) => `
+            <tr>
+                <td>${p.id}</td>
+                <td>${formatDateDisplay(p.tanggal)}</td>
+                <td>${p.customerType.toUpperCase()} (${p.pembeli || '-'})</td>
+                <td>Rp ${formatRibuan(p.grandTotal)}</td>
+                <td><button class="btn btn-danger" onclick="deletePenjualan(${i})">Delete</button></td>
+            </tr>
+        `).join('');
+
+        // Render Katalog Stok
+        const katalogBody = document.getElementById('katalog-body');
+        katalogBody.innerHTML = database.katalog.map((k, i) => `
+            <tr style="cursor:pointer;" onclick="viewBarangDetail(${i})">
+                <td>${k.barcode}</td>
+                <td>${k.nama}</td>
+                <td>${k.stok} ${k.satuan}</td>
+                <td>Rp ${formatRibuan(k.hargaPokok)}</td>
+                <td>Rp ${formatRibuan(k.hargaGrosir)}</td>
+                <td>Rp ${formatRibuan(k.hargaRetail)}</td>
+                <td>
+                    <button class="btn btn-warning" onclick="event.stopPropagation(); editBarang(${i})">Edit</button>
+                    <button class="btn btn-danger" onclick="event.stopPropagation(); deleteBarang(${i})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+
+        // Grouping Pengeluaran by Date
+        const pengBody = document.getElementById('pengeluaran-body');
+        let groupedPeng = {};
+        database.pengeluaran.forEach(p => {
+            if (!groupedPeng[p.tanggal]) groupedPeng[p.tanggal] = { total: 0, kets: [] };
+            groupedPeng[p.tanggal].total += p.jumlah;
+            groupedPeng[p.tanggal].kets.push(p.keterangan);
         });
 
-        // FORMATTER RIBUAN
-        function formatRupiah(num) {
-            return 'Rp ' + Number(num).toLocaleString('id-ID');
-        }
+        pengBody.innerHTML = Object.keys(groupedPeng).map(tgl => `
+            <tr style="cursor:pointer;" onclick="openDetailPengeluaran('${tgl}')">
+                <td>${formatDateDisplay(tgl)}</td>
+                <td>${groupedPeng[tgl].kets.join(', ')}</td>
+                <td>Rp ${formatRibuan(groupedPeng[tgl].total)}</td>
+                <td><button class="btn btn-danger" onclick="event.stopPropagation(); deletePengeluaranByDate('${tgl}')">Delete</button></td>
+            </tr>
+        `).join('');
+    }
 
-        function formatNumberInput(el) {
-            let val = el.value.replace(/\D/g, '');
-            if (val === '') { el.value = ''; return; }
-            el.value = Number(val).toLocaleString('id-ID');
-        }
+    /* ================= CAMERA SCANNER ================= */
+    function openScanner(target) {
+        activeScanTarget = target;
+        document.getElementById('scanner-modal').style.display = 'flex';
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 15, qrbox: { width: 250, height: 250 } },
+            (decodedText) => {
+                onScanSuccess(decodedText);
+            },
+            () => {}
+        );
+    }
 
-        function parseNumberInput(str) {
-            return Number(String(str).replace(/\./g, '')) || 0;
-        }
-
-        function getTodayDateStr() {
-            const today = new Date();
-            return today.toISOString().split('T')[0];
-        }
-
-        // AUTOCOMPLETE SEARCH
-        function searchAutocomplete(query, prefix) {
-            const listContainer = document.getElementById(`${prefix}-auto-list`);
-            listContainer.innerHTML = '';
-            if (!query) { listContainer.style.display = 'none'; return; }
-
-            const filtered = katalogStok.filter(item => item.nama.toLowerCase().includes(query.toLowerCase()) || item.barcode.includes(query));
-            if (filtered.length === 0) { listContainer.style.display = 'none'; return; }
-
-            filtered.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'autocomplete-item';
-                div.innerText = `${item.nama} (${item.satuan})`;
-                div.onclick = function() {
-                    selectProduct(item, prefix);
-                    listContainer.style.display = 'none';
-                };
-                listContainer.appendChild(div);
-            });
-            listContainer.style.display = 'block';
-        }
-
-        function selectProduct(item, prefix) {
-            document.getElementById(`${prefix}-barcode`).value = item.barcode;
-            document.getElementById(`${prefix}-nama`).value = item.nama;
-            document.getElementById(`${prefix}-satuan`).value = item.satuan;
-            document.getElementById(`${prefix}-nama`).dataset.selectedObj = JSON.stringify(item);
-            document.getElementById(`${prefix}-qty`).focus();
-            calcSubtotal(prefix);
-        }
-
-        function calcSubtotal(prefix) {
-            const namaEl = document.getElementById(`${prefix}-nama`);
-            if (!namaEl.dataset.selectedObj) return;
-
-            const item = JSON.parse(namaEl.dataset.selectedObj);
-            const qty = parseNumberInput(document.getElementById(`${prefix}-qty`).value);
-            
-            let price = item.hpokok;
-            if (prefix === 'pj') {
-                price = (activeCustType === 'grosir') ? item.hgrosir : item.hretail;
-            }
-
-            const subtotal = qty * price;
-            document.getElementById(`${prefix}-subtotal`).value = formatRupiah(subtotal);
-        }
-
-        // FULLSCREEN CAMERA SCANNER
-        function startScanner(targetPrefix) {
-            activeScannerTarget = targetPrefix;
-            document.getElementById('scanner-overlay').style.display = 'flex';
-            html5QrCode = new Html5Qrcode("interactive-reader");
-
-            const config = { fps: 20, qrbox: { width: 280, height: 280 }, aspectRatio: 1.0 };
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess).catch(err => {
-                alert("Gagal membuka kamera: " + err);
-                stopScanner();
+    function closeScanner() {
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                document.getElementById('scanner-modal').style.display = 'none';
+            }).catch(() => {
+                document.getElementById('scanner-modal').style.display = 'none';
             });
         }
+    }
 
-        function onScanSuccess(decodedText) {
-            stopScanner();
-            const matched = katalogStok.find(i => i.barcode === decodedText);
-            if (matched) {
-                selectProduct(matched, activeScannerTarget);
-            } else {
-                document.getElementById(`${activeScannerTarget}-barcode`).value = decodedText;
-                document.getElementById(`${activeScannerTarget}-nama`).focus();
+    function toggleTorch() {
+        if (html5QrCode) {
+            isTorchOn = !isTorchOn;
+            html5QrCode.applyVideoConstraints({ advanced: [{ torch: isTorchOn }] });
+        }
+    }
+
+    function onScanSuccess(code) {
+        closeScanner();
+        if (activeScanTarget === 'belanja') {
+            document.getElementById('belanja-barcode').value = code;
+            autoFillByBarcode(code, 'belanja');
+        } else if (activeScanTarget === 'penjualan') {
+            document.getElementById('jual-barcode').value = code;
+            autoFillByBarcode(code, 'penjualan');
+        } else if (activeScanTarget === 'katalog') {
+            document.getElementById('kat-barcode').value = code;
+        }
+    }
+
+    function autoFillByBarcode(barcode, context) {
+        const item = database.katalog.find(k => k.barcode === barcode);
+        if (item) {
+            if (context === 'belanja') {
+                document.getElementById('belanja-nama').value = item.nama;
+                document.getElementById('belanja-satuan').value = item.satuan;
+                document.getElementById('belanja-qty').focus();
+            } else if (context === 'penjualan') {
+                document.getElementById('jual-nama').value = item.nama;
+                document.getElementById('jual-satuan').value = item.satuan;
+                document.getElementById('jual-qty').focus();
             }
         }
+    }
 
-        function stopScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                    document.getElementById('scanner-overlay').style.display = 'none';
-                }).catch(() => {
-                    document.getElementById('scanner-overlay').style.display = 'none';
-                });
-            } else {
-                document.getElementById('scanner-overlay').style.display = 'none';
-            }
+    /* ================= TRANSAKSI BELANJA LOGIC ================= */
+    function openFormBelanja() {
+        cartBelanja = [];
+        document.getElementById('belanja-id').value = 'BLJ-' + Date.now().toString().slice(-6);
+        document.getElementById('belanja-tgl').value = getTodayInputFormat();
+        document.getElementById('belanja-barcode').value = '';
+        document.getElementById('belanja-nama').value = '';
+        document.getElementById('belanja-satuan').value = '';
+        document.getElementById('belanja-qty').value = '';
+        document.getElementById('belanja-total-item').value = '';
+        renderCartBelanja();
+        navigateTo('screen-form-belanja');
+        bindEnterNavigation('nav-belanja', addCartBelanja);
+        document.getElementById('belanja-barcode').focus();
+    }
+
+    // Auto Suggest Belanja
+    document.getElementById('belanja-nama').addEventListener('input', function() {
+        let val = this.value.toUpperCase();
+        let box = document.getElementById('suggest-belanja');
+        if (!val) { box.style.display = 'none'; return; }
+        let matches = database.katalog.filter(k => k.nama.includes(val));
+        if (matches.length > 0) {
+            box.style.display = 'block';
+            box.innerHTML = matches.map(m => `<div class="suggest-item" onclick="selectSuggestBelanja('${m.barcode}', '${m.nama}', '${m.satuan}')">${m.nama}</div>`).join('');
+        } else box.style.display = 'none';
+    });
+
+    function selectSuggestBelanja(barcode, nama, satuan) {
+        document.getElementById('belanja-barcode').value = barcode;
+        document.getElementById('belanja-nama').value = nama;
+        document.getElementById('belanja-satuan').value = satuan;
+        document.getElementById('suggest-belanja').style.display = 'none';
+        document.getElementById('belanja-qty').focus();
+    }
+
+    document.getElementById('belanja-qty').addEventListener('input', function() {
+        let qty = parseRibuan(this.value);
+        let barcode = document.getElementById('belanja-barcode').value;
+        let item = database.katalog.find(k => k.barcode === barcode);
+        if (item) {
+            let total = qty * item.hargaPokok;
+            document.getElementById('belanja-total-item').value = 'Rp ' + formatRibuan(total);
+        }
+    });
+
+    function addCartBelanja() {
+        let barcode = document.getElementById('belanja-barcode').value;
+        let nama = document.getElementById('belanja-nama').value;
+        let qty = parseRibuan(document.getElementById('belanja-qty').value);
+        let item = database.katalog.find(k => k.barcode === barcode) || { hargaPokok: 0 };
+        
+        if (!nama || qty <= 0) return alert('Lengkapi data barang dan Qty!');
+        
+        cartBelanja.push({ barcode, nama, qty, total: qty * item.hargaPokok });
+        renderCartBelanja();
+
+        // Reset input & Focus ke Nama Barang
+        document.getElementById('belanja-barcode').value = '';
+        document.getElementById('belanja-nama').value = '';
+        document.getElementById('belanja-satuan').value = '';
+        document.getElementById('belanja-qty').value = '';
+        document.getElementById('belanja-total-item').value = '';
+        document.getElementById('belanja-nama').focus();
+    }
+
+    function renderCartBelanja() {
+        let body = document.getElementById('cart-belanja-body');
+        let totalQty = 0, grandTotal = 0;
+        body.innerHTML = cartBelanja.map((c, i) => {
+            totalQty += c.qty;
+            grandTotal += c.total;
+            return `<tr>
+                <td>${c.nama}</td>
+                <td>${c.qty}</td>
+                <td>Rp ${formatRibuan(c.total)}</td>
+                <td><button class="btn btn-danger" onclick="cartBelanja.splice(${i},1); renderCartBelanja();">Delete</button></td>
+            </tr>`;
+        }).join('');
+        document.getElementById('cart-belanja-total-qty').innerText = totalQty;
+        document.getElementById('cart-belanja-grand-total').innerText = formatRibuan(grandTotal);
+    }
+
+    function simpanBelanja() {
+        if (cartBelanja.length === 0) return alert('Keranjang kosong!');
+        let id = document.getElementById('belanja-id').value;
+        let tanggal = document.getElementById('belanja-tgl').value;
+        let grandTotal = parseRibuan(document.getElementById('cart-belanja-grand-total').innerText);
+
+        // Update stok katalog
+        cartBelanja.forEach(c => {
+            let item = database.katalog.find(k => k.barcode === c.barcode || k.nama === c.nama);
+            if (item) item.stok += c.qty;
+        });
+
+        database.belanja.push({ id, tanggal, cart: cartBelanja, grandTotal });
+        saveData();
+        handleBack();
+    }
+
+    function deleteBelanja(index) {
+        database.belanja.splice(index, 1);
+        saveData();
+        refreshSubMenuViews();
+    }
+
+    /* ================= TRANSAKSI PENJUALAN LOGIC ================= */
+    function setCustomerType(type) {
+        currentCustomerType = type;
+        document.getElementById('btn-retail').classList.toggle('active', type === 'retail');
+        document.getElementById('btn-grosir').classList.toggle('active', type === 'grosir');
+    }
+
+    function openFormPenjualan() {
+        cartPenjualan = [];
+        document.getElementById('jual-id').value = 'PJL-' + Date.now().toString().slice(-6);
+        document.getElementById('jual-tgl').value = getTodayInputFormat();
+        document.getElementById('jual-pembeli').value = '';
+        document.getElementById('jual-barcode').value = '';
+        document.getElementById('jual-nama').value = '';
+        document.getElementById('jual-satuan').value = '';
+        document.getElementById('jual-qty').value = '';
+        document.getElementById('jual-total-item').value = '';
+        renderCartJual();
+        navigateTo('screen-form-penjualan');
+        bindEnterNavigation('nav-jual', addCartJual);
+        document.getElementById('jual-pembeli').focus();
+    }
+
+    // Auto Suggest Penjualan
+    document.getElementById('jual-nama').addEventListener('input', function() {
+        let val = this.value.toUpperCase();
+        let box = document.getElementById('suggest-jual');
+        if (!val) { box.style.display = 'none'; return; }
+        let matches = database.katalog.filter(k => k.nama.includes(val));
+        if (matches.length > 0) {
+            box.style.display = 'block';
+            box.innerHTML = matches.map(m => `<div class="suggest-item" onclick="selectSuggestJual('${m.barcode}', '${m.nama}', '${m.satuan}')">${m.nama}</div>`).join('');
+        } else box.style.display = 'none';
+    });
+
+    function selectSuggestJual(barcode, nama, satuan) {
+        document.getElementById('jual-barcode').value = barcode;
+        document.getElementById('jual-nama').value = nama;
+        document.getElementById('jual-satuan').value = satuan;
+        document.getElementById('suggest-jual').style.display = 'none';
+        document.getElementById('jual-qty').focus();
+    }
+
+    document.getElementById('jual-qty').addEventListener('input', function() {
+        let qty = parseRibuan(this.value);
+        let barcode = document.getElementById('jual-barcode').value;
+        let item = database.katalog.find(k => k.barcode === barcode);
+        if (item) {
+            let harga = (currentCustomerType === 'grosir') ? item.hargaGrosir : item.hargaRetail;
+            let total = qty * harga;
+            document.getElementById('jual-total-item').value = 'Rp ' + formatRibuan(total);
+        }
+    });
+
+    function addCartJual() {
+        let barcode = document.getElementById('jual-barcode').value;
+        let nama = document.getElementById('jual-nama').value;
+        let qty = parseRibuan(document.getElementById('jual-qty').value);
+        let item = database.katalog.find(k => k.barcode === barcode) || { hargaRetail: 0, hargaGrosir: 0 };
+        let harga = (currentCustomerType === 'grosir') ? item.hargaGrosir : item.hargaRetail;
+
+        if (!nama || qty <= 0) return alert('Lengkapi data barang dan Qty!');
+        
+        cartPenjualan.push({ barcode, nama, qty, total: qty * harga });
+        renderCartJual();
+
+        document.getElementById('jual-barcode').value = '';
+        document.getElementById('jual-nama').value = '';
+        document.getElementById('jual-satuan').value = '';
+        document.getElementById('jual-qty').value = '';
+        document.getElementById('jual-total-item').value = '';
+        document.getElementById('jual-nama').focus();
+    }
+
+    function renderCartJual() {
+        let body = document.getElementById('cart-jual-body');
+        let totalQty = 0, grandTotal = 0;
+        body.innerHTML = cartPenjualan.map((c, i) => {
+            totalQty += c.qty;
+            grandTotal += c.total;
+            return `<tr>
+                <td>${c.nama}</td>
+                <td>${c.qty}</td>
+                <td>Rp ${formatRibuan(c.total)}</td>
+                <td><button class="btn btn-danger" onclick="cartPenjualan.splice(${i},1); renderCartJual();">Delete</button></td>
+            </tr>`;
+        }).join('');
+        document.getElementById('cart-jual-total-qty').innerText = totalQty;
+        document.getElementById('cart-jual-grand-total').innerText = formatRibuan(grandTotal);
+    }
+
+    function simpanPenjualan() {
+        if (cartPenjualan.length === 0) return alert('Keranjang kosong!');
+        let id = document.getElementById('jual-id').value;
+        let tanggal = document.getElementById('jual-tgl').value;
+        let pembeli = document.getElementById('jual-pembeli').value;
+        let grandTotal = parseRibuan(document.getElementById('cart-jual-grand-total').innerText);
+
+        // Update stok katalog
+        cartPenjualan.forEach(c => {
+            let item = database.katalog.find(k => k.barcode === c.barcode || k.nama === c.nama);
+            if (item) item.stok -= c.qty;
+        });
+
+        database.penjualan.push({ id, tanggal, customerType: currentCustomerType, pembeli, cart: cartPenjualan, grandTotal });
+        saveData();
+        handleBack();
+    }
+
+    function deletePenjualan(index) {
+        database.penjualan.splice(index, 1);
+        saveData();
+        refreshSubMenuViews();
+    }
+
+    /* ================= KATALOG STOK LOGIC ================= */
+    function openFormBarangBaru() {
+        editBarangIndex = null;
+        document.getElementById('katalog-form-title').innerText = 'Form Tambah Barang Baru';
+        document.getElementById('kat-barcode').value = '';
+        document.getElementById('kat-nama').value = '';
+        document.getElementById('kat-satuan').value = '';
+        document.getElementById('kat-stok').value = '';
+        document.getElementById('kat-stok-min').value = '';
+        document.getElementById('kat-harga-pokok').value = '';
+        document.getElementById('kat-harga-grosir').value = '';
+        document.getElementById('kat-harga-retail').value = '';
+        navigateTo('screen-form-katalog');
+        bindEnterNavigation('nav-kat', simpanBarang);
+    }
+
+    function editBarang(index) {
+        editBarangIndex = index;
+        let item = database.katalog[index];
+        document.getElementById('katalog-form-title').innerText = 'Form Edit Barang';
+        document.getElementById('kat-barcode').value = item.barcode;
+        document.getElementById('kat-nama').value = item.nama;
+        document.getElementById('kat-satuan').value = item.satuan;
+        document.getElementById('kat-stok').value = formatRibuan(item.stok);
+        document.getElementById('kat-stok-min').value = formatRibuan(item.stokMin);
+        document.getElementById('kat-harga-pokok').value = formatRibuan(item.hargaPokok);
+        document.getElementById('kat-harga-grosir').value = formatRibuan(item.hargaGrosir);
+        document.getElementById('kat-harga-retail').value = formatRibuan(item.hargaRetail);
+        navigateTo('screen-form-katalog');
+        bindEnterNavigation('nav-kat', simpanBarang);
+    }
+
+    function viewBarangDetail(index) {
+        editBarang(index);
+    }
+
+    function simpanBarang() {
+        let barcode = document.getElementById('kat-barcode').value;
+        let nama = document.getElementById('kat-nama').value.toUpperCase();
+        let satuan = document.getElementById('kat-satuan').value;
+        let stok = parseRibuan(document.getElementById('kat-stok').value);
+        let stokMin = parseRibuan(document.getElementById('kat-stok-min').value);
+        let hargaPokok = parseRibuan(document.getElementById('kat-harga-pokok').value);
+        let hargaGrosir = parseRibuan(document.getElementById('kat-harga-grosir').value);
+        let hargaRetail = parseRibuan(document.getElementById('kat-harga-retail').value);
+
+        if (!nama) return alert('Nama barang harus diisi!');
+
+        let barangData = { barcode, nama, satuan, stok, stokMin, hargaPokok, hargaGrosir, hargaRetail };
+
+        if (editBarangIndex !== null) {
+            database.katalog[editBarangIndex] = barangData;
+        } else {
+            database.katalog.push(barangData);
         }
 
-        function toggleFlash() {
-            if (html5QrCode) {
-                flashState = !flashState;
-                html5QrCode.applyVideoConstraints({ advanced: [{ torch: flashState }] }).catch(() => {});
-            }
+        saveData();
+        handleBack();
+    }
+
+    function deleteBarang(index) {
+        database.katalog.splice(index, 1);
+        saveData();
+        refreshSubMenuViews();
+    }
+
+    /* ================= PENGELUARAN LAIN LOGIC ================= */
+    function openFormPengeluaran() {
+        document.getElementById('peng-tgl').value = activePengeluaranDate || getTodayInputFormat();
+        document.getElementById('peng-ket').value = '';
+        document.getElementById('peng-jumlah').value = '';
+        navigateTo('screen-form-pengeluaran');
+        bindEnterNavigation('nav-peng', simpanPengeluaran);
+    }
+
+    function openFormPengeluaranForDate() {
+        openFormPengeluaran();
+    }
+
+    function simpanPengeluaran() {
+        let tanggal = document.getElementById('peng-tgl').value;
+        let keterangan = document.getElementById('peng-ket').value;
+        let jumlah = parseRibuan(document.getElementById('peng-jumlah').value);
+
+        if (!keterangan || jumlah <= 0) return alert('Lengkapi keterangan dan jumlah!');
+
+        database.pengeluaran.push({ id: Date.now(), tanggal, keterangan, jumlah });
+        saveData();
+        
+        if (activePengeluaranDate) {
+            handleBack();
+            openDetailPengeluaran(activePengeluaranDate);
+        } else {
+            handleBack();
         }
+    }
 
-        // MODAL MANAGEMENT
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
+    function openDetailPengeluaran(tanggal) {
+        activePengeluaranDate = tanggal;
+        document.getElementById('det-peng-tgl').innerText = formatDateDisplay(tanggal);
+        
+        let list = database.pengeluaran.filter(p => p.tanggal === tanggal);
+        let total = 0;
 
-        function closeAllModals() {
-            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-        }
+        let body = document.getElementById('detail-pengeluaran-body');
+        body.innerHTML = list.map(p => {
+            total += p.jumlah;
+            return `<tr>
+                <td>${p.keterangan}</td>
+                <td>Rp ${formatRibuan(p.jumlah)}</td>
+                <td><button class="btn btn-danger" onclick="deletePengeluaranItem(${p.id})">Delete</button></td>
+            </tr>`;
+        }).join('');
 
-        // 1. MODAL BELANJA LOGIC
-        function openFormBelanja() {
-            cartBelanja = [];
-            document.getElementById('bl-id').value = 'BL-' + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('bl-tanggal').value = getTodayDateStr();
-            resetBelanjaInput();
-            renderCart('bl');
-            document.getElementById('modal-belanja').classList.add('active');
-        }
+        document.getElementById('det-peng-total').innerText = formatRibuan(total);
+        navigateTo('screen-detail-pengeluaran');
+    }
 
-        function resetBelanjaInput() {
-            document.getElementById('bl-barcode').value = '';
-            document.getElementById('bl-nama').value = '';
-            document.getElementById('bl-satuan').value = '';
-            document.getElementById('bl-qty').value = '';
-            document.getElementById('bl-subtotal').value = '';
-            delete document.getElementById('bl-nama').dataset.selectedObj;
-            document.getElementById('bl-nama').focus();
-        }
+    function deletePengeluaranItem(id) {
+        database.pengeluaran = database.pengeluaran.filter(p => p.id !== id);
+        saveData();
+        openDetailPengeluaran(activePengeluaranDate);
+    }
 
-        function addToCart(prefix) {
-            const namaEl = document.getElementById(`${prefix}-nama`);
-            if (!namaEl.dataset.selectedObj) { alert("Pilih barang terlebih dahulu!"); return; }
+    function deletePengeluaranByDate(tanggal) {
+        database.pengeluaran = database.pengeluaran.filter(p => p.tanggal !== tanggal);
+        saveData();
+        refreshSubMenuViews();
+    }
 
-            const item = JSON.parse(namaEl.dataset.selectedObj);
-            const qty = parseNumberInput(document.getElementById(`${prefix}-qty`).value);
-            if (qty <= 0) { alert("Masukkan QTY yang valid!"); return; }
-
-            let price = item.hpokok;
-            if (prefix === 'pj') {
-                price = (activeCustType === 'grosir') ? item.hgrosir : item.hretail;
-            }
-
-            const cartObj = { barcode: item.barcode, nama: item.nama, qty: qty, price: price, subtotal: qty * price };
-
-            if (prefix === 'bl') cartBelanja.push(cartObj);
-            else cartPenjualan.push(cartObj);
-
-            renderCart(prefix);
-            if (prefix === 'bl') resetBelanjaInput(); else resetPenjualanInput();
-        }
-
-        function renderCart(prefix) {
-            const cart = (prefix === 'bl') ? cartBelanja : cartPenjualan;
-            const tbody = document.getElementById(`${prefix}-cart-body`);
-            tbody.innerHTML = '';
-
-            let totalQty = 0;
-            let totalHarga = 0;
-
-            cart.forEach((item, index) => {
-                totalQty += item.qty;
-                totalHarga += item.subtotal;
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${item.nama}</td>
-                    <td>${item.qty}</td>
-                    <td>${formatRupiah(item.subtotal)}</td>
-                    <td><button class="btn-del-item" onclick="deleteCartItem('${prefix}', ${index})"><i class="fa-solid fa-trash"></i></button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            document.getElementById(`${prefix}-total-qty`).innerText = totalQty;
-            document.getElementById(`${prefix}-total-harga`).innerText = formatRupiah(totalHarga);
-        }
-
-        function deleteCartItem(prefix, index) {
-            if (prefix === 'bl') cartBelanja.splice(index, 1);
-            else cartPenjualan.splice(index, 1);
-            renderCart(prefix);
-        }
-
-        function saveBelanja() {
-            if (cartBelanja.length === 0) { alert("Keranjang belanja kosong!"); return; }
-            
-            // Update Stok
-            cartBelanja.forEach(c => {
-                let st = katalogStok.find(s => s.barcode === c.barcode || s.nama === c.nama);
-                if (st) st.qty += c.qty;
-            });
-
-            const id = document.getElementById('bl-id').value;
-            const tgl = document.getElementById('bl-tanggal').value;
-            const totalQty = document.getElementById('bl-total-qty').innerText;
-            const totalHarga = document.getElementById('bl-total-harga').innerText;
-
-            const row = document.createElement('div');
-            row.className = 'list-row';
-            row.innerHTML = `
-                <div class="col font-lg-date">${tgl}</div>
-                <div class="col text-sub">ID: #${id}</div>
-                <div class="col font-medium-text">${totalQty} Item</div>
-                <div class="col font-lg-price">${totalHarga}</div>
-            `;
-            document.getElementById('list-riwayat-belanja').prepend(row);
-
-            closeModal('modal-belanja');
-            showView('view-belanja');
-        }
-
-        // 2. MODAL PENJUALAN LOGIC
-        function openFormPenjualan() {
-            cartPenjualan = [];
-            document.getElementById('pj-id').value = 'PJ-' + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('pj-tanggal').value = getTodayDateStr();
-            document.getElementById('pj-pembeli').value = 'Umum';
-            setCustType('grosir');
-            resetPenjualanInput();
-            renderCart('pj');
-            document.getElementById('modal-penjualan').classList.add('active');
-        }
-
-        function setCustType(type) {
-            activeCustType = type;
-            if (type === 'grosir') {
-                document.getElementById('btn-cust-grosir').classList.add('active');
-                document.getElementById('btn-cust-retail').classList.remove('active');
-            } else {
-                document.getElementById('btn-cust-retail').classList.add('active');
-                document.getElementById('btn-cust-grosir').classList.remove('active');
-            }
-            calcSubtotal('pj');
-        }
-
-        function resetPenjualanInput() {
-            document.getElementById('pj-barcode').value = '';
-            document.getElementById('pj-nama').value = '';
-            document.getElementById('pj-satuan').value = '';
-            document.getElementById('pj-qty').value = '';
-            document.getElementById('pj-subtotal').value = '';
-            delete document.getElementById('pj-nama').dataset.selectedObj;
-            document.getElementById('pj-nama').focus();
-        }
-
-        function savePenjualan() {
-            if (cartPenjualan.length === 0) { alert("Keranjang penjualan kosong!"); return; }
-
-            // Update Stok
-            cartPenjualan.forEach(c => {
-                let st = katalogStok.find(s => s.barcode === c.barcode || s.nama === c.nama);
-                if (st) st.qty -= c.qty;
-            });
-
-            const pembeli = document.getElementById('pj-pembeli').value;
-            const tgl = document.getElementById('pj-tanggal').value;
-            const totalQty = document.getElementById('pj-total-qty').innerText;
-            const totalHarga = document.getElementById('pj-total-harga').innerText;
-
-            const row = document.createElement('div');
-            row.className = 'list-row';
-            row.innerHTML = `
-                <div class="col font-lg-date">${tgl}</div>
-                <div class="col font-medium-text">${pembeli}</div>
-                <div class="col text-sub">${totalQty} Item</div>
-                <div class="col font-lg-price">${totalHarga}</div>
-            `;
-            document.getElementById('list-riwayat-penjualan').prepend(row);
-
-            closeModal('modal-penjualan');
-            showView('view-penjualan');
-        }
-
-        // 3. MODAL TAMBAH STOK BARANG LOGIC
-        function openFormStok() {
-            document.getElementById('stok-nama').value = '';
-            document.getElementById('stok-barcode').value = '';
-            document.getElementById('stok-satuan').value = 'Pcs';
-            document.getElementById('stok-qty').value = '';
-            document.getElementById('stok-min').value = '';
-            document.getElementById('stok-hpokok').value = '';
-            document.getElementById('stok-hgrosir').value = '';
-            document.getElementById('stok-hretail').value = '';
-            document.getElementById('modal-stok').classList.add('active');
-        }
-
-        function saveStokBarang() {
-            const nama = document.getElementById('stok-nama').value;
-            if (!nama) { alert("Nama barang wajib diisi!"); return; }
-
-            const newItem = {
-                barcode: document.getElementById('stok-barcode').value || String(Date.now()),
-                nama: nama,
-                satuan: document.getElementById('stok-satuan').value || 'Pcs',
-                qty: parseNumberInput(document.getElementById('stok-qty').value),
-                min: parseNumberInput(document.getElementById('stok-min').value),
-                hpokok: parseNumberInput(document.getElementById('stok-hpokok').value),
-                hgrosir: parseNumberInput(document.getElementById('stok-hgrosir').value),
-                hretail: parseNumberInput(document.getElementById('stok-hretail').value)
-            };
-
-            katalogStok.push(newItem);
-            closeModal('modal-stok');
-            showView('view-stok');
-        }
-
-        function renderKatalogStok() {
-            const container = document.getElementById('list-katalog-stok');
-            container.innerHTML = '';
-            katalogStok.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'list-row';
-                row.innerHTML = `
-                    <div class="col font-medium-title">${item.nama}</div>
-                    <div class="col font-lg-price" style="color:#64b5f6;">Stok: ${item.qty} ${item.satuan}</div>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function renderPerkiraanBelanja() {
-            const container = document.getElementById('list-perkiraan-belanja');
-            container.innerHTML = '';
-            katalogStok.filter(item => item.qty <= item.min).forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'list-row';
-                row.innerHTML = `
-                    <div class="col font-medium-title">${item.nama}</div>
-                    <div class="col text-sub font-medium-text">Stok: ${item.qty} ${item.satuan}</div>
-                    <div class="col font-lg-price" style="color:#ffb74d;">Harus Beli: ${item.min * 2} ${item.satuan}</div>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        // 4. MODAL PENGELUARAN LAIN LOGIC
-        function openFormPengeluaran() {
-            document.getElementById('peng-tanggal').value = getTodayDateStr();
-            document.getElementById('peng-ket').value = '';
-            document.getElementById('peng-jumlah').value = '';
-            document.getElementById('modal-pengeluaran').classList.add('active');
-        }
-
-        function savePengeluaran() {
-            const tgl = document.getElementById('peng-tanggal').value;
-            const ket = document.getElementById('peng-ket').value;
-            const jumlah = document.getElementById('peng-jumlah').value;
-
-            if (!ket || !jumlah) { alert("Lengkapi data pengeluaran!"); return; }
-
-            const row = document.createElement('div');
-            row.className = 'list-row';
-            row.innerHTML = `
-                <div class="col font-lg-date">${tgl}</div>
-                <div class="col font-lg-price" style="color:#ff5252;">Rp ${jumlah}</div>
-                <div class="col font-medium-text">${ket}</div>
-            `;
-            document.getElementById('list-pengeluaran-lain').prepend(row);
-
-            closeModal('modal-pengeluaran');
-            showView('view-pengeluaran');
-        }
-
-        // COPY CODE
-        function copyAppScript() {
-            const copyText = document.getElementById("appscript-code");
-            copyText.select();
-            navigator.clipboard.writeText(copyText.value);
-            alert("Kode AppScript berhasil disalin!");
-        }
-
-        // INITIAL LOAD
-        renderKatalogStok();
-    </script>
+    // Inisialisasi Tampilan Awal
+    refreshSubMenuViews();
+</script>
 </body>
 </html>
