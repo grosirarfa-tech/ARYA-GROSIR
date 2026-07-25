@@ -1,2020 +1,1854 @@
 <!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARYA GROSIR - Premium POS System</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            gold: '#E5A93C',
-                            green: '#10B981',
-                            darkBg: '#08090C',
-                            cardBg: '#13151B',
-                            cardBorder: '#222630'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
-            }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>POS ARYA GROSIR - Premium System</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkbg: '#050507',
+            darkcard: '#121217',
+            darkborder: '#23232e',
+            brandYellow: '#f59e0b',
+            brandGreen: '#10b981',
+            brandRed: '#ef4444'
+          }
         }
-    </script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- HTML5 QR Code Scanner -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <style>
-        body {
-            background-color: #08090C;
-            color: #F3F4F6;
-            user-select: none;
-            -webkit-user-select: none;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            touch-action: manipulation;
-        }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #08090C;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #222630;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #374151;
-        }
-        .uppercase-input {
-            text-transform: uppercase;
-        }
-        /* Watermark Stamp Style */
-        .stamp-lunas {
-            border: 4px solid #10B981;
-            color: #10B981;
-            font-weight: 900;
-            text-transform: uppercase;
-            padding: 4px 16px;
-            border-radius: 8px;
-            display: inline-block;
-            transform: rotate(-12deg);
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-        }
-        .camera-overlay {
-            background: rgba(0,0,0,0.6);
-        }
-    </style>
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js for Profit Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- HTML5-QRCode Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body {
+      background-color: #050507;
+      color: #f3f4f6;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f0f13;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a2a38;
+      border-radius: 9999px;
+    }
+
+    /* Form control uppercase override */
+    .uppercase-input {
+      text-transform: uppercase;
+    }
+
+    /* Print styling for Invoice */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printArea, #printArea * {
+        visibility: visible;
+      }
+      #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background-color: white !important;
+        color: black !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    /* Diagonal Watermark for Paid Invoice */
+    .watermark-lunas {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-25deg);
+      font-size: 4.5rem;
+      font-weight: 900;
+      color: rgba(16, 185, 129, 0.25);
+      border: 8px solid rgba(16, 185, 129, 0.35);
+      padding: 0.5rem 2rem;
+      border-radius: 12px;
+      pointer-events: none;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      z-index: 10;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
-    <!-- HEADER -->
-    <header class="w-full bg-[#0D0E12] border-b border-[#1E222D] pt-3 pb-2 px-4 sticky top-0 z-40 shadow-lg">
-        <div class="max-w-4xl mx-auto flex flex-col items-center justify-center relative">
-            <!-- LOGO ARYA GROSIR -->
-            <div class="mb-2 flex items-center justify-center">
-                <img src="logo web arya.png" alt="ARYA GROSIR LOGO" class="h-16 md:h-20 object-contain drop-shadow-[0_4px_10px_rgba(229,169,60,0.2)]" onerror="this.onerror=null; this.src='https://placehold.co/240x80/13151B/E5A93C?text=ARYA+GROSIR';">
-            </div>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden pb-6">
 
-            <!-- SUB HEADER STATUS BAR -->
-            <div class="w-full flex items-center justify-between text-xs sm:text-sm font-medium px-1">
-                <!-- Left: Status Indicator -->
-                <div class="flex items-center space-x-2">
-                    <span class="relative flex h-2.5 w-2.5">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                    </span>
-                    <span class="text-emerald-400 font-bold tracking-wide hidden sm:inline">PREMIUM POS SYSTEM</span>
-                    <span class="text-emerald-400 font-bold tracking-wide sm:hidden">POS SYSTEM</span>
-                </div>
+  <!-- HEADER POS -->
+  <header class="sticky top-0 z-40 bg-[#09090d]/90 backdrop-blur-md border-b border-[#1f1f2a] px-4 py-3">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      
+      <!-- Top Left: Premium POS System Status -->
+      <div class="flex items-center gap-2 text-xs font-semibold tracking-wider text-emerald-400">
+        <span class="relative flex h-2.5 w-2.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        </span>
+        <span>PREMIUM POS SYSTEM</span>
+      </div>
 
-                <!-- Center: HOME BUTTON -->
-                <button onclick="navGoHome()" class="flex items-center space-x-2 px-4 py-1.5 rounded-full border border-[#E5A93C]/50 text-[#E5A93C] hover:bg-[#E5A93C]/10 active:scale-95 transition-all font-semibold shadow-[0_0_12px_rgba(229,169,60,0.15)]">
-                    <i class="fa-solid font-bold fa-house text-sm"></i>
-                    <span>HOME</span>
-                </button>
-
-                <!-- Right: Date & Live Clock -->
-                <div id="liveClock" class="text-gray-400 text-right font-mono text-[11px] sm:text-xs">
-                    -- --- ---- 00.00.00
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <main class="max-w-4xl w-full mx-auto p-4 flex-grow relative">
-
-        <!-- ================================================================= -->
-        <!-- 1. MENU UTAMA (Grid 2x4 Layout) -->
-        <!-- ================================================================= -->
-        <section id="viewMainMenu" class="space-y-4">
-            <div class="grid grid-cols-2 gap-3 sm:gap-4 my-2">
-
-                <!-- CARD 1: BELANJA BARANG -->
-                <div onclick="openSubmenu('belanja')" class="bg-[#13151B] border border-[#222630] hover:border-purple-500/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-32 sm:h-36 cursor-pointer hover:bg-[#181B23] active:scale-95 transition-all shadow-md group">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-950/60 border border-purple-800/40 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-bag-shopping text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="font-black text-white text-xs sm:text-sm tracking-wide leading-tight group-hover:text-purple-300">BELANJA BARANG</span>
-                </div>
-
-                <!-- CARD 2: PENJUALAN -->
-                <div onclick="openSubmenu('penjualan')" class="bg-[#13151B] border border-[#222630] hover:border-amber-500/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-32 sm:h-36 cursor-pointer hover:bg-[#181B23] active:scale-95 transition-all shadow-md group">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-950/60 border border-amber-800/40 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-cart-shopping text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="font-black text-white text-xs sm:text-sm tracking-wide leading-tight group-hover:text-amber-300">PENJUALAN</span>
-                </div>
-
-                <!-- CARD 3: STOK BARANG -->
-                <div onclick="openSubmenu('stok')" class="bg-[#13151B] border border-[#222630] hover:border-blue-500/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-32 sm:h-36 cursor-pointer hover:bg-[#181B23] active:scale-95 transition-all shadow-md group">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-950/60 border border-blue-800/40 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-cubes text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="font-black text-white text-xs sm:text-sm tracking-wide leading-tight group-hover:text-blue-300">STOK BARANG</span>
-                </div>
-
-                <!-- CARD 4: PERKIRAAN BELANJA -->
-                <div onclick="openSubmenu('perkiraan')" class="bg-[#13151B] border border-[#222630] hover:border-indigo-500/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-32 sm:h-36 cursor-pointer hover:bg-[#181B23] active:scale-95 transition-all shadow-md group">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-indigo-950/60 border border-indigo-800/40 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-chart-line text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="font-black text-white text-xs sm:text-sm tracking-wide leading-tight group-hover:text-indigo-300">PERKIRAAN BELANJA</span>
-                </div>
-
-                <!-- CARD 5: PENGELUARAN LAIN -->
-                <div onclick="openSubmenu('pengeluaran')" class="bg-[#13151B] border border-[#222630] hover:border-teal-500/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-32 sm:h-36 cursor-pointer hover:bg-[#181B23] active:scale-95 transition-all shadow-md group">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-teal-950/60 border border-teal-800/40 flex items-center justify-center text-teal-400 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-receipt text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="font-black text-white text-xs sm:text-sm tracking-wide leading-tight group-hover:text-teal-300">PENGELUARAN LAIN</span>
-                </div>
-
-                <!-- CARD 6: KEUNTUNGAN -->
-                <div onclick="openSubmenu('keuntungan')" class="bg-[#13151B] border border-[#222630] hover:border-rose-500/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-32 sm:h-36 cursor-pointer hover:bg-[#181B23] active:scale-95 transition-all shadow-md group">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-rose-950/60 border border-rose-800/40 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-wallet text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="font-black text-white text-xs sm:text-sm tracking-wide leading-tight group-hover:text-rose-300">KEUNTUNGAN</span>
-                </div>
-
-                <!-- CARD 7: PENGATURAN FAKTUR -->
-                <div onclick="openSubmenu('faktur')" class="bg-[#13151B] border border-[#222630] hover:border-yellow-500/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-32 sm:h-36 cursor-pointer hover:bg-[#181B23] active:scale-95 transition-all shadow-md group">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-950/60 border border-yellow-800/40 flex items-center justify-center text-yellow-400 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-[#000] fa-file-invoice-dollar text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="font-black text-white text-xs sm:text-sm tracking-wide leading-tight group-hover:text-yellow-300">PENGATURAN FAKTUR</span>
-                </div>
-
-                <!-- CARD 8: SINKRONISASI -->
-                <div onclick="openSubmenu('sync')" class="bg-[#13151B] border border-[#222630] hover:border-emerald-500/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-32 sm:h-36 cursor-pointer hover:bg-[#181B23] active:scale-95 transition-all shadow-md group">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-950/60 border border-emerald-800/40 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-arrows-rotate text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="font-black text-white text-xs sm:text-sm tracking-wide leading-tight group-hover:text-emerald-300">SINKRONISASI</span>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ================================================================= -->
-        <!-- SUBMENU VIEW CONTAINER (Dynamic content based on menu) -->
-        <!-- ================================================================= -->
-        <section id="viewSubMenu" class="hidden space-y-4">
-            
-            <!-- Submenu Header Bar -->
-            <div class="flex items-center justify-between bg-[#13151B] p-4 rounded-xl border border-[#222630]">
-                <div class="flex items-center space-x-3">
-                    <div id="subMenuIcon" class="w-9 h-9 rounded-lg flex items-center justify-center text-white bg-gray-800"></div>
-                    <h2 id="subMenuTitle" class="text-base sm:text-lg font-bold text-white uppercase tracking-wider"></h2>
-                </div>
-                <button id="btnTransaksiBaru" onclick="triggerTransaksiBaru()" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-xs sm:text-sm flex items-center space-x-2 transition-all shadow-lg active:scale-95">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>TAMBAH DATA (F5)</span>
-                </button>
-            </div>
-
-            <!-- SUBMENU CONTENTS -->
-            <div id="subMenuContent">
-                <!-- Injected via JavaScript -->
-            </div>
-        </section>
-
-        <!-- ================================================================= -->
-        <!-- FORM / CARRIER DETAIL VIEW -->
-        <!-- ================================================================= -->
-        <section id="viewFormCart" class="hidden space-y-4">
-            <!-- Header back to submenu -->
-            <div class="flex items-center justify-between bg-[#13151B] p-3 rounded-xl border border-[#222630]">
-                <button onclick="navBackFromForm()" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg text-xs font-bold flex items-center space-x-1">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>KEMBALI</span>
-                </button>
-                <span id="formCartHeaderTitle" class="font-bold text-sm text-emerald-400 uppercase tracking-wide">FORM TRANSACTION</span>
-                <span class="text-xs text-gray-400">[F8] Simpan</span>
-            </div>
-
-            <div id="formCartContent" class="bg-[#13151B] p-4 sm:p-6 rounded-xl border border-[#222630] space-y-4">
-                <!-- Injected via JS -->
-            </div>
-        </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="w-full bg-[#0D0E12] border-t border-[#1E222D] py-3 text-center text-gray-500 text-xs">
-        &copy; 2026 ARYA GROSIR POS System &bull; Single-Page Offline-First Apps Script Sync
-    </footer>
-
-    <!-- ================================================================= -->
-    <!-- FULLSCREEN CAMERA BARCODE SCANNER MODAL -->
-    <!-- ================================================================= -->
-    <div id="cameraModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col justify-between p-4">
-        <div class="flex justify-between items-center z-10">
-            <span class="text-white font-bold text-sm flex items-center gap-2">
-                <i class="fa-solid fa-barcode text-emerald-400"></i> SCANNER BARCODE
-            </span>
-            <div class="flex items-center space-x-2">
-                <button id="btnToggleFlash" onclick="toggleTorch()" class="px-3 py-1.5 bg-gray-800 text-yellow-400 rounded-lg text-xs font-bold border border-gray-700 flex items-center gap-1">
-                    <i class="fa-solid fa-bolt"></i> SENTER
-                </button>
-                <button onclick="closeCameraScanner()" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold">
-                    <i class="fa-solid fa-xmark"></i> TUTUP
-                </button>
-            </div>
+      <!-- Center Logo & Home Button -->
+      <div class="flex items-center gap-3">
+        <!-- Logo Display -->
+        <div class="flex items-center justify-center">
+          <img src="logo web arya.png" alt="ARYA GROSIR" class="h-10 object-contain drop-shadow-md" onerror="this.onerror=null; this.src='https://placehold.co/180x50/050507/f59e0b?text=ARYA+GROSIR';">
         </div>
 
-        <!-- Scanner Viewport -->
-        <div class="relative w-full max-w-md mx-auto my-auto aspect-square overflow-hidden rounded-2xl border-2 border-emerald-500/80 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-            <div id="reader" class="w-full h-full object-cover"></div>
-            <!-- Focus frame overlay -->
-            <div class="absolute inset-0 border-2 border-dashed border-emerald-400/60 m-8 rounded-xl pointer-events-none flex items-center justify-center">
-                <div class="w-full h-0.5 bg-red-500/80 animate-pulse"></div>
-            </div>
-        </div>
+        <button onclick="navGoHome()" class="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-amber-500/60 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-medium text-sm transition-all active:scale-95 shadow-sm shadow-amber-500/10">
+          <i class="fa-solid fa-house"></i>
+          <span>HOME</span>
+        </button>
+      </div>
 
-        <div class="text-center text-xs text-gray-400 z-10 pb-2">
-            Arahkan kamera ke Barcode Produk. Scanner akan otomatis mendeteksi barcode.
+      <!-- Top Right: Real-time Clock -->
+      <div id="liveClock" class="text-xs text-gray-400 font-mono tracking-wide text-center sm:text-right">
+        -- ---- ---- pukul --.--.--
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-4xl w-full mx-auto px-3 sm:px-4 mt-4 flex-grow">
+
+    <!-- ==================== VIEW 1: MAIN MENU (2x4 GRID) ==================== -->
+    <div id="viewMainMenu" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4 my-auto">
+      
+      <!-- CARD 1: BELANJA BARANG -->
+      <button onclick="openMenu('BELANJA')" class="group relative bg-[#121218] border border-[#232330] hover:border-amber-500/50 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/40">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-2xl sm:text-3xl mb-3 group-hover:bg-amber-500 group-hover:text-black transition-all">
+          <i class="fa-solid fa-bag-shopping"></i>
         </div>
+        <span class="font-extrabold text-sm sm:text-base tracking-wide text-gray-200 group-hover:text-amber-400">BELANJA BARANG</span>
+      </button>
+
+      <!-- CARD 2: PENJUALAN -->
+      <button onclick="openMenu('PENJUALAN')" class="group relative bg-[#121218] border border-[#232330] hover:border-emerald-500/50 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/40">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl sm:text-3xl mb-3 group-hover:bg-emerald-500 group-hover:text-black transition-all">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </div>
+        <span class="font-extrabold text-sm sm:text-base tracking-wide text-gray-200 group-hover:text-emerald-400">PENJUALAN</span>
+      </button>
+
+      <!-- CARD 3: STOK BARANG -->
+      <button onclick="openMenu('KATALOG')" class="group relative bg-[#121218] border border-[#232330] hover:border-blue-500/50 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/40">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-2xl sm:text-3xl mb-3 group-hover:bg-blue-500 group-hover:text-black transition-all">
+          <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <span class="font-extrabold text-sm sm:text-base tracking-wide text-gray-200 group-hover:text-blue-400">STOK BARANG</span>
+      </button>
+
+      <!-- CARD 4: PERKIRAAN BELANJA -->
+      <button onclick="openMenu('PERKIRAAN')" class="group relative bg-[#121218] border border-[#232330] hover:border-purple-500/50 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/40">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center text-2xl sm:text-3xl mb-3 group-hover:bg-purple-500 group-hover:text-black transition-all">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <span class="font-extrabold text-sm sm:text-base tracking-wide text-gray-200 group-hover:text-purple-400">PERKIRAAN BELANJA</span>
+      </button>
+
+      <!-- CARD 5: PENGELUARAN LAIN -->
+      <button onclick="openMenu('PENGELUARAN')" class="group relative bg-[#121218] border border-[#232330] hover:border-cyan-500/50 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/40">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center text-2xl sm:text-3xl mb-3 group-hover:bg-cyan-500 group-hover:text-black transition-all">
+          <i class="fa-solid fa-receipt"></i>
+        </div>
+        <span class="font-extrabold text-sm sm:text-base tracking-wide text-gray-200 group-hover:text-cyan-400">PENGELUARAN LAIN</span>
+      </button>
+
+      <!-- CARD 6: KEUNTUNGAN -->
+      <button onclick="openMenu('KEUNTUNGAN')" class="group relative bg-[#121218] border border-[#232330] hover:border-pink-500/50 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/40">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center text-2xl sm:text-3xl mb-3 group-hover:bg-pink-500 group-hover:text-black transition-all">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
+        <span class="font-extrabold text-sm sm:text-base tracking-wide text-gray-200 group-hover:text-pink-400">KEUNTUNGAN</span>
+      </button>
+
+      <!-- CARD 7: PENGATURAN FAKTUR -->
+      <button onclick="openMenu('FAKTUR')" class="group relative bg-[#121218] border border-[#232330] hover:border-amber-400/50 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/40">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-400/10 border border-amber-400/20 text-amber-300 flex items-center justify-center text-2xl sm:text-3xl mb-3 group-hover:bg-amber-400 group-hover:text-black transition-all">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <span class="font-extrabold text-sm sm:text-base tracking-wide text-gray-200 group-hover:text-amber-300">PENGATURAN FAKTUR</span>
+      </button>
+
+      <!-- CARD 8: SINKRONISASI -->
+      <button onclick="openMenu('SINKRONISASI')" class="group relative bg-[#121218] border border-[#232330] hover:border-teal-500/50 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/40">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center text-2xl sm:text-3xl mb-3 group-hover:bg-teal-500 group-hover:text-black transition-all">
+          <i class="fa-solid fa-arrows-rotate"></i>
+        </div>
+        <span class="font-extrabold text-sm sm:text-base tracking-wide text-gray-200 group-hover:text-teal-400">SINKRONISASI</span>
+      </button>
+
     </div>
 
-    <!-- INVOICE PRINT MODAL -->
-    <div id="invoiceModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white text-black w-full max-w-lg rounded-2xl p-6 relative space-y-4 shadow-2xl my-8">
-            <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-gray-600 hover:text-black font-bold text-lg">
-                <i class="fa-solid fa-xmark"></i>
+    <!-- ==================== VIEW 2: SUBMENU & HISTORY LIST ==================== -->
+    <div id="viewSubMenu" class="hidden space-y-4">
+      <!-- Top Action Bar -->
+      <div class="flex items-center justify-between bg-[#121218] p-4 rounded-2xl border border-[#232330]">
+        <div>
+          <h2 id="subMenuTitle" class="text-xl font-bold text-white tracking-wide">JUDUL MENU</h2>
+          <p id="subMenuSubtitle" class="text-xs text-gray-400">Riwayat transaksi & pengelolaan data</p>
+        </div>
+        
+        <button id="btnNewTransaction" onclick="createNewAction()" class="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-extrabold px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95 text-sm">
+          <i class="fa-solid fa-plus text-base"></i>
+          <span>Transaksi Baru (F5)</span>
+        </button>
+      </div>
+
+      <!-- Search & Filter Bar -->
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+        <input type="text" id="historySearchInput" oninput="renderHistoryList()" placeholder="Cari berdasarkan ID, nama barang, barcode..." class="w-full bg-[#121218] border border-[#232330] text-white pl-11 pr-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-500 transition-colors">
+      </div>
+
+      <!-- History Table / List Container -->
+      <div id="historyListContainer" class="bg-[#121218] rounded-2xl border border-[#232330] overflow-hidden">
+        <!-- Dynamic list rows injected here -->
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 3: INPUT FORM / TRANSAKSI BARU ==================== -->
+    <div id="viewFormInput" class="hidden space-y-4">
+      <div class="bg-[#121218] p-4 rounded-2xl border border-[#232330] flex items-center justify-between">
+        <h2 id="formInputTitle" class="text-xl font-bold text-amber-400">FORM INPUT</h2>
+        <span class="text-xs font-mono bg-amber-500/10 text-amber-400 px-3 py-1 rounded-lg border border-amber-500/20">Tekan F8 untuk Simpan</span>
+      </div>
+
+      <!-- Form Elements Wrapper -->
+      <div id="formFieldsContainer" class="bg-[#121218] p-5 rounded-2xl border border-[#232330] space-y-4">
+        <!-- Dynamic Form Fields Injected Here -->
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button onclick="cancelFormInput()" class="px-5 py-2.5 rounded-xl border border-gray-700 text-gray-300 font-semibold text-sm hover:bg-gray-800 transition-all">
+          <i class="fa-solid fa-xmark mr-1"></i> Batal / Cancel
+        </button>
+        <button id="btnSubmitForm" onclick="submitFormInput()" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-sm transition-all shadow-md active:scale-95">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan (F8)
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 4: CART & CHECKOUT DETAIL ==================== -->
+    <div id="viewCart" class="hidden space-y-4">
+      <div class="bg-[#121218] p-4 rounded-2xl border border-[#232330] flex items-center justify-between">
+        <div>
+          <h2 id="cartTitle" class="text-xl font-bold text-emerald-400">KERANJANG TRANSAKSI</h2>
+          <p id="cartHeaderMeta" class="text-xs text-gray-400">ID: - | Tanggal: -</p>
+        </div>
+        <button onclick="addMoreItemToCart()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all active:scale-95">
+          <i class="fa-solid fa-plus"></i>
+          <span>Tambah Barang</span>
+        </button>
+      </div>
+
+      <!-- Cart Items Table -->
+      <div class="bg-[#121218] rounded-2xl border border-[#232330] overflow-hidden">
+        <div class="p-3 bg-[#181822] border-b border-[#232330] grid grid-cols-12 text-xs font-bold text-gray-400 uppercase">
+          <div class="col-span-6">Nama Barang</div>
+          <div class="col-span-2 text-center">Qty</div>
+          <div class="col-span-3 text-right">Total Item</div>
+          <div class="col-span-1 text-center">Aksi</div>
+        </div>
+        
+        <div id="cartItemsList" class="divide-y divide-[#232330] max-h-80 overflow-y-auto">
+          <!-- Cart items injected here -->
+        </div>
+      </div>
+
+      <!-- Customer & Payment Fields for Sales -->
+      <div id="salesPaymentFields" class="hidden bg-[#121218] p-4 rounded-2xl border border-[#232330] grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">NAMA PEMBELI</label>
+          <input type="text" id="cartCustomerName" placeholder="Umum / Pelanggan" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-2.5 rounded-xl text-sm focus:border-emerald-500 uppercase-input">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">DIBAYAR (RP)</label>
+          <input type="text" id="cartPaidAmount" oninput="formatCurrencyInput(this); calculateCartTotal();" placeholder="0" class="w-full bg-[#0a0a0e] border border-[#232330] text-emerald-400 font-bold p-2.5 rounded-xl text-sm focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">KEMBALIAN</label>
+          <div id="cartChangeAmount" class="w-full bg-[#0a0a0e] border border-[#232330] text-amber-400 font-extrabold p-2.5 rounded-xl text-sm">
+            Rp 0
+          </div>
+        </div>
+      </div>
+
+      <!-- Cart Totals Footer -->
+      <div class="bg-[#121218] p-4 rounded-2xl border border-[#232330] flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-6 text-sm">
+          <div>
+            <span class="text-xs text-gray-400 block">TOTAL QTY</span>
+            <span id="cartTotalQty" class="font-extrabold text-white text-lg">0</span>
+          </div>
+          <div class="h-8 w-px bg-gray-800"></div>
+          <div>
+            <span class="text-xs text-gray-400 block">TOTAL HARGA</span>
+            <span id="cartTotalPrice" class="font-extrabold text-amber-400 text-xl">Rp 0</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <button onclick="cancelCartView()" class="w-1/2 sm:w-auto px-5 py-2.5 rounded-xl border border-gray-700 text-gray-300 font-semibold text-sm hover:bg-gray-800 transition-all">
+            Batal
+          </button>
+          <button id="btnSaveCart" onclick="saveCartTransaction()" class="w-1/2 sm:w-auto px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold text-sm transition-all shadow-md active:scale-95">
+            Simpan (F8)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 5: PERKIRAAN BELANJA ==================== -->
+    <div id="viewPerkiraan" class="hidden space-y-4">
+      <div class="bg-[#121218] p-4 rounded-2xl border border-[#232330] flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-purple-400">PERKIRAAN BELANJA (STOK MINIMAL)</h2>
+          <p class="text-xs text-gray-400">Daftar barang yang mendekati atau di bawah stok minimal</p>
+        </div>
+        <button onclick="exportPerkiraanBelanja()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all">
+          <i class="fa-solid fa-download mr-1"></i> Cetak List
+        </button>
+      </div>
+
+      <div class="bg-[#121218] rounded-2xl border border-[#232330] overflow-hidden">
+        <div id="perkiraanListContainer">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 6: DASHBOARD KEUNTUNGAN ==================== -->
+    <div id="viewKeuntungan" class="hidden space-y-5">
+      <div class="bg-[#121218] p-4 rounded-2xl border border-[#232330]">
+        <h2 class="text-xl font-bold text-pink-400">DASHBOARD ANALITIK KEUNTUNGAN</h2>
+        <p class="text-xs text-gray-400">Ringkasan estimasi performa laba dan pengeluaran</p>
+      </div>
+
+      <!-- Top Summary Cards (2x2 Grid) -->
+      <div class="grid grid-cols-2 gap-3 sm:gap-4">
+        <div class="bg-[#121218] border border-[#232330] p-4 rounded-2xl">
+          <div class="text-xs text-gray-400 font-semibold mb-1">Laba Bersih Kemarin</div>
+          <div id="statLabaKemarin" class="text-lg sm:text-2xl font-extrabold text-emerald-400">Rp 0</div>
+        </div>
+        <div class="bg-[#121218] border border-[#232330] p-4 rounded-2xl">
+          <div class="text-xs text-gray-400 font-semibold mb-1">Laba Bersih Bulan Ini</div>
+          <div id="statLabaBulanIni" class="text-lg sm:text-2xl font-extrabold text-emerald-400">Rp 0</div>
+        </div>
+        <div class="bg-[#121218] border border-[#232330] p-4 rounded-2xl">
+          <div class="text-xs text-gray-400 font-semibold mb-1">Pengeluaran Kemarin</div>
+          <div id="statPengeluaranKemarin" class="text-lg sm:text-2xl font-extrabold text-rose-400">Rp 0</div>
+        </div>
+        <div class="bg-[#121218] border border-[#232330] p-4 rounded-2xl">
+          <div class="text-xs text-gray-400 font-semibold mb-1">Pengeluaran Bulan Ini</div>
+          <div id="statPengeluaranBulanIni" class="text-lg sm:text-2xl font-extrabold text-rose-400">Rp 0</div>
+        </div>
+      </div>
+
+      <!-- Daily Profit Table -->
+      <div class="bg-[#121218] rounded-2xl border border-[#232330] p-4">
+        <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-list text-pink-400"></i>
+          <span>Rincian Keuntungan Harian</span>
+        </h3>
+        <div id="dailyProfitTable" class="overflow-x-auto">
+          <!-- Daily table injected here -->
+        </div>
+      </div>
+
+      <!-- Monthly Profit Chart -->
+      <div class="bg-[#121218] rounded-2xl border border-[#232330] p-4">
+        <h3 class="text-sm font-bold text-white mb-3 flex items-center justify-between">
+          <span><i class="fa-solid fa-chart-bar text-emerald-400 mr-2"></i>Grafik Keuntungan Bulanan</span>
+          <span class="text-xs font-normal text-gray-400">Gradasi Merah (Rendah) - Kuning - Hijau (Tinggi)</span>
+        </h3>
+        <div class="relative h-64 w-full">
+          <canvas id="profitChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 7: PENGATURAN FAKTUR ==================== -->
+    <div id="viewFaktur" class="hidden space-y-4">
+      <div class="bg-[#121218] p-4 rounded-2xl border border-[#232330]">
+        <h2 class="text-xl font-bold text-amber-300">PENGATURAN & TEMPLATE FAKTUR</h2>
+        <p class="text-xs text-gray-400">Desain faktur resmi & integrasi template Google Docs</p>
+      </div>
+
+      <div class="bg-[#121218] p-5 rounded-2xl border border-[#232330] space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-300 mb-1">NOMOR WHATSAPP HEADER</label>
+          <input type="text" id="settingWaNumber" value="089670179464" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-300 mb-1">URL TEMPLATE GOOGLE DOCS FAKTUR</label>
+          <input type="text" id="settingGdocUrl" placeholder="https://docs.google.com/document/d/..." class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+          <p class="text-xs text-gray-500 mt-1">Salin link dokumen Google Docs yang digunakan sebagai template cetak otomatis.</p>
+        </div>
+
+        <!-- Preview Modal/Box of Invoice Template -->
+        <div class="border border-[#232330] p-4 rounded-xl bg-white text-black text-xs font-mono space-y-2 relative overflow-hidden">
+          <div class="text-center font-bold text-sm">FAKTUR PENJUALAN</div>
+          <div class="text-center text-xs">NO WA: <span id="previewWa">089670179464</span></div>
+          <div class="text-center text-[10px] text-gray-500">[LOGO: logo web arya.png]</div>
+          <hr class="border-gray-300 my-2">
+          <div class="flex justify-between text-[11px]">
+            <span>TANGGAL: DD/MM/YYYY</span>
+            <span>ID: PJL-SAMPLE</span>
+          </div>
+          <div>PEMBELI: PELANGGAN UMUM</div>
+          <table class="w-full my-2 border-collapse text-left text-[11px]">
+            <thead>
+              <tr class="border-b border-gray-300">
+                <th class="py-1">NAMA BARANG</th>
+                <th class="py-1 text-center">QTY</th>
+                <th class="py-1 text-right">HARGA</th>
+                <th class="py-1 text-right">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SAMPLE ITEM 1</td>
+                <td class="text-center">2</td>
+                <td class="text-right">10.000</td>
+                <td class="text-right">20.000</td>
+              </tr>
+            </tbody>
+          </table>
+          <hr class="border-gray-300 my-2">
+          <div class="flex justify-between font-bold text-xs">
+            <span>TOTAL HARGA:</span>
+            <span>Rp 20.000</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span>DIBAYAR:</span>
+            <span>Rp 50.000</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span>KEMBALIAN:</span>
+            <span>Rp 30.000</span>
+          </div>
+          <!-- Sample Watermark -->
+          <div class="watermark-lunas" style="font-size: 2.5rem; border-width: 4px;">LUNAS</div>
+        </div>
+
+        <button onclick="saveFakturSettings()" class="w-full bg-amber-400 hover:bg-amber-500 text-black font-extrabold py-3 rounded-xl transition-all">
+          Simpan Pengaturan Faktur
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 8: SINKRONISASI SPREADSHEET ==================== -->
+    <div id="viewSinkronisasi" class="hidden space-y-4">
+      <div class="bg-[#121218] p-4 rounded-2xl border border-[#232330]">
+        <h2 class="text-xl font-bold text-teal-400">SINKRONISASI GOOGLE SPREADSHEET</h2>
+        <p class="text-xs text-gray-400">Pengaturan Google Apps Script & Backup otomatis pukul 23.00</p>
+      </div>
+
+      <!-- Apps Script Configuration -->
+      <div class="bg-[#121218] p-5 rounded-2xl border border-[#232330] space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-300 mb-1">GOOGLE APPS SCRIPT WEB APP URL</label>
+          <div class="flex gap-2">
+            <input type="text" id="gasScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-teal-400">
+            <button onclick="saveGasUrl()" class="bg-teal-500 hover:bg-teal-600 text-black font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all">
+              Simpan URL
             </button>
-
-            <div id="invoicePrintArea" class="space-y-4 text-sm font-sans">
-                <!-- Header Faktur -->
-                <div class="text-center border-b pb-3 relative">
-                    <img src="logo web arya.png" class="h-12 mx-auto mb-1 object-contain" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/000000?text=ARYA+GROSIR';">
-                    <h2 class="font-black text-xl tracking-wide">FAKTUR PENJUALAN</h2>
-                    <p class="text-xs font-semibold text-gray-700">ARYA GROSIR &bull; NO WA: 089670179464</p>
-                </div>
-
-                <!-- Invoice Details -->
-                <div class="grid grid-cols-2 text-xs gap-1 border-b pb-2">
-                    <div><span class="font-bold">ID:</span> <span id="invId">PJL-001</span></div>
-                    <div class="text-right"><span class="font-bold">Tanggal:</span> <span id="invDate">2026-07-20</span></div>
-                    <div><span class="font-bold">Pembeli:</span> <span id="invCustomer">Umum</span></div>
-                    <div class="text-right"><span class="font-bold">Tipe:</span> <span id="invType">RETAIL</span></div>
-                </div>
-
-                <!-- Items Table -->
-                <table class="w-full text-xs text-left border-collapse">
-                    <thead>
-                        <tr class="border-b font-bold bg-gray-100">
-                            <th class="py-1 px-1">BARANG</th>
-                            <th class="py-1 px-1 text-center">QTY</th>
-                            <th class="py-1 px-1 text-right">HARGA</th>
-                            <th class="py-1 px-1 text-right">TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody id="invItemsTable">
-                        <!-- Items injected here -->
-                    </tbody>
-                </table>
-
-                <!-- Total & Watermark -->
-                <div class="border-t pt-2 flex justify-between items-center relative">
-                    <div id="invStampArea">
-                        <div class="stamp-lunas">L U N A S</div>
-                    </div>
-                    <div class="text-right space-y-1 text-xs">
-                        <div>TOTAL: <span id="invTotal" class="font-bold text-sm">Rp 0</span></div>
-                        <div>DIBAYAR: <span id="invPaid">Rp 0</span></div>
-                        <div>KEMBALIAN: <span id="invChange">Rp 0</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Invoice Modal Action Buttons -->
-            <div class="flex gap-2 pt-2 border-t">
-                <button onclick="printInvoice()" class="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-print"></i> CETAK / PDF
-                </button>
-                <button onclick="closeInvoiceModal()" class="px-4 py-2.5 bg-gray-300 text-gray-800 rounded-lg font-bold text-xs">
-                    TUTUP
-                </button>
-            </div>
+          </div>
         </div>
-    </div>
 
-    <!-- ================================================================= -->
-    <!-- JAVASCRIPT LOGIC -->
-    <!-- ================================================================= -->
-    <script>
-        /* ================================================================== */
-        /* APPLICATION STATE & STORAGE DATA MODELS                           */
-        /* ================================================================== */
-        const APP_STORAGE_KEY = "ARYA_GROSIR_POS_DB_V1";
-
-        let db = {
-            katalog: [
-                { barcode: '8991001001', nama: 'MINYAK GORENG 1L', satuan: 'PCS', qty: 50, minQty: 10, hargaPokok: 14000, hargaGrosir: 15500, hargaRetail: 16000 },
-                { barcode: '8991001002', nama: 'BERAS PREMIUM 5KG', satuan: 'KARUNG', qty: 25, minQty: 5, hargaPokok: 65000, hargaGrosir: 71000, hargaRetail: 74000 },
-                { barcode: '8991001003', nama: 'GULA PASIR 1KG', satuan: 'PCS', qty: 8, minQty: 15, hargaPokok: 14500, hargaGrosir: 16000, hargaRetail: 17000 }
-            ],
-            belanjaHistory: [],
-            penjualanHistory: [],
-            pengeluaranHistory: [],
-            gasUrl: '',
-            syncLog: []
-        };
-
-        // Navigation History & State Management
-        let currentModule = 'main'; // 'main', 'stok', 'belanja', 'penjualan', 'perkiraan', 'pengeluaran', 'keuntungan', 'faktur', 'sync'
-        let currentSubState = 'list'; // 'list', 'form', 'cartDetail'
-        let activeCartItems = []; // Temporary cart buffer for sales/purchases
-        let activeTransactionHeader = {}; // Temporary transaction details
-        let html5QrScanner = null;
-        let torchOn = false;
-        let scannerTargetInputId = '';
-
-        /* ================================================================== */
-        /* INITIALIZATION & LIFECYCLE                                         */
-        /* ================================================================== */
-        window.onload = function() {
-            loadDatabase();
-            initClock();
-            setupKeyboardShortcuts();
-            setupAndroidBackButton();
-            setupAutoBackupSchedule();
-            renderSubMenuContent();
-        };
-
-        function saveDatabase() {
-            localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(db));
-        }
-
-        function loadDatabase() {
-            const data = localStorage.getItem(APP_STORAGE_KEY);
-            if (data) {
-                try {
-                    db = JSON.parse(data);
-                    if (!db.katalog) db.katalog = [];
-                    if (!db.belanjaHistory) db.belanjaHistory = [];
-                    if (!db.penjualanHistory) db.penjualanHistory = [];
-                    if (!db.pengeluaranHistory) db.pengeluaranHistory = [];
-                    if (!db.syncLog) db.syncLog = [];
-                } catch (e) {
-                    console.error("DB Load Error", e);
-                }
-            } else {
-                saveDatabase();
-            }
-        }
-
-        function initClock() {
-            const clockEl = document.getElementById('liveClock');
-            function update() {
-                const now = new Date();
-                const options = { day: 'numeric', month: 'Long', year: 'numeric' };
-                const dateStr = now.toLocaleDateString('id-ID', options);
-                const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '.');
-                clockEl.innerHTML = `${dateStr}<br>pukul ${timeStr}`;
-            }
-            update();
-            setInterval(update, 1000);
-        }
-
-        /* ================================================================== */
-        /* FORMATTERS & UTILS                                                 */
-        /* ================================================================== */
-        function formatThousand(val) {
-            if (val === null || val === undefined || val === '') return '';
-            let num = val.toString().replace(/\D/g, '');
-            if (!num) return '';
-            return parseInt(num, 10).toLocaleString('id-ID');
-        }
-
-        function parseThousand(val) {
-            if (!val) return 0;
-            return parseInt(val.toString().replace(/\./g, '').replace(/,/g, ''), 10) || 0;
-        }
-
-        function formatToRupiah(num) {
-            return 'Rp ' + (num || 0).toLocaleString('id-ID');
-        }
-
-        function getTodayDateString() {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            return `${yyyy}-${mm}-${dd}`;
-        }
-
-        function handleNumberInputFormatting(inputEl) {
-            let cursor = inputEl.selectionStart;
-            let originalLen = inputEl.value.length;
-            let raw = parseThousand(inputEl.value);
-            inputEl.value = raw ? formatThousand(raw) : '';
-            let newLen = inputEl.value.length;
-            cursor = cursor + (newLen - originalLen);
-            if (cursor < 0) cursor = 0;
-            inputEl.setSelectionRange(cursor, cursor);
-        }
-
-        /* ================================================================== */
-        /* KEYBOARD & BACK BUTTON NAVIGATION CONTROLLER                      */
-        /* ================================================================== */
-        function setupKeyboardShortcuts() {
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'F5') {
-                    e.preventDefault();
-                    triggerTransaksiBaru();
-                } else if (e.key === 'F8') {
-                    e.preventDefault();
-                    triggerSaveF8();
-                }
-            });
-        }
-
-        function setupAndroidBackButton() {
-            // Push initial state
-            history.pushState({ page: 'main', subState: 'list' }, '');
-
-            window.addEventListener('popstate', function(event) {
-                if (currentSubState === 'form' || currentSubState === 'cartDetail') {
-                    navBackFromForm();
-                    history.pushState({ page: currentModule, subState: 'list' }, '');
-                } else if (currentModule !== 'main') {
-                    navGoHome();
-                    history.pushState({ page: 'main', subState: 'list' }, '');
-                } else {
-                    if (confirm("Apakah Anda yakin ingin keluar dari Aplikasi ARYA GROSIR POS?")) {
-                        // Exit app
-                    } else {
-                        history.pushState({ page: 'main', subState: 'list' }, '');
-                    }
-                }
-            });
-        }
-
-        function navGoHome() {
-            currentModule = 'main';
-            currentSubState = 'list';
-            document.getElementById('viewMainMenu').classList.remove('hidden');
-            document.getElementById('viewSubMenu').classList.add('hidden');
-            document.getElementById('viewFormCart').classList.add('hidden');
-        }
-
-        function openSubmenu(moduleKey) {
-            currentModule = moduleKey;
-            currentSubState = 'list';
-
-            document.getElementById('viewMainMenu').classList.add('hidden');
-            document.getElementById('viewFormCart').classList.add('hidden');
-            document.getElementById('viewSubMenu').classList.remove('hidden');
-
-            renderSubMenuHeader();
-            renderSubMenuContent();
-
-            history.pushState({ page: currentModule, subState: 'list' }, '');
-        }
-
-        function triggerTransaksiBaru() {
-            if (currentModule === 'stok') {
-                openFormKatalogItem(null);
-            } else if (currentModule === 'belanja') {
-                openFormBelanjaBaru();
-            } else if (currentModule === 'penjualan') {
-                openFormPenjualanBaru();
-            } else if (currentModule === 'pengeluaran') {
-                openFormPengeluaranBaru();
-            }
-        }
-
-        function triggerSaveF8() {
-            const btnSave = document.getElementById('btnSubmitForm');
-            if (btnSave) {
-                btnSave.click();
-            }
-        }
-
-        function navBackFromForm() {
-            currentSubState = 'list';
-            document.getElementById('viewFormCart').classList.add('hidden');
-            document.getElementById('viewSubMenu').classList.remove('hidden');
-            renderSubMenuContent();
-        }
-
-        /* ================================================================== */
-        /* SUBMENU RENDERING ENGINE                                           */
-        /* ================================================================== */
-        function renderSubMenuHeader() {
-            const titleEl = document.getElementById('subMenuTitle');
-            const iconEl = document.getElementById('subMenuIcon');
-            const btnTambah = document.getElementById('btnTransaksiBaru');
-
-            btnTambah.classList.add('hidden');
-
-            switch (currentModule) {
-                case 'stok':
-                    titleEl.innerText = "KATALOG STOK BARANG";
-                    iconEl.className = "w-9 h-9 rounded-lg flex items-center justify-center text-blue-400 bg-blue-950/60 border border-blue-800/40";
-                    iconEl.innerHTML = '<i class="fa-solid fa-cubes"></i>';
-                    btnTambah.classList.remove('hidden');
-                    btnTambah.querySelector('span').innerText = "TAMBAH BARANG (F5)";
-                    break;
-                case 'belanja':
-                    titleEl.innerText = "RIWAYAT BELANJA (RESTOK)";
-                    iconEl.className = "w-9 h-9 rounded-lg flex items-center justify-center text-purple-400 bg-purple-950/60 border border-purple-800/40";
-                    iconEl.innerHTML = '<i class="fa-solid fa-bag-shopping"></i>';
-                    btnTambah.classList.remove('hidden');
-                    btnTambah.querySelector('span').innerText = "BELANJA BARU (F5)";
-                    break;
-                case 'penjualan':
-                    titleEl.innerText = "RIWAYAT PENJUALAN";
-                    iconEl.className = "w-9 h-9 rounded-lg flex items-center justify-center text-amber-400 bg-amber-950/60 border border-amber-800/40";
-                    iconEl.innerHTML = '<i class="fa-solid fa-cart-shopping"></i>';
-                    btnTambah.classList.remove('hidden');
-                    btnTambah.querySelector('span').innerText = "PENJUALAN BARU (F5)";
-                    break;
-                case 'perkiraan':
-                    titleEl.innerText = "PERKIRAAN BELANJA (STOK MINIMAL)";
-                    iconEl.className = "w-9 h-9 rounded-lg flex items-center justify-center text-indigo-400 bg-indigo-950/60 border border-indigo-800/40";
-                    iconEl.innerHTML = '<i class="fa-solid fa-chart-line"></i>';
-                    break;
-                case 'pengeluaran':
-                    titleEl.innerText = "PENGELUARAN LAIN-LAIN";
-                    iconEl.className = "w-9 h-9 rounded-lg flex items-center justify-center text-teal-400 bg-teal-950/60 border border-teal-800/40";
-                    iconEl.innerHTML = '<i class="fa-solid fa-receipt"></i>';
-                    btnTambah.classList.remove('hidden');
-                    btnTambah.querySelector('span').innerText = "TAMBAH PENGELUARAN (F5)";
-                    break;
-                case 'keuntungan':
-                    titleEl.innerText = "DASHBOARD ANALITIK KEUNTUNGAN";
-                    iconEl.className = "w-9 h-9 rounded-lg flex items-center justify-center text-rose-400 bg-rose-950/60 border border-rose-800/40";
-                    iconEl.innerHTML = '<i class="fa-solid fa-wallet"></i>';
-                    break;
-                case 'faktur':
-                    titleEl.innerText = "PENGATURAN TEMPLATE FAKTUR";
-                    iconEl.className = "w-9 h-9 rounded-lg flex items-center justify-center text-yellow-400 bg-yellow-950/60 border border-yellow-800/40";
-                    iconEl.innerHTML = '<i class="fa-solid fa-file-invoice-dollar"></i>';
-                    break;
-                case 'sync':
-                    titleEl.innerText = "SINKRONISASI GOOGLE SHEETS";
-                    iconEl.className = "w-9 h-9 rounded-lg flex items-center justify-center text-emerald-400 bg-emerald-950/60 border border-emerald-800/40";
-                    iconEl.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i>';
-                    break;
-            }
-        }
-
-        function renderSubMenuContent() {
-            const container = document.getElementById('subMenuContent');
-            container.innerHTML = '';
-
-            if (currentModule === 'stok') {
-                renderStokSubmenu(container);
-            } else if (currentModule === 'belanja') {
-                renderBelanjaHistorySubmenu(container);
-            } else if (currentModule === 'penjualan') {
-                renderPenjualanHistorySubmenu(container);
-            } else if (currentModule === 'perkiraan') {
-                renderPerkiraanBelanjaSubmenu(container);
-            } else if (currentModule === 'pengeluaran') {
-                renderPengeluaranSubmenu(container);
-            } else if (currentModule === 'keuntungan') {
-                renderKeuntunganSubmenu(container);
-            } else if (currentModule === 'faktur') {
-                renderPengaturanFakturSubmenu(container);
-            } else if (currentModule === 'sync') {
-                renderSyncSubmenu(container);
-            }
-        }
-
-        /* ================================================================== */
-        /* A. KATALOG STOK MODULE                                             */
-        /* ================================================================== */
-        function renderStokSubmenu(container) {
-            let html = `
-                <div class="space-y-3">
-                    <div class="flex gap-2">
-                        <input type="text" id="searchStok" oninput="filterStokTable()" placeholder="Cari Nama Barang / Barcode..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                    </div>
-                    <div id="stokListTable" class="space-y-2">
-                        <!-- Items list -->
-                    </div>
-                </div>
-            `;
-            container.innerHTML = html;
-            filterStokTable();
-        }
-
-        function filterStokTable() {
-            const query = (document.getElementById('searchStok')?.value || '').toLowerCase();
-            const listEl = document.getElementById('stokListTable');
-            if (!listEl) return;
-
-            const filtered = db.katalog.filter(item => 
-                item.nama.toLowerCase().includes(query) || item.barcode.toLowerCase().includes(query)
-            );
-
-            if (filtered.length === 0) {
-                listEl.innerHTML = `<div class="p-8 text-center text-gray-500 text-sm">Tidak ada data barang ditemukan.</div>`;
-                return;
-            }
-
-            let html = '';
-            filtered.forEach((item, index) => {
-                const isLow = item.qty <= item.minQty;
-                html += `
-                    <div onclick="openDetailStokItem('${item.barcode}')" class="bg-[#13151B] border ${isLow ? 'border-red-900/60 bg-red-950/10' : 'border-[#222630]'} p-4 rounded-xl flex items-center justify-between cursor-pointer hover:border-emerald-500/50 transition-all">
-                        <div>
-                            <div class="font-bold text-white text-sm uppercase">${item.nama}</div>
-                            <div class="text-xs text-gray-400 mt-1">Barcode: <span class="font-mono text-gray-300">${item.barcode}</span> &bull; Satuan: ${item.satuan}</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-black ${isLow ? 'text-red-400' : 'text-emerald-400'}">Qty: ${item.qty}</div>
-                            <div class="text-[11px] text-gray-400">Min: ${item.minQty}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            listEl.innerHTML = html;
-        }
-
-        function openDetailStokItem(barcode) {
-            const item = db.katalog.find(k => k.barcode === barcode);
-            if (!item) return;
-
-            currentSubState = 'form';
-            document.getElementById('viewSubMenu').classList.add('hidden');
-            document.getElementById('viewFormCart').classList.remove('hidden');
-
-            document.getElementById('formCartHeaderTitle').innerText = "DETAIL & EDIT STOK BARANG";
-
-            const container = document.getElementById('formCartContent');
-            container.innerHTML = `
-                <div class="space-y-4 text-xs sm:text-sm">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">BARCODE</label>
-                            <input type="text" id="editBarcode" value="${item.barcode}" readonly class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-mono text-gray-300">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">NAMA BARANG</label>
-                            <input type="text" id="editNama" value="${item.nama}" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold uppercase-input text-white">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">QTY STOK</label>
-                            <input type="text" id="editQty" value="${formatThousand(item.qty)}" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-emerald-400">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">MINIMAL QTY</label>
-                            <input type="text" id="editMinQty" value="${formatThousand(item.minQty)}" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-red-400">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">SATUAN</label>
-                            <input type="text" id="editSatuan" value="${item.satuan}" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 uppercase-input text-white">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">HARGA POKOK (HPP)</label>
-                            <input type="text" id="editHargaPokok" value="${formatThousand(item.hargaPokok)}" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-white">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">HARGA JUAL GROSIR</label>
-                            <input type="text" id="editHargaGrosir" value="${formatThousand(item.hargaGrosir)}" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-amber-400">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">HARGA JUAL RETAIL</label>
-                            <input type="text" id="editHargaRetail" value="${formatThousand(item.hargaRetail)}" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-emerald-400">
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3 pt-4 border-t border-gray-800">
-                        <button id="btnSubmitForm" onclick="saveEditedStokItem('${item.barcode}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg active:scale-95">
-                            <i class="fa-solid fa-floppy-disk"></i> SIMPAN PERUBAHAN (F8)
-                        </button>
-                        <button onclick="deleteStokItem('${item.barcode}')" class="px-4 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-800/40 rounded-xl font-bold transition-all">
-                            <i class="fa-solid fa-trash"></i> HAPUS
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function openFormKatalogItem() {
-            currentSubState = 'form';
-            document.getElementById('viewSubMenu').classList.add('hidden');
-            document.getElementById('viewFormCart').classList.remove('hidden');
-
-            document.getElementById('formCartHeaderTitle').innerText = "TAMBAH STOK BARANG BARU";
-
-            const container = document.getElementById('formCartContent');
-            container.innerHTML = `
-                <div class="space-y-4 text-xs sm:text-sm">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">BARCODE</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="inputBarcode" placeholder="Scan/Ketik Barcode..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-mono text-white">
-                                <button onclick="openCameraScanner('inputBarcode')" class="px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold flex items-center justify-center">
-                                    <i class="fa-solid fa-barcode text-lg"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">NAMA BARANG</label>
-                            <input type="text" id="inputNama" placeholder="Nama Barang..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold uppercase-input text-white">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">QTY awal</label>
-                            <input type="text" id="inputQty" placeholder="0" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-emerald-400">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">MINIMAL QTY STOK</label>
-                            <input type="text" id="inputMinQty" placeholder="10" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-red-400">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">SATUAN</label>
-                            <input type="text" id="inputSatuan" placeholder="PCS / DUS / KG" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 uppercase-input text-white">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">HARGA POKOK (HPP)</label>
-                            <input type="text" id="inputHargaPokok" placeholder="0" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-white">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">HARGA JUAL GROSIR</label>
-                            <input type="text" id="inputHargaGrosir" placeholder="0" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-amber-400">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-400 mb-1">HARGA JUAL RETAIL</label>
-                            <input type="text" id="inputHargaRetail" placeholder="0" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-bold text-emerald-400">
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3 pt-4 border-t border-gray-800">
-                        <button id="btnSubmitForm" onclick="saveNewKatalogItem()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg active:scale-95">
-                            <i class="fa-solid fa-floppy-disk"></i> SIMPAN BARANG (F8)
-                        </button>
-                        <button onclick="navBackFromForm()" class="px-5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl font-bold">
-                            BATAL
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function saveEditedStokItem(barcode) {
-            const item = db.katalog.find(k => k.barcode === barcode);
-            if (!item) return;
-
-            item.nama = document.getElementById('editNama').value.toUpperCase().trim();
-            item.qty = parseThousand(document.getElementById('editQty').value);
-            item.minQty = parseThousand(document.getElementById('editMinQty').value);
-            item.satuan = document.getElementById('editSatuan').value.toUpperCase().trim();
-            item.hargaPokok = parseThousand(document.getElementById('editHargaPokok').value);
-            item.hargaGrosir = parseThousand(document.getElementById('editHargaGrosir').value);
-            item.hargaRetail = parseThousand(document.getElementById('editHargaRetail').value);
-
-            saveDatabase();
-            navBackFromForm();
-        }
-
-        function saveNewKatalogItem() {
-            const barcode = document.getElementById('inputBarcode').value.trim();
-            const nama = document.getElementById('inputNama').value.toUpperCase().trim();
-
-            if (!barcode || !nama) {
-                alert("Barcode dan Nama Barang wajib diisi!");
-                return;
-            }
-
-            if (db.katalog.some(k => k.barcode === barcode)) {
-                alert("Barcode sudah terdaftar di Katalog!");
-                return;
-            }
-
-            const item = {
-                barcode: barcode,
-                nama: nama,
-                qty: parseThousand(document.getElementById('inputQty').value),
-                minQty: parseThousand(document.getElementById('inputMinQty').value) || 5,
-                satuan: document.getElementById('inputSatuan').value.toUpperCase().trim() || 'PCS',
-                hargaPokok: parseThousand(document.getElementById('inputHargaPokok').value),
-                hargaGrosir: parseThousand(document.getElementById('inputHargaGrosir').value),
-                hargaRetail: parseThousand(document.getElementById('inputHargaRetail').value)
-            };
-
-            db.katalog.push(item);
-            saveDatabase();
-            navBackFromForm();
-        }
-
-        function deleteStokItem(barcode) {
-            if (confirm("Hapus item ini dari katalog?")) {
-                db.katalog = db.katalog.filter(k => k.barcode !== barcode);
-                saveDatabase();
-                navBackFromForm();
-            }
-        }
-
-        /* ================================================================== */
-        /* B. BELANJA BARANG (RESTOK) MODULE                                  */
-        /* ================================================================== */
-        function renderBelanjaHistorySubmenu(container) {
-            let html = `
-                <div class="space-y-3">
-                    <div id="belanjaHistoryList" class="space-y-2">
-            `;
-
-            if (db.belanjaHistory.length === 0) {
-                html += `<div class="p-8 text-center text-gray-500 text-sm">Belum ada riwayat belanja barang.</div>`;
-            } else {
-                const sorted = [...db.belanjaHistory].reverse();
-                sorted.forEach(tr => {
-                    html += `
-                        <div onclick="openBelanjaCartDetail('${tr.id}')" class="bg-[#13151B] border border-[#222630] p-4 rounded-xl flex items-center justify-between cursor-pointer hover:border-purple-500/50 transition-all">
-                            <div>
-                                <div class="font-bold text-white text-sm">${tr.id}</div>
-                                <div class="text-xs text-gray-400 mt-1">${tr.tanggal} &bull; ${tr.items.length} Item</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-sm font-black text-purple-400">${formatToRupiah(tr.totalHarga)}</div>
-                                <span class="text-[10px] bg-purple-950 text-purple-300 border border-purple-800/40 px-2 py-0.5 rounded-full">RESTOK</span>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            html += `</div></div>`;
-            container.innerHTML = html;
-        }
-
-        function openFormBelanjaBaru() {
-            activeCartItems = [];
-            const autoId = 'BLJ-' + new Date().getTime().toString().slice(-8);
-            activeTransactionHeader = {
-                id: autoId,
-                tanggal: getTodayDateString()
-            };
-
-            renderBelanjaFormCartView();
-        }
-
-        function renderBelanjaFormCartView() {
-            currentSubState = 'cartDetail';
-            document.getElementById('viewSubMenu').classList.add('hidden');
-            document.getElementById('viewFormCart').classList.remove('hidden');
-
-            document.getElementById('formCartHeaderTitle').innerText = "FORM RESTOK BELANJA BARANG";
-
-            const container = document.getElementById('formCartContent');
-            
-            let totalQty = 0;
-            let totalHarga = 0;
-            activeCartItems.forEach(i => {
-                totalQty += i.qty;
-                totalHarga += i.totalHargaPerItem;
-            });
-
-            container.innerHTML = `
-                <div class="space-y-4 text-xs sm:text-sm">
-                    <!-- HEADER INFO -->
-                    <div class="grid grid-cols-2 gap-3 bg-gray-900/80 p-3 rounded-xl border border-gray-800">
-                        <div>
-                            <label class="block text-gray-400 font-bold mb-1">ID BELANJA</label>
-                            <input type="text" readonly value="${activeTransactionHeader.id}" class="w-full bg-transparent font-mono font-bold text-purple-400">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 font-bold mb-1">TANGGAL</label>
-                            <input type="date" value="${activeTransactionHeader.tanggal}" onchange="activeTransactionHeader.tanggal = this.value" class="w-full bg-gray-800 border border-gray-700 rounded p-1 text-white">
-                        </div>
-                    </div>
-
-                    <!-- FORM INPUT ITEM -->
-                    <div class="bg-purple-950/20 border border-purple-900/40 p-3 sm:p-4 rounded-xl space-y-3">
-                        <div class="font-bold text-purple-300 text-xs tracking-wider uppercase">INPUT ITEM BELANJA</div>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">BARCODE</label>
-                                <div class="flex gap-1">
-                                    <input type="text" id="bljBarcode" onchange="onBarcodeScanBelanja(this.value)" placeholder="Barcode..." class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white font-mono">
-                                    <button onclick="openCameraScanner('bljBarcode', onBarcodeScanBelanja)" class="px-3 bg-purple-600 text-white rounded font-bold">
-                                        <i class="fa-solid fa-barcode"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="sm:col-span-2 relative">
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">NAMA BARANG</label>
-                                <input type="text" id="bljNama" oninput="autocompleteBelanjaBarang(this.value)" placeholder="Ketik nama barang..." class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white uppercase-input">
-                                <div id="bljSuggestions" class="hidden absolute top-full left-0 right-0 bg-gray-900 border border-gray-700 rounded-b-xl z-20 max-h-40 overflow-y-auto shadow-xl"></div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">SATUAN</label>
-                                <input type="text" id="bljSatuan" readonly placeholder="PCS" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-gray-400 font-bold uppercase-input">
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">QTY</label>
-                                <input type="text" id="bljQty" placeholder="0" oninput="handleNumberInputFormatting(this); calcSubtotalBelanjaItem();" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-emerald-400 font-bold">
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">HARGA POKOK</label>
-                                <input type="text" id="bljHarga" placeholder="0" oninput="handleNumberInputFormatting(this); calcSubtotalBelanjaItem();" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white font-bold">
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">SUBTOTAL</label>
-                                <input type="text" id="bljSubtotal" readonly placeholder="0" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-purple-400 font-bold">
-                            </div>
-                        </div>
-
-                        <button onclick="addBelanjaItemToCart()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition-all shadow flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-cart-plus"></i> MASUKKAN KE KERANJANG (ENTER)
-                        </button>
-                    </div>
-
-                    <!-- KERANJANG BARANG LIST -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-gray-300">KERANJANG BELANJA</span>
-                            <span class="text-xs text-gray-400">${activeCartItems.length} Item</span>
-                        </div>
-
-                        <div id="belanjaCartItemsTable" class="space-y-2 max-h-60 overflow-y-auto">
-                            ${activeCartItems.length === 0 ? '<div class="p-4 text-center text-gray-600 bg-gray-900/50 rounded-xl">Keranjang masih kosong.</div>' : ''}
-                            ${activeCartItems.map((item, idx) => `
-                                <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <div class="font-bold text-white uppercase">${item.nama}</div>
-                                        <div class="text-xs text-gray-400">Qty: ${item.qty} ${item.satuan} &bull; @ ${formatToRupiah(item.hargaPokok)}</div>
-                                    </div>
-                                    <div class="flex items-center space-x-3">
-                                        <span class="font-bold text-purple-400 text-xs sm:text-sm">${formatToRupiah(item.totalHargaPerItem)}</span>
-                                        <button onclick="removeBelanjaCartItem(${idx})" class="text-red-400 hover:text-red-300 p-1">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <!-- TOTAL SUMMARY & CHECKOUT -->
-                    <div class="bg-gray-900/90 border border-gray-800 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div class="w-full sm:w-auto flex justify-between sm:justify-start gap-6 text-xs sm:text-sm">
-                            <div>TOTAL QTY: <span class="font-bold text-white">${totalQty}</span></div>
-                            <div>TOTAL HARGAB: <span class="font-bold text-purple-400 text-base sm:text-lg">${formatToRupiah(totalHarga)}</span></div>
-                        </div>
-                        <button id="btnSubmitForm" onclick="saveBelanjaTransaction()" class="w-full sm:w-auto px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95">
-                            <i class="fa-solid fa-floppy-disk"></i> SIMPAN & TAMBAH STOK (F8)
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function autocompleteBelanjaBarang(query) {
-            const suggestionsEl = document.getElementById('bljSuggestions');
-            if (!query) {
-                suggestionsEl.classList.add('hidden');
-                return;
-            }
-            const matches = db.katalog.filter(k => k.nama.toLowerCase().includes(query.toLowerCase()));
-            if (matches.length === 0) {
-                suggestionsEl.classList.add('hidden');
-                return;
-            }
-
-            let html = '';
-            matches.forEach(m => {
-                html += `
-                    <div onclick="selectBelanjaAutocomplete('${m.barcode}')" class="p-2.5 hover:bg-purple-900/50 cursor-pointer text-xs border-b border-gray-800 text-white flex justify-between">
-                        <span>${m.nama} (${m.satuan})</span>
-                        <span class="text-gray-400">Stok: ${m.qty}</span>
-                    </div>
-                `;
-            });
-            suggestionsEl.innerHTML = html;
-            suggestionsEl.classList.remove('hidden');
-        }
-
-        function selectBelanjaAutocomplete(barcode) {
-            const item = db.katalog.find(k => k.barcode === barcode);
-            if (item) {
-                document.getElementById('bljBarcode').value = item.barcode;
-                document.getElementById('bljNama').value = item.nama;
-                document.getElementById('bljSatuan').value = item.satuan;
-                document.getElementById('bljHarga').value = formatThousand(item.hargaPokok);
-            }
-            document.getElementById('bljSuggestions').classList.add('hidden');
-            document.getElementById('bljQty').focus();
-        }
-
-        function onBarcodeScanBelanja(code) {
-            const item = db.katalog.find(k => k.barcode === code);
-            if (item) {
-                document.getElementById('bljBarcode').value = item.barcode;
-                document.getElementById('bljNama').value = item.nama;
-                document.getElementById('bljSatuan').value = item.satuan;
-                document.getElementById('bljHarga').value = formatThousand(item.hargaPokok);
-                document.getElementById('bljQty').focus();
-            } else {
-                alert("Barcode tidak ditemukan di katalog stok!");
-            }
-        }
-
-        function calcSubtotalBelanjaItem() {
-            const qty = parseThousand(document.getElementById('bljQty').value);
-            const harga = parseThousand(document.getElementById('bljHarga').value);
-            document.getElementById('bljSubtotal').value = formatThousand(qty * harga);
-        }
-
-        function addBelanjaItemToCart() {
-            const barcode = document.getElementById('bljBarcode').value.trim();
-            const nama = document.getElementById('bljNama').value.toUpperCase().trim();
-            const satuan = document.getElementById('bljSatuan').value.toUpperCase().trim() || 'PCS';
-            const qty = parseThousand(document.getElementById('bljQty').value);
-            const harga = parseThousand(document.getElementById('bljHarga').value);
-
-            if (!nama || qty <= 0) {
-                alert("Nama Barang dan Qty harus valid!");
-                return;
-            }
-
-            activeCartItems.push({
-                barcode: barcode,
-                nama: nama,
-                satuan: satuan,
-                qty: qty,
-                hargaPokok: harga,
-                totalHargaPerItem: qty * harga
-            });
-
-            renderBelanjaFormCartView();
-            document.getElementById('bljNama').focus();
-        }
-
-        function removeBelanjaCartItem(index) {
-            activeCartItems.splice(index, 1);
-            renderBelanjaFormCartView();
-        }
-
-        function saveBelanjaTransaction() {
-            if (activeCartItems.length === 0) {
-                alert("Keranjang belanja masih kosong!");
-                return;
-            }
-
-            let totalHarga = activeCartItems.reduce((acc, curr) => acc + curr.totalHargaPerItem, 0);
-
-            const tr = {
-                id: activeTransactionHeader.id,
-                tanggal: activeTransactionHeader.tanggal,
-                totalHarga: totalHarga,
-                items: [...activeCartItems]
-            };
-
-            // Update Stock in Catalog automatically
-            activeCartItems.forEach(cartItem => {
-                let kat = db.katalog.find(k => k.barcode === cartItem.barcode || k.nama === cartItem.nama);
-                if (kat) {
-                    kat.qty += cartItem.qty;
-                } else {
-                    db.katalog.push({
-                        barcode: cartItem.barcode || 'NOBARCODE-' + Date.now(),
-                        nama: cartItem.nama,
-                        satuan: cartItem.satuan,
-                        qty: cartItem.qty,
-                        minQty: 5,
-                        hargaPokok: cartItem.hargaPokok,
-                        hargaGrosir: Math.round(cartItem.hargaPokok * 1.1),
-                        hargaRetail: Math.round(cartItem.hargaPokok * 1.15)
-                    });
-                }
-            });
-
-            db.belanjaHistory.push(tr);
-            saveDatabase();
-            navBackFromForm();
-        }
-
-        function openBelanjaCartDetail(id) {
-            const tr = db.belanjaHistory.find(b => b.id === id);
-            if (!tr) return;
-
-            activeTransactionHeader = { id: tr.id, tanggal: tr.tanggal };
-            activeCartItems = [...tr.items];
-            renderBelanjaFormCartView();
-        }
-
-        /* ================================================================== */
-        /* C. PENJUALAN BARANG MODULE                                         */
-        /* ================================================================== */
-        function renderPenjualanHistorySubmenu(container) {
-            let html = `
-                <div class="space-y-3">
-                    <div id="penjualanHistoryList" class="space-y-2">
-            `;
-
-            if (db.penjualanHistory.length === 0) {
-                html += `<div class="p-8 text-center text-gray-500 text-sm">Belum ada riwayat penjualan.</div>`;
-            } else {
-                const sorted = [...db.penjualanHistory].reverse();
-                sorted.forEach(tr => {
-                    html += `
-                        <div class="bg-[#13151B] border border-[#222630] p-4 rounded-xl flex items-center justify-between cursor-pointer hover:border-amber-500/50 transition-all">
-                            <div onclick="openPenjualanCartDetail('${tr.id}')" class="flex-1">
-                                <div class="font-bold text-white text-sm">${tr.id} <span class="text-xs font-normal text-amber-400">(${tr.tipeCustomer})</span></div>
-                                <div class="text-xs text-gray-400 mt-1">${tr.tanggal} &bull; ${tr.namaPembeli} &bull; ${tr.items.length} Item</div>
-                            </div>
-                            <div class="text-right flex items-center space-x-3">
-                                <div>
-                                    <div class="text-sm font-black text-amber-400">${formatToRupiah(tr.totalHarga)}</div>
-                                    <span class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800/40 px-2 py-0.5 rounded-full">TERJUAL</span>
-                                </div>
-                                <button onclick="event.stopPropagation(); printInvoicePDF('${tr.id}')" class="p-2 bg-amber-600/20 text-amber-400 hover:bg-amber-600 hover:text-white rounded-lg transition-all">
-                                    <i class="fa-solid fa-print"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            html += `</div></div>`;
-            container.innerHTML = html;
-        }
-
-        function openFormPenjualanBaru() {
-            activeCartItems = [];
-            const autoId = 'PJL-' + new Date().getTime().toString().slice(-8);
-            activeTransactionHeader = {
-                id: autoId,
-                tanggal: getTodayDateString(),
-                tipeCustomer: 'RETAIL',
-                namaPembeli: 'UMUM',
-                dibayar: 0
-            };
-
-            renderPenjualanFormCartView();
-        }
-
-        function renderPenjualanFormCartView() {
-            currentSubState = 'cartDetail';
-            document.getElementById('viewSubMenu').classList.add('hidden');
-            document.getElementById('viewFormCart').classList.remove('hidden');
-
-            document.getElementById('formCartHeaderTitle').innerText = "FORM TRANSAKSI PENJUALAN";
-
-            const container = document.getElementById('formCartContent');
-
-            let totalQty = 0;
-            let totalHarga = 0;
-            activeCartItems.forEach(i => {
-                totalQty += i.qty;
-                totalHarga += i.totalHargaPerItem;
-            });
-
-            const kembalian = (activeTransactionHeader.dibayar || 0) - totalHarga;
-
-            container.innerHTML = `
-                <div class="space-y-4 text-xs sm:text-sm">
-                    <!-- HEADER TRANSACTION INFO -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-900/80 p-3 rounded-xl border border-gray-800">
-                        <div>
-                            <label class="block text-gray-400 font-bold mb-1">ID PENJUALAN</label>
-                            <input type="text" readonly value="${activeTransactionHeader.id}" class="w-full bg-transparent font-mono font-bold text-amber-400">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 font-bold mb-1">TANGGAL</label>
-                            <input type="date" value="${activeTransactionHeader.tanggal}" onchange="activeTransactionHeader.tanggal = this.value" class="w-full bg-gray-800 border border-gray-700 rounded p-1 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 font-bold mb-1">TIPE CUSTOMER</label>
-                            <select onchange="activeTransactionHeader.tipeCustomer = this.value; renderPenjualanFormCartView();" class="w-full bg-gray-800 border border-gray-700 rounded p-1 text-amber-400 font-bold">
-                                <option value="RETAIL" ${activeTransactionHeader.tipeCustomer === 'RETAIL' ? 'selected' : ''}>RETAIL</option>
-                                <option value="GROSIR" ${activeTransactionHeader.tipeCustomer === 'GROSIR' ? 'selected' : ''}>GROSIR</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 font-bold mb-1">NAMA PEMBELI</label>
-                            <input type="text" value="${activeTransactionHeader.namaPembeli}" oninput="activeTransactionHeader.namaPembeli = this.value.toUpperCase()" class="w-full bg-gray-800 border border-gray-700 rounded p-1 text-white uppercase-input">
-                        </div>
-                    </div>
-
-                    <!-- FORM INPUT PENJUALAN ITEM -->
-                    <div class="bg-amber-950/20 border border-amber-900/40 p-3 sm:p-4 rounded-xl space-y-3">
-                        <div class="font-bold text-amber-300 text-xs tracking-wider uppercase">INPUT ITEM KASIR</div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">BARCODE</label>
-                                <div class="flex gap-1">
-                                    <input type="text" id="pjlBarcode" onchange="onBarcodeScanPenjualan(this.value)" placeholder="Barcode..." class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white font-mono">
-                                    <button onclick="openCameraScanner('pjlBarcode', onBarcodeScanPenjualan)" class="px-3 bg-amber-600 text-white rounded font-bold">
-                                        <i class="fa-solid fa-barcode"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="sm:col-span-2 relative">
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">NAMA BARANG</label>
-                                <input type="text" id="pjlNama" oninput="autocompletePenjualanBarang(this.value)" placeholder="Ketik nama barang..." class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white uppercase-input">
-                                <div id="pjlSuggestions" class="hidden absolute top-full left-0 right-0 bg-gray-900 border border-gray-700 rounded-b-xl z-20 max-h-40 overflow-y-auto shadow-xl"></div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">SATUAN</label>
-                                <input type="text" id="pjlSatuan" readonly placeholder="PCS" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-gray-400 font-bold uppercase-input">
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">QTY</label>
-                                <input type="text" id="pjlQty" placeholder="1" oninput="handleNumberInputFormatting(this); calcSubtotalPenjualanItem();" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-emerald-400 font-bold">
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">HARGA (${activeTransactionHeader.tipeCustomer})</label>
-                                <input type="text" id="pjlHarga" readonly placeholder="0" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-amber-400 font-bold">
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 text-[11px] font-bold mb-1">SUBTOTAL</label>
-                                <input type="text" id="pjlSubtotal" readonly placeholder="0" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-amber-400 font-bold">
-                            </div>
-                        </div>
-
-                        <button onclick="addPenjualanItemToCart()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition-all shadow flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-cart-plus"></i> MASUKKAN KERANJANG (ENTER)
-                        </button>
-                    </div>
-
-                    <!-- CART TABLE -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-gray-300">KERANJANG TRANSAKSI</span>
-                            <span class="text-xs text-gray-400">${activeCartItems.length} Item</span>
-                        </div>
-
-                        <div class="space-y-2 max-h-60 overflow-y-auto">
-                            ${activeCartItems.length === 0 ? '<div class="p-4 text-center text-gray-600 bg-gray-900/50 rounded-xl">Keranjang belanja kosong.</div>' : ''}
-                            ${activeCartItems.map((item, idx) => `
-                                <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <div class="font-bold text-white uppercase">${item.nama}</div>
-                                        <div class="text-xs text-gray-400">Qty: ${item.qty} ${item.satuan} &bull; @ ${formatToRupiah(item.hargaJual)}</div>
-                                    </div>
-                                    <div class="flex items-center space-x-3">
-                                        <span class="font-bold text-amber-400 text-xs sm:text-sm">${formatToRupiah(item.totalHargaPerItem)}</span>
-                                        <button onclick="removePenjualanCartItem(${idx})" class="text-red-400 hover:text-red-300 p-1">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <!-- PAYMENT SECTION -->
-                    <div class="bg-gray-900/90 border border-gray-800 p-4 rounded-xl space-y-3">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-gray-400 text-xs font-bold mb-1">TOTAL BAYAR</label>
-                                <div class="text-xl font-black text-amber-400">${formatToRupiah(totalHarga)}</div>
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 text-xs font-bold mb-1">DIBAYAR (CASH)</label>
-                                <input type="text" value="${formatThousand(activeTransactionHeader.dibayar)}" oninput="handleNumberInputFormatting(this); activeTransactionHeader.dibayar = parseThousand(this.value); renderPenjualanFormCartView();" placeholder="0" class="w-full bg-gray-800 border border-amber-500/50 rounded p-2 text-white font-bold text-lg">
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 text-xs font-bold mb-1">KEMBALIAN</label>
-                                <div class="text-xl font-black ${kembalian >= 0 ? 'text-emerald-400' : 'text-red-400'}">${formatToRupiah(kembalian)}</div>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2 pt-2">
-                            <button id="btnSubmitForm" onclick="savePenjualanTransaction()" class="flex-1 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95 text-sm sm:text-base">
-                                <i class="fa-solid fa-floppy-disk"></i> SIMPAN & KURANGI STOK (F8)
-                            </button>
-                            <button onclick="printInvoicePDF(activeTransactionHeader.id)" class="px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl flex items-center justify-center">
-                                <i class="fa-solid fa-print text-lg"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function autocompletePenjualanBarang(query) {
-            const suggestionsEl = document.getElementById('pjlSuggestions');
-            if (!query) {
-                suggestionsEl.classList.add('hidden');
-                return;
-            }
-            const matches = db.katalog.filter(k => k.nama.toLowerCase().includes(query.toLowerCase()));
-            if (matches.length === 0) {
-                suggestionsEl.classList.add('hidden');
-                return;
-            }
-
-            let html = '';
-            matches.forEach(m => {
-                const harga = activeTransactionHeader.tipeCustomer === 'GROSIR' ? m.hargaGrosir : m.hargaRetail;
-                html += `
-                    <div onclick="selectPenjualanAutocomplete('${m.barcode}')" class="p-2.5 hover:bg-amber-900/50 cursor-pointer text-xs border-b border-gray-800 text-white flex justify-between">
-                        <span>${m.nama} (${m.satuan})</span>
-                        <span class="text-amber-400 font-bold">${formatToRupiah(harga)} &bull; Stok: ${m.qty}</span>
-                    </div>
-                `;
-            });
-            suggestionsEl.innerHTML = html;
-            suggestionsEl.classList.remove('hidden');
-        }
-
-        function selectPenjualanAutocomplete(barcode) {
-            const item = db.katalog.find(k => k.barcode === barcode);
-            if (item) {
-                const harga = activeTransactionHeader.tipeCustomer === 'GROSIR' ? item.hargaGrosir : item.hargaRetail;
-                document.getElementById('pjlBarcode').value = item.barcode;
-                document.getElementById('pjlNama').value = item.nama;
-                document.getElementById('pjlSatuan').value = item.satuan;
-                document.getElementById('pjlHarga').value = formatThousand(harga);
-                document.getElementById('pjlQty').value = '1';
-                calcSubtotalPenjualanItem();
-            }
-            document.getElementById('pjlSuggestions').classList.add('hidden');
-            document.getElementById('pjlQty').focus();
-        }
-
-        function onBarcodeScanPenjualan(code) {
-            const item = db.katalog.find(k => k.barcode === code);
-            if (item) {
-                const harga = activeTransactionHeader.tipeCustomer === 'GROSIR' ? item.hargaGrosir : item.hargaRetail;
-                document.getElementById('pjlBarcode').value = item.barcode;
-                document.getElementById('pjlNama').value = item.nama;
-                document.getElementById('pjlSatuan').value = item.satuan;
-                document.getElementById('pjlHarga').value = formatThousand(harga);
-                document.getElementById('pjlQty').value = '1';
-                calcSubtotalPenjualanItem();
-                document.getElementById('pjlQty').focus();
-            } else {
-                alert("Barcode tidak ditemukan di Katalog!");
-            }
-        }
-
-        function calcSubtotalPenjualanItem() {
-            const qty = parseThousand(document.getElementById('pjlQty').value);
-            const harga = parseThousand(document.getElementById('pjlHarga').value);
-            document.getElementById('pjlSubtotal').value = formatThousand(qty * harga);
-        }
-
-        function addPenjualanItemToCart() {
-            const barcode = document.getElementById('pjlBarcode').value.trim();
-            const nama = document.getElementById('pjlNama').value.toUpperCase().trim();
-            const satuan = document.getElementById('pjlSatuan').value.toUpperCase().trim() || 'PCS';
-            const qty = parseThousand(document.getElementById('pjlQty').value);
-            const harga = parseThousand(document.getElementById('pjlHarga').value);
-
-            if (!nama || qty <= 0) {
-                alert("Pilih barang dan jumlah qty valid!");
-                return;
-            }
-
-            // Check stock available
-            const itemKatalog = db.katalog.find(k => k.barcode === barcode || k.nama === nama);
-            if (itemKatalog && itemKatalog.qty < qty) {
-                if (!confirm(`Stok tersisa hanya ${itemKatalog.qty}. Tetap lanjutkan penjualan?`)) return;
-            }
-
-            activeCartItems.push({
-                barcode: barcode,
-                nama: nama,
-                satuan: satuan,
-                qty: qty,
-                hargaJual: harga,
-                hargaPokok: itemKatalog ? itemKatalog.hargaPokok : 0,
-                totalHargaPerItem: qty * harga
-            });
-
-            renderPenjualanFormCartView();
-            document.getElementById('pjlNama').focus();
-        }
-
-        function removePenjualanCartItem(idx) {
-            activeCartItems.splice(idx, 1);
-            renderPenjualanFormCartView();
-        }
-
-        function savePenjualanTransaction() {
-            if (activeCartItems.length === 0) {
-                alert("Keranjang kasir masih kosong!");
-                return;
-            }
-
-            let totalHarga = activeCartItems.reduce((acc, curr) => acc + curr.totalHargaPerItem, 0);
-
-            const tr = {
-                id: activeTransactionHeader.id,
-                tanggal: activeTransactionHeader.tanggal,
-                tipeCustomer: activeTransactionHeader.tipeCustomer,
-                namaPembeli: activeTransactionHeader.namaPembeli || 'UMUM',
-                totalHarga: totalHarga,
-                dibayar: activeTransactionHeader.dibayar || totalHarga,
-                items: [...activeCartItems]
-            };
-
-            // Deduct Stock from Catalog
-            activeCartItems.forEach(cartItem => {
-                let kat = db.katalog.find(k => k.barcode === cartItem.barcode || k.nama === cartItem.nama);
-                if (kat) {
-                    kat.qty = Math.max(0, kat.qty - cartItem.qty);
-                }
-            });
-
-            db.penjualanHistory.push(tr);
-            saveDatabase();
-            navBackFromForm();
-        }
-
-        function openPenjualanCartDetail(id) {
-            const tr = db.penjualanHistory.find(p => p.id === id);
-            if (!tr) return;
-
-            activeTransactionHeader = {
-                id: tr.id,
-                tanggal: tr.tanggal,
-                tipeCustomer: tr.tipeCustomer,
-                namaPembeli: tr.namaPembeli,
-                dibayar: tr.dibayar
-            };
-            activeCartItems = [...tr.items];
-            renderPenjualanFormCartView();
-        }
-
-        /* ================================================================== */
-        /* D. PERKIRAAN BELANJA MODULE                                        */
-        /* ================================================================== */
-        function renderPerkiraanBelanjaSubmenu(container) {
-            const lowStockItems = db.katalog.filter(k => k.qty <= k.minQty);
-
-            let html = `
-                <div class="space-y-3">
-                    <div class="bg-indigo-950/30 border border-indigo-900/50 p-4 rounded-xl flex items-center justify-between text-xs sm:text-sm">
-                        <span class="text-indigo-300 font-bold"><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>ITEM DENGAN STOK MINIMAL</span>
-                        <span class="bg-indigo-900 text-indigo-200 px-3 py-1 rounded-full font-mono font-bold">${lowStockItems.length} Produk</span>
-                    </div>
-
-                    <div class="space-y-2">
-                        ${lowStockItems.length === 0 ? '<div class="p-8 text-center text-gray-500 text-sm">Semua stok barang masih tercukupi di atas minimal stok.</div>' : ''}
-                        ${lowStockItems.map(item => {
-                            const reorderQty = Math.max(10, (item.minQty * 2) - item.qty);
-                            return `
-                                <div class="bg-[#13151B] border border-[#222630] p-4 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <div class="font-bold text-white uppercase text-sm">${item.nama}</div>
-                                        <div class="text-xs text-gray-400 mt-0.5">Stok Saat Ini: <span class="text-red-400 font-bold">${item.qty}</span> &bull; Minimal: ${item.minQty} ${item.satuan}</div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xs text-gray-400">Rekomendasi Beli:</div>
-                                        <div class="text-sm font-black text-indigo-400">${reorderQty} ${item.satuan}</div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                </div>
-            `;
-            container.innerHTML = html;
-        }
-
-        /* ================================================================== */
-        /* E. PENGELUARAN LAIN MODULE                                         */
-        /* ================================================================== */
-        function renderPengeluaranSubmenu(container) {
-            let html = `
-                <div class="space-y-3">
-                    <div class="space-y-2">
-            `;
-
-            if (db.pengeluaranHistory.length === 0) {
-                html += `<div class="p-8 text-center text-gray-500 text-sm">Belum ada catatan pengeluaran lain.</div>`;
-            } else {
-                const sorted = [...db.pengeluaranHistory].reverse();
-                sorted.forEach((p, idx) => {
-                    html += `
-                        <div class="bg-[#13151B] border border-[#222630] p-4 rounded-xl flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-white uppercase text-sm">${p.keterangan}</div>
-                                <div class="text-xs text-gray-400 mt-1">${p.tanggal}</div>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <span class="font-bold text-teal-400 text-sm">${formatToRupiah(p.jumlah)}</span>
-                                <button onclick="deletePengeluaran(${idx})" class="p-1.5 text-red-400 hover:text-red-300">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            html += `</div></div>`;
-            container.innerHTML = html;
-        }
-
-        function openFormPengeluaranBaru() {
-            currentSubState = 'form';
-            document.getElementById('viewSubMenu').classList.add('hidden');
-            document.getElementById('viewFormCart').classList.remove('hidden');
-
-            document.getElementById('formCartHeaderTitle').innerText = "INPUT PENGELUARAN LAIN-LAIN";
-
-            const container = document.getElementById('formCartContent');
-            container.innerHTML = `
-                <div class="space-y-4 text-xs sm:text-sm">
-                    <div>
-                        <label class="block font-bold text-gray-400 mb-1">TANGGAL</label>
-                        <input type="date" id="pnlTanggal" value="${getTodayDateString()}" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 text-white font-bold">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-400 mb-1">KETERANGAN PENGELUARAN</label>
-                        <input type="text" id="pnlKet" placeholder="Contoh: Bayar Listrik Toko / Beli Plastik..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 uppercase-input text-white font-bold">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-400 mb-1">JUMLAH (RP)</label>
-                        <input type="text" id="pnlJumlah" placeholder="0" oninput="handleNumberInputFormatting(this)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 text-teal-400 font-bold text-lg">
-                    </div>
-
-                    <div class="flex gap-3 pt-4 border-t border-gray-800">
-                        <button id="btnSubmitForm" onclick="savePengeluaranBaru()" class="flex-1 bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg active:scale-95">
-                            <i class="fa-solid fa-floppy-disk"></i> SIMPAN PENGELUARAN (F8)
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function savePengeluaranBaru() {
-            const tgl = document.getElementById('pnlTanggal').value;
-            const ket = document.getElementById('pnlKet').value.toUpperCase().trim();
-            const jml = parseThousand(document.getElementById('pnlJumlah').value);
-
-            if (!ket || jml <= 0) {
-                alert("Isi Keterangan dan Jumlah pengeluaran valid!");
-                return;
-            }
-
-            db.pengeluaranHistory.push({
-                tanggal: tgl,
-                keterangan: ket,
-                jumlah: jml
-            });
-
-            saveDatabase();
-            navBackFromForm();
-        }
-
-        function deletePengeluaran(idx) {
-            if (confirm("Hapus catatan pengeluaran ini?")) {
-                db.pengeluaranHistory.splice(idx, 1);
-                saveDatabase();
-                renderSubMenuContent();
-            }
-        }
-
-        /* ================================================================== */
-        /* F. KEUNTUNGAN (DASHBOARD ANALITIK) MODULE                         */
-        /* ================================================================== */
-        function renderKeuntunganSubmenu(container) {
-            const now = new Date();
-            const yesterdayStr = new Date(now.setDate(now.getDate() - 1)).toISOString().split('T')[0];
-            const currentMonthStr = new Date().toISOString().slice(0, 7);
-
-            // Calculations
-            let labaYesterday = 0;
-            let expYesterday = 0;
-            let labaMonth = 0;
-            let expMonth = 0;
-
-            // Daily sales profit calculation
-            db.penjualanHistory.forEach(p => {
-                let grossProfit = 0;
-                p.items.forEach(i => {
-                    grossProfit += (i.hargaJual - (i.hargaPokok || 0)) * i.qty;
-                });
-
-                if (p.tanggal === yesterdayStr) {
-                    labaYesterday += grossProfit;
-                }
-                if (p.tanggal.startsWith(currentMonthStr)) {
-                    labaMonth += grossProfit;
-                }
-            });
-
-            db.pengeluaranHistory.forEach(p => {
-                if (p.tanggal === yesterdayStr) expYesterday += p.jumlah;
-                if (p.tanggal.startsWith(currentMonthStr)) expMonth += p.jumlah;
-            });
-
-            let html = `
-                <div class="space-y-6">
-                    <!-- RINGKASAN CARDS (2x2) -->
-                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                        <div class="bg-[#13151B] border border-emerald-900/40 p-4 rounded-xl">
-                            <div class="text-[11px] font-bold text-gray-400">LABA BERSIH KEMARIN</div>
-                            <div class="text-base sm:text-lg font-black text-emerald-400 mt-1">${formatToRupiah(labaYesterday - expYesterday)}</div>
-                        </div>
-                        <div class="bg-[#13151B] border border-blue-900/40 p-4 rounded-xl">
-                            <div class="text-[11px] font-bold text-gray-400">LABA BERSIH BULAN INI</div>
-                            <div class="text-base sm:text-lg font-black text-blue-400 mt-1">${formatToRupiah(labaMonth - expMonth)}</div>
-                        </div>
-                        <div class="bg-[#13151B] border border-teal-900/40 p-4 rounded-xl">
-                            <div class="text-[11px] font-bold text-gray-400">PENGELUARAN KEMARIN</div>
-                            <div class="text-base sm:text-lg font-black text-teal-400 mt-1">${formatToRupiah(expYesterday)}</div>
-                        </div>
-                        <div class="bg-[#13151B] border border-rose-900/40 p-4 rounded-xl">
-                            <div class="text-[11px] font-bold text-gray-400">PENGELUARAN BULAN INI</div>
-                            <div class="text-base sm:text-lg font-black text-rose-400 mt-1">${formatToRupiah(expMonth)}</div>
-                        </div>
-                    </div>
-
-                    <!-- GRAFIK KEUNTUNGAN BULANAN -->
-                    <div class="bg-[#13151B] border border-[#222630] p-4 rounded-xl space-y-3">
-                        <div class="font-bold text-xs uppercase text-gray-300">GRAFIK KEUNTUNGAN BULANAN (TAHUN BERJALAN)</div>
-                        <div class="relative h-64">
-                            <canvas id="profitChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- TABLE RIWAYAT PERTANGGAL -->
-                    <div class="space-y-2">
-                        <div class="font-bold text-xs uppercase text-gray-300">RINCIAN KEUNTUNGAN HARIAN</div>
-                        <div id="profitDailyTable" class="space-y-2">
-                            <!-- Injected by script -->
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            container.innerHTML = html;
-            initProfitChartAndTable();
-        }
-
-        function initProfitChartAndTable() {
-            const ctx = document.getElementById('profitChart')?.getContext('2d');
-            if (!ctx) return;
-
-            // Monthly stats aggregation
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
-            const monthlyData = new Array(12).fill(0);
-
-            const currentYear = new Date().getFullYear().toString();
-
-            db.penjualanHistory.forEach(p => {
-                if (p.tanggal.startsWith(currentYear)) {
-                    const mIdx = parseInt(p.tanggal.split('-')[1], 10) - 1;
-                    let grossProfit = 0;
-                    p.items.forEach(i => grossProfit += (i.hargaJual - (i.hargaPokok || 0)) * i.qty);
-                    monthlyData[mIdx] += grossProfit;
-                }
-            });
-
-            db.pengeluaranHistory.forEach(p => {
-                if (p.tanggal.startsWith(currentYear)) {
-                    const mIdx = parseInt(p.tanggal.split('-')[1], 10) - 1;
-                    monthlyData[mIdx] -= p.jumlah;
-                }
-            });
-
-            // Color gradient mapping: Red (low < 1m), Yellow (med 1m - 5m), Green (high > 5m)
-            const bgColors = monthlyData.map(val => {
-                if (val <= 1000000) return 'rgba(239, 68, 68, 0.8)';
-                if (val <= 5000000) return 'rgba(245, 158, 11, 0.8)';
-                return 'rgba(16, 185, 129, 0.8)';
-            });
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: months,
-                    datasets: [{
-                        label: 'Laba Bersih (Rp)',
-                        data: monthlyData,
-                        backgroundColor: bgColors,
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { ticks: { color: '#9CA3AF' }, grid: { color: '#1F2937' } },
-                        x: { ticks: { color: '#9CA3AF' }, grid: { display: false } }
-                    }
-                }
-            });
-
-            // Render Daily List
-            const tableEl = document.getElementById('profitDailyTable');
-            const dates = [...new Set([
-                ...db.penjualanHistory.map(p => p.tanggal),
-                ...db.pengeluaranHistory.map(p => p.tanggal)
-            ])].sort().reverse();
-
-            if (dates.length === 0) {
-                tableEl.innerHTML = `<div class="p-4 text-center text-gray-500 text-xs">Belum ada transaksi recorded.</div>`;
-                return;
-            }
-
-            let html = '';
-            dates.forEach(dt => {
-                let labaKotor = 0;
-                db.penjualanHistory.filter(p => p.tanggal === dt).forEach(p => {
-                    p.items.forEach(i => labaKotor += (i.hargaJual - (i.hargaPokok || 0)) * i.qty);
-                });
-
-                let exp = 0;
-                db.pengeluaranHistory.filter(p => p.tanggal === dt).forEach(p => exp += p.jumlah);
-
-                let labaBersih = labaKotor - exp;
-
-                html += `
-                    <div class="bg-[#13151B] border border-[#222630] p-3 rounded-xl flex items-center justify-between text-xs">
-                        <div>
-                            <div class="font-bold text-white">${dt}</div>
-                            <div class="text-[11px] text-gray-400 mt-0.5">Laba Kotor: ${formatToRupiah(labaKotor)} &bull; Pengeluaran: ${formatToRupiah(exp)}</div>
-                        </div>
-                        <div class="text-right font-black ${labaBersih >= 0 ? 'text-emerald-400' : 'text-red-400'} text-sm">
-                            ${formatToRupiah(labaBersih)}
-                        </div>
-                    </div>
-                `;
-            });
-            tableEl.innerHTML = html;
-        }
-
-        /* ================================================================== */
-        /* H. PENGATURAN FAKTUR GOOGLE DOCS                                  */
-        /* ================================================================== */
-        function renderPengaturanFakturSubmenu(container) {
-            let html = `
-                <div class="space-y-4 text-xs sm:text-sm">
-                    <div class="bg-yellow-950/20 border border-yellow-800/40 p-4 rounded-xl space-y-2">
-                        <div class="font-bold text-yellow-400 flex items-center gap-2">
-                            <i class="fa-solid fa-file-invoice"></i> TEMPLATE FAKTUR GOOGLE DOCUMENTS
-                        </div>
-                        <p class="text-gray-300">
-                            Faktur penjualan menggunakan format standar ARYA GROSIR dengan Header Logo, Nomor WA: <b>089670179464</b>, Rincian Barang (Nama, Qty, Harga Jual, Total), serta Stempel Watermark <b>"LUNAS"</b>.
-                        </p>
-                    </div>
-
-                    <div class="bg-[#13151B] border border-[#222630] p-4 rounded-xl space-y-3">
-                        <label class="block font-bold text-gray-300">TAUTAN EDIT GOOGLE DOCS TEMPLATE FAKTUR:</label>
-                        <input type="text" readonly value="https://docs.google.com/document/d/1ExampleInvoiceAryaGrosirTemplate/edit" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-mono text-gray-400 text-xs">
-                        <a href="https://docs.google.com" target="_blank" class="inline-block px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-lg transition-all">
-                            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Buka Google Docs Editor
-                        </a>
-                    </div>
-                </div>
-            `;
-            container.innerHTML = html;
-        }
-
-        /* ================================================================== */
-        /* F/G. SINKRONISASI SPREADSHEET MODULE                              */
-        /* ================================================================== */
-        function renderSyncSubmenu(container) {
-            let html = `
-                <div class="space-y-4 text-xs sm:text-sm">
-                    <div class="bg-[#13151B] border border-[#222630] p-4 rounded-xl space-y-3">
-                        <label class="block font-bold text-gray-300">GOOGLE APPS SCRIPT WEB APP URL:</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="gasUrlInput" value="${db.gasUrl || ''}" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 font-mono text-white text-xs">
-                            <button onclick="saveGasUrl()" class="px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg">SIMPAN</button>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button onclick="syncPushToSheets()" class="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg">
-                            <i class="fa-solid fa-cloud-arrow-up text-lg"></i> KIRIM / BACKUP DATA (PUSH)
-                        </button>
-                        <button onclick="syncPullFromSheets()" class="py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg">
-                            <i class="fa-solid fa-cloud-arrow-down text-lg"></i> TARIK DATA SPREADSHEET (PULL)
-                        </button>
-                    </div>
-
-                    <!-- GAS SCRIPT CODE TEMPLATE -->
-                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-gray-300 text-xs">KODE GOOGLE APPS SCRIPT (Copy-Paste ke Google Sheets)</span>
-                            <button onclick="copyGasScriptToClipboard()" class="px-2.5 py-1 bg-gray-800 text-emerald-400 hover:bg-gray-700 rounded text-xs font-bold">
-                                <i class="fa-solid fa-copy"></i> SALIN KODE
-                            </button>
-                        </div>
-                        <textarea id="gasScriptCode" readonly class="w-full h-40 bg-black text-emerald-400 font-mono text-[10px] p-3 rounded-lg border border-gray-800">
-// KODE GOOGLE APPS SCRIPT ARYA GROSIR
-function doPost(e) {
-  var data = JSON.parse(e.postData.contents);
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  
-  // Update Katalog
-  if(data.katalog) updateSheet(ss, "KATALOG BARANG", data.katalog);
-  if(data.belanja) updateSheet(ss, "BELANJA", data.belanja);
-  if(data.penjualan) updateSheet(ss, "PENJUALAN", data.penjualan);
-  if(data.pengeluaran) updateSheet(ss, "PENGELUARAN LAIN", data.pengeluaran);
-  
-  return ContentService.createTextOutput(JSON.stringify({status: "SUCCESS"})).setMimeType(ContentService.MimeType.JSON);
+        <!-- Sync Action Buttons -->
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button onclick="triggerSyncPush()" class="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold p-3 rounded-xl text-sm transition-all active:scale-95 shadow-md">
+            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+            <span>Kirim Data (Backup)</span>
+          </button>
+          <button onclick="triggerSyncPull()" class="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold p-3 rounded-xl text-sm transition-all active:scale-95 shadow-md">
+            <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
+            <span>Tarik Data (Sync)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sync Logs History -->
+      <div class="bg-[#121218] p-4 rounded-2xl border border-[#232330]">
+        <h3 class="text-xs font-bold text-gray-300 mb-2 uppercase">Riwayat Sinkronisasi</h3>
+        <div id="syncLogsContainer" class="text-xs font-mono bg-[#09090d] p-3 rounded-xl border border-[#232330] max-h-36 overflow-y-auto space-y-1 text-gray-400">
+          <div>[INFO] Belum ada aktivitas sinkronisasi.</div>
+        </div>
+      </div>
+
+      <!-- Setup Guide & Apps Script Code -->
+      <div class="bg-[#121218] p-5 rounded-2xl border border-[#232330] space-y-3">
+        <h3 class="text-sm font-bold text-amber-400 flex items-center gap-2">
+          <i class="fa-solid fa-book"></i>
+          <span>Panduan Setup Google Apps Script</span>
+        </h3>
+        <ol class="list-decimal list-inside text-xs text-gray-300 space-y-1.5 leading-relaxed">
+          <li>Buat Google Sheets baru di Google Drive Anda.</li>
+          <li>Buat sheet/tab sesuai nama berikut: <code class="text-amber-300">KATALOG BARANG</code>, <code class="text-amber-300">BELANJA</code>, <code class="text-amber-300">PENJUALAN</code>, <code class="text-amber-300">PERKIRAAN BELANJA</code>, <code class="text-amber-300">PENGELUARAN LAIN</code>, <code class="text-amber-300">KEUNTUNGAN HARIAN</code>, <code class="text-amber-300">KEUNTUNGAN PERBULAN</code>, <code class="text-amber-300">SINGKRONISASI</code>.</li>
+          <li>Buka <strong class="text-white">Ekstensi > Apps Script</strong>, hapus kode lama, lalu paste kode di bawah ini.</li>
+          <li>Klik <strong class="text-white">Deploy > Deployment baru</strong>, pilih jenis <strong class="text-white">Web App</strong>, atur akses ke <strong class="text-white">"Siapa Saja / Anyone"</strong>, lalu deploy dan salin Web App URL ke kolom di atas.</li>
+        </ol>
+
+        <div class="relative mt-2">
+          <pre class="bg-[#050508] p-3 rounded-xl border border-[#232330] text-[11px] font-mono text-emerald-400 overflow-x-auto max-h-48">
+function doGet(e) {
+  var action = e.parameter.action;
+  if(action === "getData") {
+    return ContentService.createTextOutput(JSON.stringify(getAllData()))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput("ARYA GROSIR Apps Script Ready");
 }
 
-function updateSheet(ss, sheetName, rows) {
-  var sheet = ss.getSheetByName(sheetName);
-  if(!sheet) sheet = ss.insertSheet(sheetName);
-  sheet.clear();
-  if(rows.length > 0) {
-    sheet.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    saveAllData(data);
+    return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({status: "error", message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }
-                        </textarea>
-                    </div>
+
+function getAllData() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  return {
+    katalog: getSheetData(ss, "KATALOG BARANG"),
+    belanja: getSheetData(ss, "BELANJA"),
+    penjualan: getSheetData(ss, "PENJUALAN"),
+    pengeluaran: getSheetData(ss, "PENGELUARAN LAIN")
+  };
+}
+
+function getSheetData(ss, sheetName) {
+  var sheet = ss.getSheetByName(sheetName);
+  if(!sheet) return [];
+  var values = sheet.getDataRange().getValues();
+  if(values.length < 2) return [];
+  var headers = values[0];
+  var results = [];
+  for(var i=1; i<values.length; i++) {
+    var row = values[i];
+    var obj = {};
+    for(var j=0; j<headers.length; j++) {
+      obj[headers[j]] = row[j];
+    }
+    results.push(obj);
+  }
+  return results;
+}
+
+function saveAllData(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if(data.katalog) writeSheet(ss, "KATALOG BARANG", data.katalog);
+  if(data.belanja) writeSheet(ss, "BELANJA", data.belanja);
+  if(data.penjualan) writeSheet(ss, "PENJUALAN", data.penjualan);
+  if(data.pengeluaran) writeSheet(ss, "PENGELUARAN LAIN", data.pengeluaran);
+}
+
+function writeSheet(ss, sheetName, items) {
+  var sheet = ss.getSheetByName(sheetName);
+  if(!sheet) return;
+  sheet.clearContents();
+  if(items.length === 0) return;
+  var headers = Object.keys(items[0]);
+  sheet.appendRow(headers);
+  items.forEach(function(item){
+    var row = [];
+    headers.forEach(function(h){ row.push(item[h]); });
+    sheet.appendRow(row);
+  });
+}</pre>
+          <button onclick="copyAppsScriptCode()" class="absolute top-2 right-2 bg-amber-500 text-black text-xs font-bold px-2.5 py-1 rounded-lg">
+            <i class="fa-solid fa-copy"></i> Copy Kode
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- BARCODE SCANNER FULLSCREEN MODAL -->
+  <div id="modalBarcodeScanner" class="fixed inset-0 bg-black/95 z-50 hidden flex-col justify-between p-4">
+    <div class="flex items-center justify-between z-10">
+      <div class="text-white font-bold text-sm flex items-center gap-2">
+        <i class="fa-solid fa-barcode text-amber-400"></i>
+        <span>CAMERA SCANNER BARCODE</span>
+      </div>
+      <button onclick="closeBarcodeScanner()" class="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center font-bold">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Scanner Viewport -->
+    <div class="relative w-full max-w-sm mx-auto my-auto aspect-square bg-black rounded-2xl overflow-hidden border-2 border-amber-500 shadow-2xl">
+      <div id="reader" class="w-full h-full"></div>
+      <div class="absolute inset-0 border-2 border-dashed border-amber-400/50 pointer-events-none flex items-center justify-center">
+        <span class="text-xs text-amber-300 bg-black/60 px-3 py-1 rounded-full">Arahkan Barcode ke Dalam Kotak</span>
+      </div>
+    </div>
+
+    <!-- Scanner Controls -->
+    <div class="flex items-center justify-center gap-4 z-10 pb-4">
+      <button onclick="toggleTorch()" class="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-amber-400 font-bold px-5 py-2.5 rounded-xl text-sm border border-gray-700">
+        <i class="fa-solid fa-bolt"></i> Toggle Senter
+      </button>
+    </div>
+  </div>
+
+  <!-- PRINTABLE INVOICE RECEIPT MODAL -->
+  <div id="modalPrintInvoice" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-black p-6 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
+      <button onclick="closeInvoiceModal()" class="no-print absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-200 text-gray-800 flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div id="printArea" class="relative">
+        <!-- Injected Printable Receipt -->
+      </div>
+
+      <div class="no-print mt-5 flex gap-3">
+        <button onclick="window.print()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold py-3 rounded-xl flex items-center justify-center gap-2">
+          <i class="fa-solid fa-print"></i> Cetak Faktur (PDF)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // LOCAL STORAGE KEYS & IN-MEMORY STATE
+    const STORAGE_KEY_KATALOG = 'arya_pos_katalog';
+    const STORAGE_KEY_BELANJA = 'arya_pos_belanja';
+    const STORAGE_KEY_PENJUALAN = 'arya_pos_penjualan';
+    const STORAGE_KEY_PENGELUARAN = 'arya_pos_pengeluaran';
+    const STORAGE_KEY_GAS = 'arya_pos_gas_url';
+    const STORAGE_KEY_WA = 'arya_pos_wa_number';
+
+    // Application State Arrays
+    let catalogState = [];
+    let belanjaState = [];
+    let penjualanState = [];
+    let pengeluaranState = [];
+    
+    // UI Navigation History Stack
+    let navHistory = ['MAIN'];
+    let currentMenu = ''; // 'BELANJA', 'PENJUALAN', 'KATALOG', 'PERKIRAAN', 'PENGELUARAN', 'KEUNTUNGAN', 'FAKTUR', 'SINKRONISASI'
+    
+    // Active Cart / Form Temporary State
+    let activeCartItems = [];
+    let activeCartMeta = { id: '', date: '', customerType: 'RETAIL', customerName: 'UMUM' };
+    let editingCatalogIndex = -1;
+
+    // Camera Scanner Instance
+    let html5QrcodeScanner = null;
+    let isTorchOn = false;
+
+    window.onload = function() {
+      // Load Data from Local Storage
+      loadInitialData();
+      
+      // Start Real-Time Clock
+      startClock();
+
+      // Bind Keyboard Shortcuts (F5 & F8)
+      setupKeyboardShortcuts();
+
+      // Setup Android Back Button Browser State
+      setupAndroidBackHandler();
+
+      // Auto Backup Check at 23:00
+      setupAutoBackupScheduler();
+    };
+
+    function startClock() {
+      const clockEl = document.getElementById('liveClock');
+      function update() {
+        const now = new Date();
+        const options = { day: 'numeric', month: 'Long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        // Indonesian Date Format
+        const dateStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, '.');
+        clockEl.innerText = `${dateStr} pukul ${timeStr}`;
+      }
+      update();
+      setInterval(update, 1000);
+    }
+
+    function loadInitialData() {
+      catalogState = JSON.parse(localStorage.getItem(STORAGE_KEY_KATALOG)) || [
+        { barcode: '8991234567890', name: 'MINYAK GORENG 1L', unit: 'PCS', qty: 25, minQty: 5, buyPrice: 14000, wholesalePrice: 15500, retailPrice: 16500 },
+        { barcode: '8990987654321', name: 'GULA PASIR 1KG', unit: 'PCS', qty: 30, minQty: 10, buyPrice: 13000, wholesalePrice: 14200, retailPrice: 15000 },
+        { barcode: '8991111222333', name: 'BERAS ROJOLELE 5KG', unit: 'KARUNG', qty: 4, minQty: 5, buyPrice: 62000, wholesalePrice: 65000, retailPrice: 68000 }
+      ];
+      belanjaState = JSON.parse(localStorage.getItem(STORAGE_KEY_BELANJA)) || [];
+      penjualanState = JSON.parse(localStorage.getItem(STORAGE_KEY_PENJUALAN)) || [];
+      pengeluaranState = JSON.parse(localStorage.getItem(STORAGE_KEY_PENGELUARAN)) || [];
+
+      document.getElementById('gasScriptUrl').value = localStorage.getItem(STORAGE_KEY_GAS) || '';
+      document.getElementById('settingWaNumber').value = localStorage.getItem(STORAGE_KEY_WA) || '089670179464';
+      saveAllToLocalStorage();
+    }
+
+    function saveAllToLocalStorage() {
+      localStorage.setItem(STORAGE_KEY_KATALOG, JSON.stringify(catalogState));
+      localStorage.setItem(STORAGE_KEY_BELANJA, JSON.stringify(belanjaState));
+      localStorage.setItem(STORAGE_KEY_PENJUALAN, JSON.stringify(penjualanState));
+      localStorage.setItem(STORAGE_KEY_PENGELUARAN, JSON.stringify(pengeluaranState));
+    }
+
+    function showView(viewId) {
+      const views = ['viewMainMenu', 'viewSubMenu', 'viewFormInput', 'viewCart', 'viewPerkiraan', 'viewKeuntungan', 'viewFaktur', 'viewSinkronisasi'];
+      views.forEach(v => {
+        const el = document.getElementById(v);
+        if(el) el.classList.add('hidden');
+      });
+      document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    function navGoHome() {
+      navHistory = ['MAIN'];
+      currentMenu = '';
+      showView('viewMainMenu');
+    }
+
+    function openMenu(menuType) {
+      currentMenu = menuType;
+      pushNavState('SUBMENU');
+
+      if(menuType === 'PERKIRAAN') {
+        renderPerkiraanBelanja();
+        showView('viewPerkiraan');
+        return;
+      }
+      if(menuType === 'KEUNTUNGAN') {
+        renderKeuntunganDashboard();
+        showView('viewKeuntungan');
+        return;
+      }
+      if(menuType === 'FAKTUR') {
+        showView('viewFaktur');
+        return;
+      }
+      if(menuType === 'SINKRONISASI') {
+        showView('viewSinkronisasi');
+        return;
+      }
+
+      // Default Submenu Titles
+      const titleMap = {
+        'BELANJA': 'RIWAYAT BELANJA BARANG',
+        'PENJUALAN': 'RIWAYAT PENJUALAN BARANG',
+        'KATALOG': 'KATALOG STOK BARANG',
+        'PENGELUARAN': 'RIWAYAT PENGELUARAN LAIN'
+      };
+      document.getElementById('subMenuTitle').innerText = titleMap[menuType] || 'MENU';
+      renderHistoryList();
+      showView('viewSubMenu');
+    }
+
+    function pushNavState(stateName) {
+      navHistory.push(stateName);
+      history.pushState({ state: stateName }, '');
+    }
+
+    function setupAndroidBackHandler() {
+      window.addEventListener('popstate', function(e) {
+        if (navHistory.length > 1) {
+          navHistory.pop();
+          const lastState = navHistory[navHistory.length - 1];
+          if (lastState === 'MAIN') {
+            navGoHome();
+          } else if (lastState === 'SUBMENU') {
+            openMenu(currentMenu);
+          }
+        } else {
+          navGoHome();
+        }
+      });
+    }
+
+    function setupKeyboardShortcuts() {
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'F5') {
+          e.preventDefault();
+          createNewAction();
+        } else if (e.key === 'F8') {
+          e.preventDefault();
+          if (!document.getElementById('viewFormInput').classList.contains('hidden')) {
+            submitFormInput();
+          } else if (!document.getElementById('viewCart').classList.contains('hidden')) {
+            saveCartTransaction();
+          }
+        }
+      });
+    }
+
+    function renderHistoryList() {
+      const container = document.getElementById('historyListContainer');
+      const search = document.getElementById('historySearchInput').value.toUpperCase();
+      let html = '';
+
+      if (currentMenu === 'KATALOG') {
+        const filtered = catalogState.filter(item => 
+          item.name.toUpperCase().includes(search) || item.barcode.includes(search)
+        );
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<div class="p-8 text-center text-gray-500 text-sm">Tidak ada data stok ditemukan.</div>`;
+          return;
+        }
+
+        html = `<div class="divide-y divide-[#232330]">`;
+        filtered.forEach((item, idx) => {
+          const isLow = item.qty <= item.minQty;
+          html += `
+            <div onclick="openCatalogDetail(${idx})" class="p-4 hover:bg-[#181822] cursor-pointer flex items-center justify-between transition-colors">
+              <div>
+                <div class="font-bold text-white text-sm tracking-wide flex items-center gap-2">
+                  <span>${item.name}</span>
+                  ${isLow ? '<span class="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded border border-rose-500/30">Stok Menipis</span>' : ''}
                 </div>
-            `;
-            container.innerHTML = html;
+                <div class="text-xs text-gray-400 font-mono mt-1">
+                  Barcode: ${item.barcode} | Min: ${item.minQty} ${item.unit}
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-lg font-extrabold ${isLow ? 'text-rose-400' : 'text-amber-400'}">${formatNumber(item.qty)} <span class="text-xs font-normal text-gray-400">${item.unit}</span></div>
+                <div class="text-xs text-emerald-400 font-semibold">Retail: Rp ${formatNumber(item.retailPrice)}</div>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      } 
+      else if (currentMenu === 'BELANJA') {
+        const sorted = [...belanjaState].reverse();
+        if (sorted.length === 0) {
+          container.innerHTML = `<div class="p-8 text-center text-gray-500 text-sm">Belum ada riwayat belanja.</div>`;
+          return;
         }
 
-        function saveGasUrl() {
-            db.gasUrl = document.getElementById('gasUrlInput').value.trim();
-            saveDatabase();
-            alert("URL Apps Script disimpan!");
+        html = `<div class="divide-y divide-[#232330]">`;
+        sorted.forEach((trx) => {
+          html += `
+            <div onclick="openCartView('BELANJA', '${trx.id}')" class="p-4 hover:bg-[#181822] cursor-pointer flex items-center justify-between transition-colors">
+              <div>
+                <div class="font-bold text-amber-400 text-sm font-mono">${trx.id}</div>
+                <div class="text-xs text-gray-400 mt-1">Tanggal: ${trx.date} | Items: ${trx.items.length}</div>
+              </div>
+              <div class="text-right">
+                <div class="text-base font-extrabold text-white">Rp ${formatNumber(trx.totalPrice)}</div>
+                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">Restok</span>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+      else if (currentMenu === 'PENJUALAN') {
+        const sorted = [...penjualanState].reverse();
+        if (sorted.length === 0) {
+          container.innerHTML = `<div class="p-8 text-center text-gray-500 text-sm">Belum ada riwayat penjualan.</div>`;
+          return;
         }
 
-        function copyGasScriptToClipboard() {
-            const scriptText = document.getElementById('gasScriptCode').value;
-            const el = document.createElement('textarea');
-            el.value = scriptText;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            alert("Kode Google Apps Script berhasil disalin!");
+        html = `<div class="divide-y divide-[#232330]">`;
+        sorted.forEach((trx) => {
+          html += `
+            <div onclick="openCartView('PENJUALAN', '${trx.id}')" class="p-4 hover:bg-[#181822] cursor-pointer flex items-center justify-between transition-colors">
+              <div>
+                <div class="font-bold text-emerald-400 text-sm font-mono">${trx.id} - ${trx.customerName}</div>
+                <div class="text-xs text-gray-400 mt-1">Tanggal: ${trx.date} | Tipe: ${trx.customerType}</div>
+              </div>
+              <div class="text-right flex items-center gap-3">
+                <div>
+                  <div class="text-base font-extrabold text-amber-400">Rp ${formatNumber(trx.totalPrice)}</div>
+                  <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">LUNAS</span>
+                </div>
+                <button onclick="event.stopPropagation(); printInvoiceDirect('${trx.id}')" class="bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-black p-2 rounded-xl transition-all" title="Cetak Faktur">
+                  <i class="fa-solid fa-print"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+      else if (currentMenu === 'PENGELUARAN') {
+        const sorted = [...pengeluaranState].reverse();
+        if (sorted.length === 0) {
+          container.innerHTML = `<div class="p-8 text-center text-gray-500 text-sm">Belum ada catatan pengeluaran.</div>`;
+          return;
         }
 
-        function syncPushToSheets() {
-            if (!db.gasUrl) {
-                alert("Masukkan URL Apps Script Web App terlebih dahulu!");
-                return;
-            }
-            alert("Proses sinkronisasi data ke Google Sheets berjalan...");
+        html = `<div class="divide-y divide-[#232330]">`;
+        sorted.forEach((exp, idx) => {
+          html += `
+            <div class="p-4 flex items-center justify-between">
+              <div>
+                <div class="font-bold text-white text-sm">${exp.description}</div>
+                <div class="text-xs text-gray-400 mt-1">Tanggal: ${exp.date}</div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-base font-extrabold text-rose-400">Rp ${formatNumber(exp.amount)}</span>
+                <button onclick="deletePengeluaran(${idx})" class="text-gray-500 hover:text-rose-400 p-2">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function createNewAction() {
+      pushNavState('FORM');
+      
+      if (currentMenu === 'KATALOG') {
+        editingCatalogIndex = -1;
+        document.getElementById('formInputTitle').innerText = 'TAMBAH STOK BARANG BARU';
+        document.getElementById('formFieldsContainer').innerHTML = getCatalogFormHtml();
+        showView('viewFormInput');
+      }
+      else if (currentMenu === 'BELANJA') {
+        const newId = 'BLJ-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(1000 + Math.random()*9000);
+        activeCartMeta = { id: newId, date: getTodayDateString(), customerType: 'RESTOK', customerName: 'SUPPLIER' };
+        activeCartItems = [];
+        openNewTransactionForm('BELANJA');
+      }
+      else if (currentMenu === 'PENJUALAN') {
+        const newId = 'PJL-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(1000 + Math.random()*9000);
+        activeCartMeta = { id: newId, date: getTodayDateString(), customerType: 'RETAIL', customerName: 'UMUM' };
+        activeCartItems = [];
+        openNewTransactionForm('PENJUALAN');
+      }
+      else if (currentMenu === 'PENGELUARAN') {
+        document.getElementById('formInputTitle').innerText = 'TAMBAH PENGELUARAN LAIN';
+        document.getElementById('formFieldsContainer').innerHTML = getPengeluaranFormHtml();
+        showView('viewFormInput');
+      }
+    }
+
+    function openNewTransactionForm(type) {
+      document.getElementById('formInputTitle').innerText = type === 'BELANJA' ? 'INPUT BARANG RESTOK' : 'INPUT BARANG PENJUALAN';
+      document.getElementById('formFieldsContainer').innerHTML = getTransactionItemFormHtml(type);
+      showView('viewFormInput');
+    }
+
+    function getCatalogFormHtml(item = {}) {
+      return `
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">BARCODE</label>
+          <div class="flex gap-2">
+            <input type="text" id="catBarcode" value="${item.barcode || ''}" placeholder="Scan atau Ketik Barcode" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+            <button type="button" onclick="openBarcodeScanner('catBarcode')" class="bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-xl font-bold">
+              <i class="fa-solid fa-camera"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">NAMA BARANG</label>
+          <input type="text" id="catName" value="${item.name || ''}" placeholder="Nama Barang (Huruf Besar)" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400 uppercase-input">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">QTY STOK</label>
+            <input type="text" id="catQty" value="${item.qty !== undefined ? formatNumber(item.qty) : ''}" oninput="formatCurrencyInput(this)" placeholder="0" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">MINIMAL QTY STOK</label>
+            <input type="text" id="catMinQty" value="${item.minQty !== undefined ? formatNumber(item.minQty) : '5'}" oninput="formatCurrencyInput(this)" placeholder="5" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">SATUAN</label>
+          <input type="text" id="catUnit" value="${item.unit || 'PCS'}" placeholder="PCS / DUS / KG" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400 uppercase-input">
+        </div>
+        <div class="grid grid-cols-3 gap-2 sm:gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-gray-400 mb-1">HARGA POKOK</label>
+            <input type="text" id="catBuyPrice" value="${item.buyPrice ? formatNumber(item.buyPrice) : ''}" oninput="formatCurrencyInput(this)" placeholder="0" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-2.5 rounded-xl text-xs sm:text-sm focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-400 mb-1">HARGA GROSIR</label>
+            <input type="text" id="catWholesalePrice" value="${item.wholesalePrice ? formatNumber(item.wholesalePrice) : ''}" oninput="formatCurrencyInput(this)" placeholder="0" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-2.5 rounded-xl text-xs sm:text-sm focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-400 mb-1">HARGA RETAIL</label>
+            <input type="text" id="catRetailPrice" value="${item.retailPrice ? formatNumber(item.retailPrice) : ''}" oninput="formatCurrencyInput(this)" placeholder="0" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-2.5 rounded-xl text-xs sm:text-sm focus:border-amber-400">
+          </div>
+        </div>
+      `;
+    }
+
+    function getTransactionItemFormHtml(type) {
+      return `
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">ID TRANSAKSI</label>
+            <input type="text" value="${activeCartMeta.id}" readonly class="w-full bg-[#050508] border border-[#232330] text-amber-400 font-mono p-3 rounded-xl text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">TANGGAL</label>
+            <input type="date" id="trxDate" value="${activeCartMeta.date}" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+          </div>
+        </div>
+
+        ${type === 'PENJUALAN' ? `
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">TIPE CUSTOMER</label>
+          <select id="trxCustomerType" onchange="activeCartMeta.customerType = this.value; recalculateFormTotal();" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-emerald-400">
+            <option value="RETAIL" ${activeCartMeta.customerType === 'RETAIL' ? 'selected' : ''}>RETAIL (Eceran)</option>
+            <option value="GROSIR" ${activeCartMeta.customerType === 'GROSIR' ? 'selected' : ''}>GROSIR (Partai)</option>
+          </select>
+        </div>
+        ` : ''}
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">BARCODE BARANG</label>
+          <div class="flex gap-2">
+            <input type="text" id="trxBarcode" placeholder="Scan Barcode / Ketik" onchange="autoLookupItemByBarcode()" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+            <button type="button" onclick="openBarcodeScanner('trxBarcode')" class="bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-xl font-bold">
+              <i class="fa-solid fa-camera"></i>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">NAMA BARANG (AUTOCOMPLETE)</label>
+          <input type="text" id="trxItemName" list="catalogAutocomplete" oninput="autoLookupItemByName()" placeholder="Ketik Nama Barang..." class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400 uppercase-input">
+          <datalist id="catalogAutocomplete">
+            ${catalogState.map(i => `<option value="${i.name}">${i.name} (Stok: ${i.qty})</option>`).join('')}
+          </datalist>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">QTY</label>
+            <input type="text" id="trxQty" oninput="formatCurrencyInput(this); recalculateFormTotal();" placeholder="1" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-1">SATUAN</label>
+            <input type="text" id="trxUnit" readonly placeholder="PCS" class="w-full bg-[#050508] border border-[#232330] text-gray-400 p-3 rounded-xl text-sm font-bold uppercase-input">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">TOTAL HARGA ITEM</label>
+          <div id="trxItemTotalDisplay" class="w-full bg-[#050508] border border-[#232330] text-amber-400 font-extrabold p-3 rounded-xl text-base">
+            Rp 0
+          </div>
+        </div>
+
+        <button type="button" onclick="addItemToCartFromForm('${type}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold py-3 rounded-xl transition-all shadow-md active:scale-95">
+          <i class="fa-solid fa-cart-plus mr-1"></i> Masukkan ke Keranjang
+        </button>
+      `;
+    }
+
+    function getPengeluaranFormHtml() {
+      return `
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">TANGGAL</label>
+          <input type="date" id="expDate" value="${getTodayDateString()}" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">KETERANGAN PENGELUARAN</label>
+          <input type="text" id="expDesc" placeholder="Contoh: Bayar Listrik / Plastik Packing" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400 uppercase-input">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">JUMLAH (RP)</label>
+          <input type="text" id="expAmount" oninput="formatCurrencyInput(this)" placeholder="0" class="w-full bg-[#0a0a0e] border border-[#232330] text-white p-3 rounded-xl text-sm focus:border-amber-400">
+        </div>
+      `;
+    }
+
+    function autoLookupItemByBarcode() {
+      const barcode = document.getElementById('trxBarcode').value.trim();
+      const found = catalogState.find(c => c.barcode === barcode);
+      if (found) {
+        document.getElementById('trxItemName').value = found.name;
+        document.getElementById('trxUnit').value = found.unit;
+        recalculateFormTotal();
+      }
+    }
+
+    function autoLookupItemByName() {
+      const name = document.getElementById('trxItemName').value.trim().toUpperCase();
+      const found = catalogState.find(c => c.name.toUpperCase() === name);
+      if (found) {
+        document.getElementById('trxBarcode').value = found.barcode;
+        document.getElementById('trxUnit').value = found.unit;
+        recalculateFormTotal();
+      }
+    }
+
+    function recalculateFormTotal() {
+      const name = document.getElementById('trxItemName')?.value.trim().toUpperCase();
+      const qty = unformatNumber(document.getElementById('trxQty')?.value || '1');
+      const found = catalogState.find(c => c.name.toUpperCase() === name);
+      
+      let unitPrice = 0;
+      if (found) {
+        if (currentMenu === 'BELANJA') {
+          unitPrice = found.buyPrice;
+        } else {
+          unitPrice = activeCartMeta.customerType === 'GROSIR' ? found.wholesalePrice : found.retailPrice;
         }
+      }
 
-        function syncPullFromSheets() {
-            if (!db.gasUrl) {
-                alert("Masukkan URL Apps Script Web App terlebih dahulu!");
-                return;
-            }
-            alert("Menarik data terbaru dari Google Sheets...");
+      const total = qty * unitPrice;
+      const display = document.getElementById('trxItemTotalDisplay');
+      if (display) display.innerText = 'Rp ' + formatNumber(total);
+    }
+
+    function addItemToCartFromForm(type) {
+      const barcode = document.getElementById('trxBarcode').value.trim();
+      const name = document.getElementById('trxItemName').value.trim().toUpperCase();
+      const qty = unformatNumber(document.getElementById('trxQty').value || '1');
+      const unit = document.getElementById('trxUnit').value || 'PCS';
+
+      if (!name || qty <= 0) {
+        alert('Mohon lengkapi Nama Barang dan Qty valid!');
+        return;
+      }
+
+      const found = catalogState.find(c => c.name.toUpperCase() === name || c.barcode === barcode);
+      let price = 0;
+      let buyPrice = found ? found.buyPrice : 0;
+
+      if (type === 'BELANJA') {
+        price = found ? found.buyPrice : 0;
+      } else {
+        price = found ? (activeCartMeta.customerType === 'GROSIR' ? found.wholesalePrice : found.retailPrice) : 0;
+      }
+
+      const totalItemPrice = qty * price;
+
+      activeCartItems.push({
+        barcode: barcode || (found ? found.barcode : ''),
+        name: name,
+        unit: unit,
+        qty: qty,
+        price: price,
+        buyPrice: buyPrice,
+        totalPrice: totalItemPrice
+      });
+
+      // Clear Form Fields & Set Focus to Item Name
+      document.getElementById('trxBarcode').value = '';
+      document.getElementById('trxItemName').value = '';
+      document.getElementById('trxQty').value = '';
+      document.getElementById('trxItemTotalDisplay').innerText = 'Rp 0';
+      document.getElementById('trxItemName').focus();
+
+      // Show Toast Notification
+      showToast('Barang berhasil masuk keranjang!');
+    }
+
+    function addMoreItemToCart() {
+      pushNavState('FORM');
+      openNewTransactionForm(currentMenu);
+    }
+
+    function openCartView(type, id = '') {
+      pushNavState('CART');
+
+      if (id) {
+        // View existing transaction detail
+        if (type === 'BELANJA') {
+          const trx = belanjaState.find(b => b.id === id);
+          if (trx) {
+            activeCartMeta = { id: trx.id, date: trx.date, customerType: 'RESTOK', customerName: 'SUPPLIER' };
+            activeCartItems = [...trx.items];
+          }
+        } else {
+          const trx = penjualanState.find(p => p.id === id);
+          if (trx) {
+            activeCartMeta = { id: trx.id, date: trx.date, customerType: trx.customerType, customerName: trx.customerName };
+            activeCartItems = [...trx.items];
+          }
         }
+      }
 
-        function setupAutoBackupSchedule() {
-            setInterval(() => {
-                const now = new Date();
-                if (now.getHours() === 23 && now.getMinutes() === 0) {
-                    if (db.gasUrl) {
-                        syncPushToSheets();
-                    }
-                }
-            }, 60000);
+      document.getElementById('cartTitle').innerText = type === 'BELANJA' ? 'KERANJANG BELANJA BARANG' : 'KERANJANG PENJUALAN';
+      document.getElementById('cartHeaderMeta').innerText = `ID: ${activeCartMeta.id} | Tanggal: ${activeCartMeta.date}`;
+
+      if (type === 'PENJUALAN') {
+        document.getElementById('salesPaymentFields').classList.remove('hidden');
+        document.getElementById('cartCustomerName').value = activeCartMeta.customerName || 'UMUM';
+      } else {
+        document.getElementById('salesPaymentFields').classList.add('hidden');
+      }
+
+      renderCartItems();
+      showView('viewCart');
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cartItemsList');
+      if (activeCartItems.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-gray-500 text-sm">Keranjang masih kosong. Sila klik "Tambah Barang".</div>`;
+      } else {
+        let html = '';
+        activeCartItems.forEach((item, idx) => {
+          html += `
+            <div class="p-3 grid grid-cols-12 items-center text-xs text-white">
+              <div class="col-span-6 font-bold truncate">${item.name}</div>
+              <div class="col-span-2 text-center font-mono">${formatNumber(item.qty)} ${item.unit}</div>
+              <div class="col-span-3 text-right font-extrabold text-amber-400">Rp ${formatNumber(item.totalPrice)}</div>
+              <div class="col-span-1 text-center">
+                <button onclick="removeCartItem(${idx})" class="text-gray-500 hover:text-rose-400 p-1">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      }
+
+      calculateCartTotal();
+    }
+
+    function removeCartItem(idx) {
+      activeCartItems.splice(idx, 1);
+      renderCartItems();
+    }
+
+    function calculateCartTotal() {
+      const totalQty = activeCartItems.reduce((acc, i) => acc + i.qty, 0);
+      const totalPrice = activeCartItems.reduce((acc, i) => acc + i.totalPrice, 0);
+
+      document.getElementById('cartTotalQty').innerText = formatNumber(totalQty);
+      document.getElementById('cartTotalPrice').innerText = 'Rp ' + formatNumber(totalPrice);
+
+      if (currentMenu === 'PENJUALAN') {
+        const paid = unformatNumber(document.getElementById('cartPaidAmount').value || '0');
+        const change = paid - totalPrice;
+        const changeEl = document.getElementById('cartChangeAmount');
+        if (change >= 0) {
+          changeEl.innerText = 'Rp ' + formatNumber(change);
+          changeEl.className = 'w-full bg-[#0a0a0e] border border-[#232330] text-emerald-400 font-extrabold p-2.5 rounded-xl text-sm';
+        } else {
+          changeEl.innerText = 'Kurang: Rp ' + formatNumber(Math.abs(change));
+          changeEl.className = 'w-full bg-[#0a0a0e] border border-[#232330] text-rose-400 font-extrabold p-2.5 rounded-xl text-sm';
         }
+      }
+    }
 
-        /* ================================================================== */
-        /* CAMERA SCANNER ENGINE                                             */
-        /* ================================================================== */
-        function openCameraScanner(targetInputId, callback) {
-            scannerTargetInputId = targetInputId;
-            document.getElementById('cameraModal').classList.remove('hidden');
+    function submitFormInput() {
+      if (currentMenu === 'KATALOG') {
+        saveCatalogItem();
+      } else if (currentMenu === 'PENGELUARAN') {
+        savePengeluaranItem();
+      } else if (currentMenu === 'BELANJA' || currentMenu === 'PENJUALAN') {
+        openCartView(currentMenu);
+      }
+    }
 
-            html5QrScanner = new Html5Qrcode("reader");
-            const config = { fps: 20, qrbox: { width: 250, height: 250 } };
+    function saveCatalogItem() {
+      const barcode = document.getElementById('catBarcode').value.trim();
+      const name = document.getElementById('catName').value.trim().toUpperCase();
+      const qty = unformatNumber(document.getElementById('catQty').value || '0');
+      const minQty = unformatNumber(document.getElementById('catMinQty').value || '5');
+      const unit = document.getElementById('catUnit').value.trim().toUpperCase() || 'PCS';
+      const buyPrice = unformatNumber(document.getElementById('catBuyPrice').value || '0');
+      const wholesalePrice = unformatNumber(document.getElementById('catWholesalePrice').value || '0');
+      const retailPrice = unformatNumber(document.getElementById('catRetailPrice').value || '0');
 
-            html5QrScanner.start(
-                { facingMode: "environment" },
-                config,
-                (decodedText) => {
-                    document.getElementById(targetInputId).value = decodedText;
-                    closeCameraScanner();
-                    if (callback) callback(decodedText);
-                },
-                (error) => {}
-            ).catch(err => {
-                console.error("Camera start error", err);
+      if (!name) {
+        alert('Nama barang tidak boleh kosong!');
+        return;
+      }
+
+      const itemData = { barcode, name, qty, minQty, unit, buyPrice, wholesalePrice, retailPrice };
+
+      if (editingCatalogIndex >= 0) {
+        catalogState[editingCatalogIndex] = itemData;
+      } else {
+        catalogState.push(itemData);
+      }
+
+      saveAllToLocalStorage();
+      showToast('Katalog stok berhasil disimpan!');
+      openMenu('KATALOG');
+    }
+
+    function openCatalogDetail(idx) {
+      editingCatalogIndex = idx;
+      const item = catalogState[idx];
+      pushNavState('FORM');
+      document.getElementById('formInputTitle').innerText = 'EDIT STOK BARANG';
+      document.getElementById('formFieldsContainer').innerHTML = getCatalogFormHtml(item);
+      showView('viewFormInput');
+    }
+
+    function savePengeluaranItem() {
+      const date = document.getElementById('expDate').value;
+      const description = document.getElementById('expDesc').value.trim().toUpperCase();
+      const amount = unformatNumber(document.getElementById('expAmount').value || '0');
+
+      if (!description || amount <= 0) {
+        alert('Isi keterangan dan jumlah pengeluaran!');
+        return;
+      }
+
+      pengeluaranState.push({ date, description, amount });
+      saveAllToLocalStorage();
+      showToast('Pengeluaran berhasil disimpan!');
+      openMenu('PENGELUARAN');
+    }
+
+    function saveCartTransaction() {
+      if (activeCartItems.length === 0) {
+        alert('Keranjang transaksi masih kosong!');
+        return;
+      }
+
+      const totalQty = activeCartItems.reduce((acc, i) => acc + i.qty, 0);
+      const totalPrice = activeCartItems.reduce((acc, i) => acc + i.totalPrice, 0);
+
+      if (currentMenu === 'BELANJA') {
+        const trxData = {
+          id: activeCartMeta.id,
+          date: activeCartMeta.date,
+          items: activeCartItems,
+          totalQty: totalQty,
+          totalPrice: totalPrice
+        };
+
+        // Update Stock Catalog (+)
+        activeCartItems.forEach(cartItem => {
+          let cat = catalogState.find(c => c.name.toUpperCase() === cartItem.name.toUpperCase());
+          if (cat) {
+            cat.qty += cartItem.qty;
+          } else {
+            catalogState.push({
+              barcode: cartItem.barcode,
+              name: cartItem.name,
+              unit: cartItem.unit,
+              qty: cartItem.qty,
+              minQty: 5,
+              buyPrice: cartItem.price,
+              wholesalePrice: Math.round(cartItem.price * 1.1),
+              retailPrice: Math.round(cartItem.price * 1.2)
             });
-        }
+          }
+        });
 
-        function closeCameraScanner() {
-            if (html5QrScanner) {
-                html5QrScanner.stop().then(() => {
-                    html5QrScanner.clear();
-                    document.getElementById('cameraModal').classList.add('hidden');
-                }).catch(err => {
-                    document.getElementById('cameraModal').classList.add('hidden');
-                });
-            } else {
-                document.getElementById('cameraModal').classList.add('hidden');
+        belanjaState.push(trxData);
+        saveAllToLocalStorage();
+        showToast('Restok berhasil disimpan & stok diperbarui!');
+        openMenu('BELANJA');
+      } 
+      else if (currentMenu === 'PENJUALAN') {
+        const customerName = document.getElementById('cartCustomerName').value.trim().toUpperCase() || 'UMUM';
+        const paidAmount = unformatNumber(document.getElementById('cartPaidAmount').value || '0');
+
+        const trxData = {
+          id: activeCartMeta.id,
+          date: activeCartMeta.date,
+          customerType: activeCartMeta.customerType,
+          customerName: customerName,
+          items: activeCartItems,
+          totalQty: totalQty,
+          totalPrice: totalPrice,
+          paidAmount: paidAmount,
+          changeAmount: paidAmount - totalPrice
+        };
+
+        // Update Stock Catalog (-)
+        activeCartItems.forEach(cartItem => {
+          let cat = catalogState.find(c => c.name.toUpperCase() === cartItem.name.toUpperCase());
+          if (cat) {
+            cat.qty = Math.max(0, cat.qty - cartItem.qty);
+          }
+        });
+
+        penjualanState.push(trxData);
+        saveAllToLocalStorage();
+        
+        // Open Invoice Print Preview Modal
+        printInvoiceDirect(trxData.id);
+        openMenu('PENJUALAN');
+      }
+    }
+
+    function cancelFormInput() {
+      if (navHistory.length > 1) {
+        history.back();
+      } else {
+        openMenu(currentMenu);
+      }
+    }
+
+    function cancelCartView() {
+      openMenu(currentMenu);
+    }
+
+    function renderPerkiraanBelanja() {
+      const container = document.getElementById('perkiraanListContainer');
+      const lowStockItems = catalogState.filter(item => item.qty <= item.minQty);
+
+      if (lowStockItems.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-emerald-400 font-bold text-sm">Semua stok barang mencukupi (di atas minimal)!</div>`;
+        return;
+      }
+
+      let html = `
+        <div class="p-3 bg-[#181822] border-b border-[#232330] grid grid-cols-12 text-xs font-bold text-gray-400 uppercase">
+          <div class="col-span-6">Nama Barang</div>
+          <div class="col-span-3 text-center">Stok Saat Ini</div>
+          <div class="col-span-3 text-right">Perkiraan Beli</div>
+        </div>
+        <div class="divide-y divide-[#232330]">
+      `;
+
+      lowStockItems.forEach((item) => {
+        const estBuy = (item.minQty * 2) - item.qty;
+        html += `
+          <div class="p-3 grid grid-cols-12 items-center text-xs text-white">
+            <div class="col-span-6 font-bold truncate">${item.name}</div>
+            <div class="col-span-3 text-center font-mono text-rose-400 font-bold">${item.qty} ${item.unit}</div>
+            <div class="col-span-3 text-right font-extrabold text-amber-400">${estBuy > 0 ? estBuy : 5} ${item.unit}</div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    function exportPerkiraanBelanja() {
+      window.print();
+    }
+
+    function renderKeuntunganDashboard() {
+      const today = getTodayDateString();
+      const yesterday = getYesterdayDateString();
+      const currentMonthStr = today.slice(0, 7);
+
+      // Calculations
+      let labaKemarin = 0;
+      let labaBulanIni = 0;
+      let expKemarin = 0;
+      let expBulanIni = 0;
+
+      // Group daily profits
+      const dailyMap = {};
+
+      penjualanState.forEach(p => {
+        const date = p.date;
+        let grossProfit = 0;
+        
+        p.items.forEach(item => {
+          const buyP = item.buyPrice || 0;
+          grossProfit += (item.price - buyP) * item.qty;
+        });
+
+        if (!dailyMap[date]) {
+          dailyMap[date] = { date, gross: 0, exp: 0, net: 0 };
+        }
+        dailyMap[date].gross += grossProfit;
+      });
+
+      pengeluaranState.forEach(e => {
+        const date = e.date;
+        if (!dailyMap[date]) {
+          dailyMap[date] = { date, gross: 0, exp: 0, net: 0 };
+        }
+        dailyMap[date].exp += e.amount;
+      });
+
+      // Calculate Net Profits per day
+      Object.keys(dailyMap).forEach(d => {
+        dailyMap[d].net = dailyMap[d].gross - dailyMap[d].exp;
+        
+        if (d === yesterday) {
+          labaKemarin += dailyMap[d].net;
+          expKemarin += dailyMap[d].exp;
+        }
+        if (d.startsWith(currentMonthStr)) {
+          labaBulanIni += dailyMap[d].net;
+          expBulanIni += dailyMap[d].exp;
+        }
+      });
+
+      // Render Summary Cards
+      document.getElementById('statLabaKemarin').innerText = 'Rp ' + formatNumber(labaKemarin);
+      document.getElementById('statLabaBulanIni').innerText = 'Rp ' + formatNumber(labaBulanIni);
+      document.getElementById('statPengeluaranKemarin').innerText = 'Rp ' + formatNumber(expKemarin);
+      document.getElementById('statPengeluaranBulanIni').innerText = 'Rp ' + formatNumber(expBulanIni);
+
+      // Render Daily Table
+      const sortedDays = Object.values(dailyMap).sort((a,b) => b.date.localeCompare(a.date));
+      let tableHtml = `
+        <table class="w-full text-xs text-left">
+          <thead>
+            <tr class="border-b border-[#232330] text-gray-400 uppercase">
+              <th class="py-2">Tanggal</th>
+              <th class="py-2 text-right">Laba Kotor</th>
+              <th class="py-2 text-right">Pengeluaran</th>
+              <th class="py-2 text-right">Laba Bersih</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#232330]">
+      `;
+      sortedDays.forEach(d => {
+        tableHtml += `
+          <tr>
+            <td class="py-2.5 font-mono text-gray-300">${d.date}</td>
+            <td class="py-2.5 text-right font-semibold text-emerald-400">Rp ${formatNumber(d.gross)}</td>
+            <td class="py-2.5 text-right font-semibold text-rose-400">Rp ${formatNumber(d.exp)}</td>
+            <td class="py-2.5 text-right font-extrabold text-amber-400">Rp ${formatNumber(d.net)}</td>
+          </tr>
+        `;
+      });
+      tableHtml += `</tbody></table>`;
+      document.getElementById('dailyProfitTable').innerHTML = tableHtml;
+
+      // Render Monthly Chart with Gradient Colors (Red - Yellow - Green)
+      renderMonthlyChart();
+    }
+
+    let profitChartInstance = null;
+    function renderMonthlyChart() {
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      const monthlyData = new Array(12).fill(0);
+
+      penjualanState.forEach(p => {
+        const monthIdx = parseInt(p.date.split('-')[1]) - 1;
+        p.items.forEach(i => {
+          monthlyData[monthIdx] += (i.price - (i.buyPrice || 0)) * i.qty;
+        });
+      });
+
+      pengeluaranState.forEach(e => {
+        const monthIdx = parseInt(e.date.split('-')[1]) - 1;
+        monthlyData[monthIdx] -= e.amount;
+      });
+
+      // Color mapping thresholds
+      const maxVal = Math.max(...monthlyData, 1000000);
+      const bgColors = monthlyData.map(val => {
+        const ratio = val / maxVal;
+        if (ratio < 0.35) return '#ef4444'; // Red (Low)
+        if (ratio < 0.70) return '#f59e0b'; // Yellow (Medium)
+        return '#10b981'; // Green (High)
+      });
+
+      if (profitChartInstance) profitChartInstance.destroy();
+
+      profitChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: monthNames,
+          datasets: [{
+            label: 'Laba Bersih (Rp)',
+            data: monthlyData,
+            backgroundColor: bgColors,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              ticks: { color: '#9ca3af', font: { size: 10 } },
+              grid: { color: '#232330' }
+            },
+            x: {
+              ticks: { color: '#9ca3af', font: { size: 10 } },
+              grid: { display: false }
             }
+          }
         }
+      });
+    }
 
-        function toggleTorch() {
-            if (html5QrScanner) {
-                torchOn = !torchOn;
-                html5QrScanner.applyVideoConstraints({
-                    advanced: [{ torch: torchOn }]
-                }).catch(e => console.log('Torch not supported', e));
-            }
+    function printInvoiceDirect(trxId) {
+      const trx = penjualanState.find(p => p.id === trxId);
+      if (!trx) return;
+
+      const wa = localStorage.getItem(STORAGE_KEY_WA) || '089670179464';
+      const isPaidFull = trx.paidAmount >= trx.totalPrice;
+
+      let html = `
+        <div class="text-center font-bold text-base mb-1">FAKTUR PENJUALAN</div>
+        <div class="text-center text-xs text-gray-600 mb-2">NO WA: ${wa}</div>
+        <div class="flex justify-center mb-2">
+          <img src="logo web arya.png" class="h-8 object-contain" onerror="this.onerror=null; this.src='https://placehold.co/120x35/ffffff/000000?text=ARYA+GROSIR';">
+        </div>
+        <hr class="border-gray-300 my-2">
+        <div class="flex justify-between text-xs my-1">
+          <span>TANGGAL: ${trx.date}</span>
+          <span class="font-mono font-bold">${trx.id}</span>
+        </div>
+        <div class="text-xs mb-2">PEMBELI: ${trx.customerName} (${trx.customerType})</div>
+        <table class="w-full text-xs text-left my-2 border-collapse">
+          <thead>
+            <tr class="border-b border-gray-300 font-bold">
+              <th class="py-1">NAMA BARANG</th>
+              <th class="py-1 text-center">QTY</th>
+              <th class="py-1 text-right">HARGA</th>
+              <th class="py-1 text-right">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+      `;
+
+      trx.items.forEach(i => {
+        html += `
+          <tr>
+            <td class="py-1 uppercase font-semibold">${i.name}</td>
+            <td class="py-1 text-center">${i.qty} ${i.unit}</td>
+            <td class="py-1 text-right">${formatNumber(i.price)}</td>
+            <td class="py-1 text-right font-bold">${formatNumber(i.totalPrice)}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+          </tbody>
+        </table>
+        <hr class="border-gray-300 my-2">
+        <div class="flex justify-between font-extrabold text-sm">
+          <span>TOTAL HARGA:</span>
+          <span>Rp ${formatNumber(trx.totalPrice)}</span>
+        </div>
+        <div class="flex justify-between text-xs mt-1">
+          <span>DIBAYAR:</span>
+          <span>Rp ${formatNumber(trx.paidAmount)}</span>
+        </div>
+        <div class="flex justify-between text-xs mt-0.5">
+          <span>KEMBALIAN:</span>
+          <span>Rp ${formatNumber(trx.changeAmount)}</span>
+        </div>
+      `;
+
+      if (isPaidFull) {
+        html += `<div class="watermark-lunas">LUNAS</div>`;
+      }
+
+      document.getElementById('printArea').innerHTML = html;
+      document.getElementById('modalPrintInvoice').classList.remove('hidden');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('modalPrintInvoice').classList.add('hidden');
+    }
+
+    function saveFakturSettings() {
+      const wa = document.getElementById('settingWaNumber').value.trim();
+      const gdoc = document.getElementById('settingGdocUrl').value.trim();
+      localStorage.setItem(STORAGE_KEY_WA, wa);
+      document.getElementById('previewWa').innerText = wa;
+      showToast('Pengaturan faktur berhasil disimpan!');
+    }
+
+    function saveGasUrl() {
+      const url = document.getElementById('gasScriptUrl').value.trim();
+      localStorage.setItem(STORAGE_KEY_GAS, url);
+      showToast('URL Apps Script disimpan!');
+    }
+
+    function triggerSyncPush() {
+      const url = localStorage.getItem(STORAGE_KEY_GAS);
+      if (!url) {
+        alert('Mohon masukkan URL Google Apps Script terlebih dahulu!');
+        return;
+      }
+
+      const payload = {
+        katalog: catalogState,
+        belanja: belanjaState,
+        penjualan: penjualanState,
+        pengeluaran: pengeluaranState
+      };
+
+      addSyncLog('Memulai upload backup data ke Spreadsheet...');
+      fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        addSyncLog('SUCCESS: Data berhasil dikirim ke Spreadsheet!');
+        showToast('Sync / Backup Berhasil!');
+      })
+      .catch(err => {
+        addSyncLog('ERROR: gagal mengirim data: ' + err.toString());
+      });
+    }
+
+    function triggerSyncPull() {
+      const url = localStorage.getItem(STORAGE_KEY_GAS);
+      if (!url) {
+        alert('Mohon masukkan URL Google Apps Script terlebih dahulu!');
+        return;
+      }
+
+      addSyncLog('Menarik data dari Google Spreadsheet...');
+      fetch(url + '?action=getData')
+      .then(res => res.json())
+      .then(data => {
+        if (data.katalog) catalogState = data.katalog;
+        if (data.belanja) belanjaState = data.belanja;
+        if (data.penjualan) penjualanState = data.penjualan;
+        if (data.pengeluaran) pengeluaranState = data.pengeluaran;
+
+        saveAllToLocalStorage();
+        addSyncLog('SUCCESS: Data berhasil disinkronisasi dari Spreadsheet!');
+        showToast('Sinkronisasi Data Berhasil!');
+      })
+      .catch(err => {
+        addSyncLog('ERROR: Gagal tarik data: ' + err.toString());
+      });
+    }
+
+    function addSyncLog(msg) {
+      const container = document.getElementById('syncLogsContainer');
+      const time = new Date().toLocaleTimeString('id-ID');
+      const div = document.createElement('div');
+      div.innerText = `[${time}] ${msg}`;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function setupAutoBackupScheduler() {
+      setInterval(() => {
+        const now = new Date();
+        if (now.getHours() === 23 && now.getMinutes() === 0 && now.getSeconds() < 5) {
+          addSyncLog('AUTO-BACKUP: Menjalankan backup otomatis pukul 23:00...');
+          triggerSyncPush();
         }
+      }, 5000);
+    }
 
-        /* ================================================================== */
-        /* INVOICE PRINT & MODAL ENGINE                                       */
-        /* ================================================================== */
-        function printInvoicePDF(id) {
-            let tr = db.penjualanHistory.find(p => p.id === id);
-            if (!tr && activeTransactionHeader.id === id) {
-                tr = {
-                    id: activeTransactionHeader.id,
-                    tanggal: activeTransactionHeader.tanggal,
-                    namaPembeli: activeTransactionHeader.namaPembeli || 'UMUM',
-                    tipeCustomer: activeTransactionHeader.tipeCustomer || 'RETAIL',
-                    totalHarga: activeCartItems.reduce((acc, c) => acc + c.totalHargaPerItem, 0),
-                    dibayar: activeTransactionHeader.dibayar || 0,
-                    items: [...activeCartItems]
-                };
-            }
-            if (!tr) return;
+    let currentScanTargetInputId = '';
+    function openBarcodeScanner(inputId) {
+      currentScanTargetInputId = inputId;
+      document.getElementById('modalBarcodeScanner').classList.remove('hidden');
 
-            document.getElementById('invId').innerText = tr.id;
-            document.getElementById('invDate').innerText = tr.tanggal;
-            document.getElementById('invCustomer').innerText = tr.namaPembeli;
-            document.getElementById('invType').innerText = tr.tipeCustomer;
+      html5QrcodeScanner = new Html5Qrcode("reader");
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps: 15, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          document.getElementById(currentScanTargetInputId).value = decodedText;
+          closeBarcodeScanner();
+          if (currentScanTargetInputId === 'trxBarcode') {
+            autoLookupItemByBarcode();
+          }
+        },
+        () => {}
+      ).catch(err => console.error(err));
+    }
 
-            const tbody = document.getElementById('invItemsTable');
-            tbody.innerHTML = tr.items.map(i => `
-                <tr class="border-b">
-                    <td class="py-1 px-1 font-bold">${i.nama}</td>
-                    <td class="py-1 px-1 text-center">${i.qty} ${i.satuan}</td>
-                    <td class="py-1 px-1 text-right">${formatToRupiah(i.hargaJual)}</td>
-                    <td class="py-1 px-1 text-right font-bold">${formatToRupiah(i.totalHargaPerItem)}</td>
-                </tr>
-            `).join('');
+    function closeBarcodeScanner() {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          html5QrcodeScanner.clear();
+          document.getElementById('modalBarcodeScanner').classList.add('hidden');
+        }).catch(() => {
+          document.getElementById('modalBarcodeScanner').classList.add('hidden');
+        });
+      } else {
+        document.getElementById('modalBarcodeScanner').classList.add('hidden');
+      }
+    }
 
-            const total = tr.totalHarga;
-            const dibayar = tr.dibayar || total;
-            const kembalian = dibayar - total;
+    function toggleTorch() {
+      if (html5QrcodeScanner) {
+        isTorchOn = !isTorchOn;
+        html5QrcodeScanner.applyVideoConstraints({
+          advanced: [{ torch: isTorchOn }]
+        });
+      }
+    }
 
-            document.getElementById('invTotal').innerText = formatToRupiah(total);
-            document.getElementById('invPaid').innerText = formatToRupiah(dibayar);
-            document.getElementById('invChange').innerText = formatToRupiah(kembalian);
+    function formatNumber(num) {
+      return (num || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
-            document.getElementById('invStampArea').style.display = dibayar >= total ? 'block' : 'none';
+    function unformatNumber(str) {
+      return parseInt((str || '0').toString().replace(/\./g, ''), 10) || 0;
+    }
 
-            document.getElementById('invoiceModal').classList.remove('hidden');
-        }
+    function formatCurrencyInput(input) {
+      const cursor = input.selectionStart;
+      const val = unformatNumber(input.value);
+      input.value = formatNumber(val);
+    }
 
-        function closeInvoiceModal() {
-            document.getElementById('invoiceModal').classList.add('hidden');
-        }
+    function getTodayDateString() {
+      return new Date().toISOString().split('T')[0];
+    }
 
-        function printInvoice() {
-            window.print();
-        }
-    </script>
+    function getYesterdayDateString() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return d.toISOString().split('T')[0];
+    }
+
+    function copyAppsScriptCode() {
+      const code = document.querySelector('pre').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('Kode Script disalin ke clipboard!');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-6 right-6 bg-amber-500 text-black font-extrabold text-xs px-4 py-3 rounded-xl shadow-2xl z-50 animate-bounce';
+      toast.innerText = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+  </script>
 </body>
 </html>
