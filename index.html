@@ -1,324 +1,1099 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Manajemen Toko</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-  <style>
-    :root {
-      --primary: #2563eb;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #1e293b;
-      --border: #e2e8f0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Arya Grosir - Premium POS System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 20px; }
-    .container { max-width: 1200px; margin: 0 auto; }
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+        html, body { width: 100vw; height: 100vh; overflow: hidden; background-color: #080808; color: #ffffff; }
+        .app-container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 1.5vh 2vw; max-width: 1200px; margin: 0 auto; }
+        
+        /* HEADER SECTION */
+        header { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1vh; flex-shrink: 0; }
+        .logo-container img { height: clamp(35px, 6vh, 60px); object-fit: contain; }
+        .header-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 0.5rem; }
+        .system-title { display: flex; align-items: center; gap: 8px; color: #00e676; font-size: clamp(0.65rem, 1.1vh, 0.85rem); font-weight: 700; letter-spacing: 0.5px; }
+        .dot { width: 8px; height: 8px; background-color: #00e676; border-radius: 50%; box-shadow: 0 0 8px #00e676; }
+        .btn-home { background-color: transparent; border: 1px solid #d48806; color: #ff9800; padding: 0.4em 1em; border-radius: 20px; font-size: clamp(0.7rem, 1.2vh, 0.9rem); font-weight: 600; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .datetime { color: #8c8c8c; font-size: clamp(0.65rem, 1.1vh, 0.8rem); text-align: right; line-height: 1.2; font-family: monospace; }
 
-    /* Navigation */
-    nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    nav button { padding: 10px 18px; border: none; background: #e2e8f0; border-radius: 8px; cursor: pointer; font-weight: 600; }
-    nav button.active { background: var(--primary); color: white; }
+        /* VIEWS CONTAINER */
+        .view-content { width: 100%; flex-grow: 1; display: none; flex-direction: column; overflow: hidden; margin-top: 1vh; }
+        .view-content.active { display: flex; }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+        /* MENU UTAMA GRID */
+        #view-main-menu { display: none; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1.2vh 1.2vw; }
+        #view-main-menu.active { display: grid; }
+        .menu-card { background: linear-gradient(145deg, #141414, #0d0d0d); border: 1px solid #1f1f1f; border-radius: 20px; padding: 1.5vh 1vw; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2vh; height: 100%; cursor: pointer; transition: all 0.15s ease-in-out; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); }
+        .menu-card:active { transform: scale(0.96); border-color: #333; background: #1a1a1a; }
+        .icon-box { width: clamp(50px, 8vh, 75px); height: clamp(50px, 8vh, 75px); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: clamp(1.4rem, 3.2vh, 2.2rem); border: 1.5px solid transparent; }
+        .menu-title { font-size: clamp(0.7rem, 1.3vh, 0.85rem); font-weight: 800; color: #ffffff; letter-spacing: 0.5px; line-height: 1.2; text-transform: uppercase; text-align: center; }
 
-    /* KPI Cards 2x2 */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-    .kpi-card {
-      background: var(--card-bg);
-      padding: 18px;
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      border: 1px solid var(--border);
-    }
-    .kpi-title { font-size: 0.875rem; color: #64748b; margin-bottom: 5px; }
-    .kpi-value { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
+        .icon-belanja { background-color: rgba(63, 81, 181, 0.08); border-color: rgba(121, 134, 203, 0.4); color: #7986cb; }
+        .icon-penjualan { background-color: rgba(255, 152, 0, 0.08); border-color: rgba(255, 183, 77, 0.4); color: #ffb74d; }
+        .icon-stok { background-color: rgba(33, 150, 243, 0.08); border-color: rgba(100, 181, 246, 0.4); color: #64b5f6; }
+        .icon-perkiraan { background-color: rgba(156, 39, 176, 0.08); border-color: rgba(186, 104, 200, 0.4); color: #ba68c8; }
+        .icon-pengeluaran { background-color: rgba(0, 188, 212, 0.08); border-color: rgba(77, 208, 225, 0.4); color: #4dd0e1; }
+        .icon-keuntungan { background-color: rgba(233, 30, 99, 0.08); border-color: rgba(240, 98, 146, 0.4); color: #f06292; }
+        .icon-faktur { background-color: rgba(255, 193, 7, 0.08); border-color: rgba(255, 213, 79, 0.4); color: #ffd54f; }
+        .icon-sinkronisasi { background-color: rgba(76, 175, 80, 0.08); border-color: rgba(129, 199, 132, 0.4); color: #81c784; }
 
-    /* Table Styling */
-    .table-container { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 25px; }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th, td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
-    th { background: #f1f5f9; font-weight: 600; }
+        /* SUB-MENU STYLES */
+        .submenu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
+        .submenu-title { font-size: 1.1rem; font-weight: 700; color: #ff9800; display: flex; align-items: center; gap: 8px; }
+        .btn-action { background: #00e676; color: #000; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .list-container { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
+        
+        /* ITEM LIST ROW 3 KOLOM: TANGGAL | HARGA TOTAL | QTY TOTAL (A) */
+        .list-row-3col { background: #141414; border: 1px solid #222; padding: 12px 14px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; gap: 10px; cursor: pointer; }
+        .list-row-3col:hover { border-color: #444; }
+        .col-left { text-align: left; font-weight: 700; color: #fff; }
+        .col-center { text-align: center; font-weight: 800; color: #00e676; }
+        .col-right { text-align: right; font-weight: 700; color: #ffb74d; }
 
-    /* Chart Container */
-    .chart-box {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      height: 400px;
-    }
+        .list-header-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 6px 14px; font-size: 0.75rem; font-weight: bold; color: #ff9800; text-transform: uppercase; border-bottom: 1px solid #222; margin-bottom: 6px; }
 
-    /* Action Buttons */
-    .btn-sync { padding: 10px 16px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-  </style>
+        /* PERKIRAAN BELANJA LIST ITEM ROW */
+        .perkiraan-row { display: grid; grid-template-columns: 2fr 1fr 1fr; align-items: center; background: #141414; border: 1px solid #222; padding: 12px; border-radius: 10px; gap: 10px; }
+        .perkiraan-header { display: grid; grid-template-columns: 2fr 1fr 1fr; font-weight: bold; color: #ff9800; font-size: 0.8rem; padding: 0 12px 6px 12px; border-bottom: 1px solid #333; }
+
+        /* KEUNTUNGAN STYLES & CHART (B) */
+        .grid-2x2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; flex-shrink: 0; }
+        .card-stat { background: #141414; border: 1px solid #222; padding: 10px; border-radius: 10px; text-align: center; }
+        .card-stat .title { font-size: 0.65rem; color: #aaa; text-transform: uppercase; }
+        .card-stat .val { font-size: 0.95rem; font-weight: 700; margin-top: 4px; }
+        .text-green { color: #00e676; }
+        .text-red { color: #ff5252; }
+
+        /* CHART CONTAINER (B) */
+        .chart-section { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 12px; margin-top: 15px; flex-shrink: 0; }
+        .chart-title { font-size: 0.85rem; font-weight: 700; color: #ff9800; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .chart-container { display: flex; align-items: flex-end; justify-content: space-between; height: 180px; gap: 4px; padding-top: 25px; border-bottom: 1px solid #333; }
+        .bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative; }
+        .bar-val { font-size: 0.55rem; font-weight: bold; color: #fff; margin-bottom: 4px; text-align: center; white-space: nowrap; }
+        .bar { width: 80%; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.5s ease; }
+        .bar-label { font-size: 0.6rem; color: #888; margin-top: 6px; font-weight: 600; }
+
+        /* FORM STYLES */
+        .form-group { margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; position: relative; }
+        .form-group label { font-size: 0.8rem; color: #aaa; }
+        .form-group input, .form-group textarea { background: #141414; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.85rem; outline: none; }
+        .form-group input:focus { border-color: #00e676; }
+        .uppercase-input { text-transform: uppercase; }
+
+        .btn-full { width: 100%; padding: 10px; background: #ff9800; color: #000; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 4px; }
+
+        .code-box-container { background: #0d0d0d; border: 1px solid #222; border-radius: 8px; padding: 10px; margin-top: 10px; }
+        .code-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .code-box-header span { font-size: 0.75rem; color: #ff9800; font-weight: 700; }
+        .btn-copy { background: #2196f3; color: #fff; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+        textarea.code-area { width: 100%; height: 180px; background: #000; color: #00e676; font-family: monospace; font-size: 0.7rem; padding: 8px; border: 1px solid #333; border-radius: 6px; resize: none; white-space: pre; overflow-x: auto;}
+
+        /* MODAL OVERLAY */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); z-index: 999; display: none; flex-direction: column; padding: 15px; overflow-y: auto; }
+        .modal-overlay.active { display: flex; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .modal-title { font-size: 1.1rem; font-weight: 700; color: #00e676; }
+        .btn-close { background: #ff5252; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        /* CUST TYPE & SCANNER INPUT */
+        .cust-type-container { display: flex; gap: 10px; margin-bottom: 8px; }
+        .btn-cust-type { flex: 1; padding: 10px; border: 1px solid #333; background: #141414; color: #fff; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-cust-type.active { background: #ff9800; color: #000; border-color: #ff9800; }
+        .input-with-btn { display: flex; gap: 8px; }
+        .input-with-btn input { flex: 1; }
+        .btn-scan { background: #2196f3; color: #fff; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
+
+        /* AUTOCOMPLETE */
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: #1f1f1f; border: 1px solid #333; border-radius: 0 0 8px 8px; max-height: 140px; overflow-y: auto; z-index: 100; display: none; }
+        .autocomplete-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #2a2a2a; font-size: 0.85rem; }
+        .autocomplete-item:hover { background: #00e676; color: #000; }
+
+        /* TABEL */
+        .cart-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .cart-table th, .cart-table td { padding: 8px; text-align: left; font-size: 0.8rem; border-bottom: 1px solid #222; }
+        .cart-table th { color: #888; text-transform: uppercase; background:#141414; position: sticky; top: 0;}
+        .btn-del-item { color: #ff5252; background: transparent; border: none; cursor: pointer; font-size: 1rem; }
+        .cart-summary { display: flex; justify-content: space-between; background: #141414; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: 700; }
+
+        /* FULLSCREEN CAMERA SCANNER OVERLAY */
+        #scanner-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        #interactive-reader { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        #interactive-reader video { object-fit: cover; width: 100%; height: 100%; }
+        .scanner-controls { position: absolute; bottom: 40px; display: flex; gap: 20px; z-index: 10000; }
+        .btn-scanner-ctrl { background: rgba(255,50,50,0.8); color: #fff; border: 2px solid #fff; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; }
+
+        /* TOAST NOTIFICATION STYLES */
+        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: #1a1a1a; color: #fff; border: 1px solid #00e676; padding: 12px 20px; border-radius: 25px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; opacity: 0; transform: translateY(20px); }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { border-color: #ff5252; }
+        .toast.info { border-color: #2196f3; }
+
+        @media (min-width: 768px) {
+            #view-main-menu { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 2vh 2vw; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="container">
-  <nav>
-    <button class="nav-btn active" onclick="switchTab('riwayat-belanja')">Riwayat Belanja</button>
-    <button class="nav-btn" onclick="switchTab('riwayat-penjualan')">Riwayat Penjualan</button>
-    <button class="nav-btn" onclick="switchTab('riwayat-pengeluaran')">Riwayat Pengeluaran Lain</button>
-    <button class="nav-btn" onclick="switchTab('laporan-keuntungan')">Laporan Keuntungan</button>
-    <button class="nav-btn" onclick="switchTab('sinkronisasi')">Sinkronisasi</button>
-  </nav>
+    <div id="toast-container"></div>
 
-  <!-- a. RIWAYAT BELANJA -->
-  <div id="riwayat-belanja" class="tab-content active">
-    <h2>Riwayat Belanja</h2>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Tanggal</th>
-            <th>Harga Total</th>
-            <th>Qty Total</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-belanja"></tbody>
-      </table>
-    </div>
-  </div>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header>
+            <div class="logo-container">
+                <img src="logo web arya.png" alt="Arya Grosir Logo" onerror="this.src='https://via.placeholder.com/150x50?text=ARYA+GROSIR'">
+            </div>
+            <div class="header-bar">
+                <div class="system-title"><span class="dot"></span><span>PREMIUM POS<br>SYSTEM</span></div>
+                <button class="btn-home" onclick="navBackHome()"><i class="fa-solid fa-house"></i> HOME (F7)</button>
+                <div class="datetime" id="datetime">Loading...</div>
+            </div>
+        </header>
 
-  <!-- a. RIWAYAT PENJUALAN -->
-  <div id="riwayat-penjualan" class="tab-content">
-    <h2>Riwayat Penjualan</h2>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Tanggal</th>
-            <th>Harga Total</th>
-            <th>Qty Total</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-penjualan"></tbody>
-      </table>
-    </div>
-  </div>
+        <!-- 0. MENU UTAMA -->
+        <main class="view-content active" id="view-main-menu">
+            <div class="menu-card" onclick="showView('view-belanja')"><div class="icon-box icon-belanja"><i class="fa-solid fa-bag-shopping"></i></div><div class="menu-title">Belanja Barang</div></div>
+            <div class="menu-card" onclick="showView('view-penjualan')"><div class="icon-box icon-penjualan"><i class="fa-solid fa-cart-shopping"></i></div><div class="menu-title">Penjualan</div></div>
+            <div class="menu-card" onclick="showView('view-stok')"><div class="icon-box icon-stok"><i class="fa-solid fa-cubes"></i></div><div class="menu-title">Stok Barang</div></div>
+            <div class="menu-card" onclick="showView('view-perkiraan')"><div class="icon-box icon-perkiraan"><i class="fa-solid fa-chart-line"></i></div><div class="menu-title">Perkiraan Belanja</div></div>
+            <div class="menu-card" onclick="showView('view-pengeluaran')"><div class="icon-box icon-pengeluaran"><i class="fa-solid fa-file-invoice"></i></div><div class="menu-title">Pengeluaran Lain</div></div>
+            <div class="menu-card" onclick="showView('view-keuntungan')"><div class="icon-box icon-keuntungan"><i class="fa-solid fa-wallet"></i></div><div class="menu-title">Keuntungan</div></div>
+            <div class="menu-card" onclick="showView('view-faktur')"><div class="icon-box icon-faktur"><i class="fa-solid fa-money-bill-wave"></i></div><div class="menu-title">Pengaturan Faktur</div></div>
+            <div class="menu-card" onclick="showView('view-sinkronisasi')"><div class="icon-box icon-sinkronisasi"><i class="fa-solid fa-rotate"></i></div><div class="menu-title">Sinkronisasi</div></div>
+        </main>
 
-  <!-- a. RIWAYAT PENGELUARAN LAIN -->
-  <div id="riwayat-pengeluaran" class="tab-content">
-    <h2>Riwayat Pengeluaran Lain</h2>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Tanggal</th>
-            <th>Harga Total</th>
-            <th>Qty Total</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-pengeluaran"></tbody>
-      </table>
-    </div>
-  </div>
+        <!-- 1. BELANJA BARANG (A) -->
+        <section class="view-content" id="view-belanja">
+            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-bag-shopping"></i> Riwayat Belanja</div><button class="btn-action" onclick="openFormBelanja()"><i class="fa-solid fa-plus"></i> Transaksi Baru (F5)</button></div>
+            <div class="list-header-3col">
+                <div style="text-align:left;">TANGGAL</div>
+                <div style="text-align:center;">HARGA TOTAL</div>
+                <div style="text-align:right;">QTY TOTAL</div>
+            </div>
+            <div class="list-container" id="list-riwayat-belanja"></div>
+        </section>
 
-  <!-- b. LAPORAN KEUNTUNGAN -->
-  <div id="laporan-keuntungan" class="tab-content">
-    <h2>Laporan Keuntungan</h2>
-    <br>
-    
-    <!-- Grid 2x2 -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-title">Laba Bersih Kemarin</div>
-        <div class="kpi-value" id="kpi-laba-kemarin">Rp 0</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">Laba Bersih Bulan Ini</div>
-        <div class="kpi-value" id="kpi-laba-bulan-ini">Rp 0</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">Pengeluaran Kemarin</div>
-        <div class="kpi-value" id="kpi-pengeluaran-kemarin">Rp 0</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">Pengeluaran Bulan Ini</div>
-        <div class="kpi-value" id="kpi-pengeluaran-bulan-ini">Rp 0</div>
-      </div>
-    </div>
+        <!-- 2. PENJUALAN (A) -->
+        <section class="view-content" id="view-penjualan">
+            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-cart-shopping"></i> Riwayat Penjualan</div><button class="btn-action" onclick="openFormPenjualan()"><i class="fa-solid fa-plus"></i> Transaksi Baru (F5)</button></div>
+            <div class="list-header-3col">
+                <div style="text-align:left;">TANGGAL</div>
+                <div style="text-align:center;">HARGA TOTAL</div>
+                <div style="text-align:right;">QTY TOTAL</div>
+            </div>
+            <div class="list-container" id="list-riwayat-penjualan"></div>
+        </section>
 
-    <!-- Tabel Rincian Keuntungan Harian -->
-    <h3>Rincian Keuntungan Harian</h3>
-    <br>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Tanggal</th>
-            <th>Laba Bersih</th>
-            <th>Pengeluaran</th>
-            <th>Laba Kotor</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-keuntungan-harian"></tbody>
-      </table>
-    </div>
+        <!-- 3. STOK BARANG -->
+        <section class="view-content" id="view-stok">
+            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-cubes"></i> Katalog Stok</div><button class="btn-action" onclick="openFormStok()"><i class="fa-solid fa-plus"></i> Tambah Barang (F5)</button></div>
+            <div class="list-container" id="list-katalog-stok"></div>
+        </section>
 
-    <!-- Diagram Keuntungan Bersih -->
-    <h3>Diagram Keuntungan Bersih (Tahun Ini)</h3>
-    <br>
-    <div class="chart-box">
-      <canvas id="chartKeuntungan"></canvas>
-    </div>
-  </div>
+        <!-- 4. PERKIRAAN BELANJA -->
+        <section class="view-content" id="view-perkiraan">
+            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-chart-line"></i> Perkiraan Belanja / Restock</div></div>
+            <div class="perkiraan-header">
+                <div>NAMA BARANG</div>
+                <div style="text-align:center;">STOK SAAT INI</div>
+                <div style="text-align:right;">HARUS RESTOCK</div>
+            </div>
+            <div class="list-container" id="list-perkiraan-belanja" style="margin-top:8px;"></div>
+        </section>
 
-  <!-- MENU SINKRONISASI -->
-  <div id="sinkronisasi" class="tab-content">
-    <h2>Sinkronisasi Data</h2>
-    <br>
-    <button class="btn-sync" onclick="backupManual()">Backup Data Manual</button>
-    <button class="btn-sync" style="background:#0284c7" onclick="tarikDataManual()">Tarik Data Manual</button>
-  </div>
-</div>
+        <!-- 5. PENGELUARAN LAIN (A) -->
+        <section class="view-content" id="view-pengeluaran">
+            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-file-invoice"></i> Pengeluaran Lain</div><button class="btn-action" onclick="openFormPengeluaran()"><i class="fa-solid fa-plus"></i> Tambah Pengeluaran (F5)</button></div>
+            <div class="list-header-3col">
+                <div style="text-align:left;">TANGGAL</div>
+                <div style="text-align:center;">HARGA TOTAL</div>
+                <div style="text-align:right;">QTY TOTAL</div>
+            </div>
+            <div class="list-container" id="list-pengeluaran-lain"></div>
+        </section>
 
-<script>
-  // Sample Data Dummy untuk Pengujian
-  let dataBelanja = [
-    { tanggal: '2026-07-25', hargaTotal: 1500000, qtyTotal: 30 },
-    { tanggal: '2026-07-24', hargaTotal: 800000, qtyTotal: 15 },
-    { tanggal: '2026-07-23', hargaTotal: 1200000, qtyTotal: 22 }
-  ];
+        <!-- 6. KEUNTUNGAN (B) -->
+        <section class="view-content" id="view-keuntungan">
+            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-wallet"></i> Laporan Keuntungan</div></div>
+            <!-- Grid 2x2: Laba Bersih Kemarin, Laba Bersih Bulan Ini, Pengeluaran Kemarin, Pengeluaran Bulan Ini -->
+            <div class="grid-2x2">
+                <div class="card-stat"><div class="title">Laba Bersih Kemarin</div><div class="val text-green" id="stat-laba-kemarin">Rp 0</div></div>
+                <div class="card-stat"><div class="title">Laba Bersih Bulan Ini</div><div class="val text-green" id="stat-laba-bulan">Rp 0</div></div>
+                <div class="card-stat"><div class="title">Pengeluaran Kemarin</div><div class="val text-red" id="stat-exp-kemarin">Rp 0</div></div>
+                <div class="card-stat"><div class="title">Pengeluaran Bulan Ini</div><div class="val text-red" id="stat-exp-bulan">Rp 0</div></div>
+            </div>
+            
+            <div class="submenu-header" style="margin-top:10px; margin-bottom:5px;"><div class="submenu-title" style="font-size:0.85rem;">Rincian Keuntungan Harian</div></div>
+            <div class="list-container" style="background:#141414; border:1px solid #222; border-radius:10px; padding:5px; max-height:160px; flex-shrink:0;">
+                <table class="cart-table">
+                    <thead><tr><th>Tanggal</th><th>Laba Bersih</th><th>Pengeluaran</th><th>Laba Kotor</th></tr></thead>
+                    <tbody id="list-keuntungan-harian"></tbody>
+                </table>
+            </div>
 
-  let dataPenjualan = [
-    { tanggal: '2026-07-25', hargaTotal: 2500000, qtyTotal: 45 },
-    { tanggal: '2026-07-24', hargaTotal: 1800000, qtyTotal: 30 },
-    { tanggal: '2026-07-23', hargaTotal: 2100000, qtyTotal: 38 }
-  ];
+            <!-- Diagram Keuntungan Bersih Bulan Jan - Des dengan Gradasi Merah-Kuning-Hijau + Nominal Atas Bar -->
+            <div class="chart-section">
+                <div class="chart-title">
+                    <span><i class="fa-solid fa-chart-column"></i> DIAGRAM KEUNTUNGAN BERSIH TAHUN INI</span>
+                </div>
+                <div class="chart-container" id="chart-bars-container"></div>
+            </div>
+        </section>
 
-  let dataPengeluaranLain = [
-    { tanggal: '2026-07-25', hargaTotal: 100000, qtyTotal: 2 },
-    { tanggal: '2026-07-24', hargaTotal: 150000, qtyTotal: 1 },
-    { tanggal: '2026-07-23', hargaTotal: 50000, qtyTotal: 1 }
-  ];
+        <!-- 7. FAKTUR -->
+        <section class="view-content" id="view-faktur">
+            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-money-bill-wave"></i> Pengaturan Faktur</div></div>
+            <div class="list-container">
+                <div class="form-group"><label>Nama Toko</label><input type="text" id="faktur-nama" value="ARYA GROSIR" class="uppercase-input"></div>
+                <div class="form-group"><label>Alamat Toko</label><input type="text" id="faktur-alamat" value="Jl. Pasar Raya No. 123"></div>
+                <div class="form-group"><label>Footer Struk</label><textarea id="faktur-footer" rows="2">Terima kasih telah berbelanja!</textarea></div>
+                <button class="btn-full" onclick="simpanPengaturanFaktur()"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan</button>
+            </div>
+        </section>
 
-  let rincianHarian = [
-    { tanggal: '2026-07-25', labaBersih: 900000, pengeluaran: 100000, labaKotor: 1000000 },
-    { tanggal: '2026-07-24', labaBersih: 850000, pengeluaran: 150000, labaKotor: 1000000 },
-    { tanggal: '2026-07-23', labaBersih: 850000, pengeluaran: 50000, labaKotor: 900000 }
-  ];
-
-  let dataBulanan = [12000000, 8000000, 15000000, 22000000, 18000000, 5000000, 14000000, 0, 0, 0, 0, 0];
-
-  function formatRupiah(val) {
-    return 'Rp ' + val.toLocaleString('id-ID');
-  }
-
-  function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    event.target.classList.add('active');
-  }
-
-  // a. Render Tabel dengan Pengurutan Tanggal Terbaru di Atas
-  function renderTableStandard(id, listData) {
-    const sorted = [...listData].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
-    const tbody = document.getElementById(id);
-    tbody.innerHTML = sorted.map(item => `
-      <tr>
-        <td>${item.tanggal}</td>
-        <td>${formatRupiah(item.hargaTotal)}</td>
-        <td>${item.qtyTotal}</td>
-      </tr>
-    `).join('');
-  }
-
-  // b. Render Laporan Keuntungan Harian
-  function renderKeuntunganHarian() {
-    const sorted = [...rincianHarian].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
-    const tbody = document.getElementById('tbody-keuntungan-harian');
-    tbody.innerHTML = sorted.map(item => `
-      <tr>
-        <td>${item.tanggal}</td>
-        <td>${formatRupiah(item.labaBersih)}</td>
-        <td>${formatRupiah(item.pengeluaran)}</td>
-        <td>${formatRupiah(item.labaKotor)}</td>
-      </tr>
-    `).join('');
-  }
-
-  // Set Ringkasan KPI
-  function renderKPI() {
-    document.getElementById('kpi-laba-kemarin').innerText = formatRupiah(850000);
-    document.getElementById('kpi-laba-bulan-ini').innerText = formatRupiah(31500000);
-    document.getElementById('kpi-pengeluaran-kemarin').innerText = formatRupiah(150000);
-    document.getElementById('kpi-pengeluaran-bulan-ini').innerText = formatRupiah(4200000);
-  }
-
-  // Render Chart Diagram Bulanan dengan Gradasi Warna & Nominal
-  let myChart;
-  function renderChart() {
-    Chart.register(ChartDataLabels);
-    const ctx = document.getElementById('chartKeuntungan').getContext('2d');
-    
-    const minVal = Math.min(...dataBulanan.filter(v => v > 0));
-    const maxVal = Math.max(...dataBulanan);
-
-    const backgroundColors = dataBulanan.map(val => {
-      if (val === 0) return '#cbd5e1';
-      if (val <= minVal + (maxVal - minVal) * 0.33) return '#ef4444'; // Merah (Rendah)
-      if (val <= minVal + (maxVal - minVal) * 0.66) return '#eab308'; // Kuning (Menengah)
-      return '#22c55e'; // Hijau (Tinggi)
-    });
-
-    if (myChart) myChart.destroy();
-
-    myChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'],
-        datasets: [{
-          label: 'Laba Bersih',
-          data: dataBulanan,
-          backgroundColor: backgroundColors,
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          datalabels: {
-            anchor: 'end',
-            align: 'top',
-            formatter: (value) => value > 0 ? (value / 1000).toLocaleString('id-ID') + 'k' : '',
-            font: { weight: 'bold', size: 10 }
-          }
-        },
-        scales: {
-          y: { beginAtZero: true, grid: { display: false } },
-          x: { grid: { display: false } }
-        }
-      }
-    });
-  }
-
-  function backupManual() { alert('Proses backup manual dimulai...'); }
-  function tarikDataManual() { alert('Proses tarik data manual dimulai...'); }
-
-  // Initial Load
-  window.onload = () => {
-    renderTableStandard('tbody-belanja', dataBelanja);
-    renderTableStandard('tbody-penjualan', dataPenjualan);
-    renderTableStandard('tbody-pengeluaran', dataPengeluaranLain);
-    renderKeuntunganHarian();
-    renderKPI();
-    renderChart();
+        <!-- 8. SINKRONISASI -->
+        <section class="view-content" id="view-sinkronisasi">
+            <div class="submenu-header"><div class="submenu-title"><i class="fa-solid fa-rotate"></i> Sinkronisasi Google Sheets</div></div>
+            <div class="list-container">
+                <div class="form-group"><label>URL Web App Google AppScript</label><input type="text" id="appscript-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+                <button class="btn-full" onclick="simpanUrlAppscript()" style="background:#00e676; color:#000;"><i class="fa-solid fa-link"></i> Simpan URL WebApp</button>
+                <button class="btn-full" onclick="tarikDataFromSheets()" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cloud-arrow-down"></i> Download Data (Tarik Data)</button>
+                <button class="btn-full" onclick="backupDataToSheets()" style="background:#ff9800; color:#000;"><i class="fa-solid fa-cloud-arrow-up"></i> Backup Data (Upload Data Manual)</button>
+                
+                <div class="code-box-container">
+                    <div class="code-box-header"><span>KODE GOOGLE APPSCRIPT ENGINE</span><button class="btn-copy" onclick="copyAppScript()">Copy Kode</button></div>
+                    <textarea id="appscript-code" class="code-area" readonly>
+// ARYA GROSIR - APPSCRIPT ENGINE (LENGKAP 7 SHEET + OTOMATIS 23.00)
+function setupSheets() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const headers = {
+    "stok barang barang": ["ID", "Barcode", "Nama Barang", "Satuan", "Stok", "Min Stok", "Harga Beli", "Harga Grosir", "Harga Retail"],
+    "belanja": ["ID Transaksi", "Tanggal", "Harga Total", "Qty Total"],
+    "penjualan": ["ID Transaksi", "Tanggal", "Customer", "Pembeli", "Harga Total", "Qty Total"],
+    "perkiraan belanja": ["Barcode", "Nama Barang", "Stok Saat Ini", "Min Stok", "Restock Qty"],
+    "pengeluaran lain": ["ID", "Tanggal", "Harga Total", "Qty Total", "Keterangan"],
+    "keuntungan": ["Tanggal", "Laba Bersih", "Pengeluaran", "Laba Kotor"],
+    "waktu singkronisasi": ["Waktu", "Jenis Sinkronisasi", "Status"]
   };
-</script>
+  for (let sheetName in headers) {
+    let sheet = ss.getSheetByName(sheetName);
+    if (!sheet) sheet = ss.insertSheet(sheetName);
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(headers[sheetName]);
+      sheet.getRange(1, 1, 1, headers[sheetName].length).setFontWeight("bold").setBackground("#00e676").setFontColor("#000000");
+      sheet.setFrozenRows(1);
+    }
+  }
+}
+
+function doGet(e) {
+  setupSheets();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  function getSheetValues(sheetName) {
+    let sheet = ss.getSheetByName(sheetName);
+    if (!sheet || sheet.getLastRow() <= 1) return [];
+    return sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+  }
+  let result = {
+    stok: getSheetValues("stok barang barang"),
+    belanja: getSheetValues("belanja"),
+    penjualan: getSheetValues("penjualan"),
+    perkiraan: getSheetValues("perkiraan belanja"),
+    pengeluaran: getSheetValues("pengeluaran lain"),
+    keuntungan: getSheetValues("keuntungan"),
+    waktu: getSheetValues("waktu singkronisasi")
+  };
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    setupSheets();
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const data = JSON.parse(e.postData.contents);
+
+    function updateSheetData(sheetName, rowArray) {
+      let sheet = ss.getSheetByName(sheetName);
+      if (sheet.getLastRow() > 1) sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).clearContent();
+      if (rowArray && rowArray.length > 0) sheet.getRange(2, 1, rowArray.length, rowArray[0].length).setValues(rowArray);
+    }
+
+    if (data.stok) updateSheetData("stok barang barang", data.stok);
+    if (data.belanja) updateSheetData("belanja", data.belanja);
+    if (data.penjualan) updateSheetData("penjualan", data.penjualan);
+    if (data.perkiraan) updateSheetData("perkiraan belanja", data.perkiraan);
+    if (data.pengeluaran) updateSheetData("pengeluaran lain", data.pengeluaran);
+    if (data.keuntungan) updateSheetData("keuntungan", data.keuntungan);
+
+    let nowFormatted = Utilities.formatDate(new Date(), ss.getSpreadsheetTimeZone(), "dd/MM/yyyy HH:mm:ss");
+    ss.getSheetByName("waktu singkronisasi").appendRow([nowFormatted, data.jenis || "Manual Backup", "Berhasil"]);
+
+    return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Backup Berhasil!" })).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// OTOMATIS BIKIN TRIGGER SINKRONISASI JAM 23.00
+function setDailyTrigger() {
+  let triggers = ScriptApp.getProjectTriggers();
+  for (let i = 0; i < triggers.length; i++) {
+    ScriptApp.deleteTrigger(triggers[i]);
+  }
+  ScriptApp.newTrigger('autoBackupAt23')
+    .timeBased()
+    .atHour(23)
+    .everyDays(1)
+    .create();
+}
+
+function autoBackupAt23() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let nowFormatted = Utilities.formatDate(new Date(), ss.getSpreadsheetTimeZone(), "dd/MM/yyyy HH:mm:ss");
+  ss.getSheetByName("waktu singkronisasi").appendRow([nowFormatted, "Otomatis Jam 23.00", "Berhasil dijalankan"]);
+}
+                    </textarea>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ================= MODAL BELANJA ================= -->
+    <div class="modal-overlay" id="modal-belanja">
+        <div class="modal-header"><div class="modal-title" id="bl-modal-title">FORM BELANJA BARU</div><button class="btn-close" onclick="closeModalDirect()">X</button></div>
+        <div id="bl-form-container">
+            <form id="form-chain-bl" onsubmit="return false;">
+                <div class="form-group"><label>ID Belanja</label><input type="text" id="bl-id" readonly tabindex="-1"></div>
+                <div class="form-group"><label>Tanggal</label><input type="date" id="bl-tanggal" class="enter-chain"></div>
+                <div class="form-group">
+                    <label>Barcode</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="bl-barcode" class="enter-chain" placeholder="Scan/Ketik Barcode" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); lookupBarcode(this.value, 'bl');">
+                        <button type="button" class="btn-scan" onclick="startScanner('bl')"><i class="fa-solid fa-camera"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nama Barang</label>
+                    <input type="text" id="bl-nama" class="uppercase-input enter-chain" placeholder="Ketik nama barang..." oninput="this.value = this.value.toUpperCase(); searchAutocomplete(this.value, 'bl');">
+                    <div class="autocomplete-list" id="bl-auto-list"></div>
+                </div>
+                <div class="form-group"><label>Satuan</label><input type="text" id="bl-satuan" class="uppercase-input enter-chain" oninput="this.value=this.value.toUpperCase()"></div>
+                <div class="form-group"><label>Harga Beli (Modal)</label><input type="text" id="bl-harga" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('bl');"></div>
+                <div class="form-group"><label>QTY (Tekan Enter Untuk Simpan)</label><input type="text" inputmode="numeric" id="bl-qty" class="enter-chain" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('bl');"></div>
+                <div class="form-group"><label>Total Harga Per Item</label><input type="text" id="bl-subtotal" readonly tabindex="-1"></div>
+                
+                <button type="button" class="btn-full enter-chain" id="bl-btn-add" onclick="addToCart('bl')" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cart-plus"></i> Masukkan ke Keranjang</button>
+            </form>
+        </div>
+
+        <table class="cart-table">
+            <thead><tr><th>Nama Barang</th><th>QTY</th><th>Subtotal</th><th>Aksi</th></tr></thead>
+            <tbody id="bl-cart-body"></tbody>
+        </table>
+        <div class="cart-summary"><span>Total QTY: <span id="bl-total-qty">0</span></span><span>Total: <span id="bl-total-harga" style="color:#00e676;">Rp 0</span></span></div>
+        <button class="btn-full" id="bl-btn-save-main" onclick="saveBelanja()" style="background:#00e676; color:#000; margin-top:15px;"><i class="fa-solid fa-floppy-disk"></i> Simpan Transaksi (F8)</button>
+    </div>
+
+    <!-- ================= MODAL PENJUALAN ================= -->
+    <div class="modal-overlay" id="modal-penjualan">
+        <div class="modal-header"><div class="modal-title" id="pj-modal-title">FORM PENJUALAN BARU</div><button class="btn-close" onclick="closeModalDirect()">X</button></div>
+        <div id="pj-form-container">
+            <form id="form-chain-pj" onsubmit="return false;">
+                <div class="form-group"><label>ID Penjualan</label><input type="text" id="pj-id" readonly tabindex="-1"></div>
+                <div class="form-group"><label>Tanggal</label><input type="date" id="pj-tanggal" class="enter-chain"></div>
+                <div class="form-group">
+                    <label>Tipe Customer</label>
+                    <div class="cust-type-container">
+                        <button type="button" class="btn-cust-type active" id="btn-cust-grosir" onclick="setCustType('grosir')">GROSIR</button>
+                        <button type="button" class="btn-cust-type" id="btn-cust-retail" onclick="setCustType('retail')">RETAIL</button>
+                    </div>
+                </div>
+                <div class="form-group"><label>Nama Pembeli</label><input type="text" id="pj-pembeli" value="UMUM" class="uppercase-input enter-chain" oninput="this.value=this.value.toUpperCase()"></div>
+                <div class="form-group">
+                    <label>Barcode</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="pj-barcode" class="enter-chain" placeholder="Scan/Ketik Barcode" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); lookupBarcode(this.value, 'pj');">
+                        <button type="button" class="btn-scan" onclick="startScanner('pj')"><i class="fa-solid fa-camera"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nama Barang</label>
+                    <input type="text" id="pj-nama" class="uppercase-input enter-chain" placeholder="Ketik nama barang..." oninput="this.value = this.value.toUpperCase(); searchAutocomplete(this.value, 'pj');">
+                    <div class="autocomplete-list" id="pj-auto-list"></div>
+                </div>
+                <div class="form-group"><label>Satuan</label><input type="text" id="pj-satuan" class="uppercase-input" readonly tabindex="-1"></div>
+                <div class="form-group"><label>Harga Jual</label><input type="text" id="pj-harga" readonly tabindex="-1"></div>
+                <div class="form-group"><label>QTY (Tekan Enter Untuk Simpan)</label><input type="text" inputmode="numeric" id="pj-qty" class="enter-chain" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('pj');"></div>
+                <div class="form-group"><label>Total Subtotal</label><input type="text" id="pj-subtotal" readonly tabindex="-1"></div>
+                
+                <button type="button" class="btn-full enter-chain" id="pj-btn-add" onclick="addToCart('pj')" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cart-plus"></i> Masukkan ke Keranjang</button>
+            </form>
+        </div>
+
+        <table class="cart-table">
+            <thead><tr><th>Nama Barang</th><th>QTY</th><th>Subtotal</th><th>Aksi</th></tr></thead>
+            <tbody id="pj-cart-body"></tbody>
+        </table>
+        <div class="cart-summary"><span>Total QTY: <span id="pj-total-qty">0</span></span><span>Total: <span id="pj-total-harga" style="color:#00e676;">Rp 0</span></span></div>
+        <button class="btn-full" id="pj-btn-save-main" onclick="savePenjualan()" style="background:#00e676; color:#000; margin-top:15px;"><i class="fa-solid fa-floppy-disk"></i> Simpan Transaksi (F8)</button>
+    </div>
+
+    <!-- ================= MODAL STOK ================= -->
+    <div class="modal-overlay" id="modal-stok">
+        <div class="modal-header"><div class="modal-title" id="stok-modal-title">FORM TAMBAH BARANG</div><button class="btn-close" onclick="closeModalDirect()">X</button></div>
+        <div class="list-container">
+            <form id="form-chain-stok" onsubmit="return false;">
+                <input type="hidden" id="stok-id">
+                <div class="form-group">
+                    <label>Barcode</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="stok-barcode" class="enter-chain" placeholder="Scan/Ketik Barcode" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        <button type="button" class="btn-scan" onclick="startScanner('stok')"><i class="fa-solid fa-camera"></i></button>
+                    </div>
+                </div>
+                <div class="form-group"><label>Nama Barang</label><input type="text" id="stok-nama" class="uppercase-input enter-chain" oninput="this.value=this.value.toUpperCase()"></div>
+                <div class="form-group"><label>Satuan</label><input type="text" id="stok-satuan" class="uppercase-input enter-chain" placeholder="PCS / DUS / PACK" oninput="this.value=this.value.toUpperCase()"></div>
+                <div class="form-group"><label>Stok Saat Ini</label><input type="text" id="stok-qty" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                <div class="form-group"><label>Minimal Stok (Untuk Restock)</label><input type="text" id="stok-min" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                <div class="form-group"><label>Harga Beli (Modal)</label><input type="text" id="stok-harga-beli" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                <div class="form-group"><label>Harga Jual Grosir</label><input type="text" id="stok-harga-grosir" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                <div class="form-group"><label>Harga Jual Retail</label><input type="text" id="stok-harga-retail" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                
+                <button class="btn-full enter-chain" onclick="saveStok()"><i class="fa-solid fa-floppy-disk"></i> Simpan Barang (F8)</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL PENGELUARAN ================= -->
+    <div class="modal-overlay" id="modal-pengeluaran">
+        <div class="modal-header"><div class="modal-title" id="exp-modal-title">FORM PENGELUARAN LAIN</div><button class="btn-close" onclick="closeModalDirect()">X</button></div>
+        <div class="list-container">
+            <form id="form-chain-exp" onsubmit="return false;">
+                <input type="hidden" id="exp-id">
+                <div class="form-group"><label>Tanggal</label><input type="date" id="exp-tanggal" class="enter-chain"></div>
+                <div class="form-group"><label>Keterangan Pengeluaran</label><input type="text" id="exp-ket" class="enter-chain" placeholder="Contoh: Bayar Listrik, Plastik, dll"></div>
+                <div class="form-group"><label>Nominal Pengeluaran</label><input type="text" id="exp-nominal" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                
+                <button class="btn-full enter-chain" onclick="savePengeluaran()"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengeluaran (F8)</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FULLSCREEN CAMERA SCANNER OVERLAY -->
+    <div id="scanner-overlay">
+        <div id="interactive-reader"></div>
+        <div class="scanner-controls">
+            <button class="btn-scanner-ctrl" onclick="stopScanner()">BATAL / TUTUP</button>
+        </div>
+    </div>
+
+    <script>
+        // DATA STORAGE LOCAL
+        let dbStok = JSON.parse(localStorage.getItem('arya_stok')) || [];
+        let dbBelanja = JSON.parse(localStorage.getItem('arya_belanja')) || [];
+        let dbPenjualan = JSON.parse(localStorage.getItem('arya_penjualan')) || [];
+        let dbPengeluaran = JSON.parse(localStorage.getItem('arya_pengeluaran')) || [];
+        
+        let html5QrcodeScanner = null;
+        let activeScanForm = null;
+        let activeCustType = 'grosir';
+
+        function getTodayISO() {
+            let today = new Date();
+            let dd = String(today.getDate()).padStart(2, '0');
+            let mm = String(today.getMonth() + 1).padStart(2, '0');
+            let yyyy = today.getFullYear();
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function formatThousand(val) {
+            if (!val && val !== 0) return '';
+            let numStr = val.toString().replace(/[^0-9]/g, '');
+            if (!numStr) return '';
+            return parseInt(numStr, 10).toLocaleString('id-ID');
+        }
+
+        function parseFormattedNum(val) {
+            if (!val) return 0;
+            return parseInt(val.toString().replace(/[^0-9]/g, ''), 10) || 0;
+        }
+
+        function formatNumberInput(inputEl) {
+            let cursor = inputEl.selectionStart;
+            let prevLen = inputEl.value.length;
+            let clean = inputEl.value.replace(/[^0-9]/g, '');
+            if (clean) {
+                inputEl.value = parseInt(clean, 10).toLocaleString('id-ID');
+            } else {
+                inputEl.value = '';
+            }
+            let nextLen = inputEl.value.length;
+            cursor += (nextLen - prevLen);
+            inputEl.setSelectionRange(cursor, cursor);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type} show`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const dayName = days[now.getDay()];
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            const time = now.toTimeString().split(' ')[0];
+            document.getElementById('datetime').innerHTML = `${dayName}, ${d}/${m}/${y}<br>${time}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function showView(viewId) {
+            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+
+            // Render Ulang List Sesuai View
+            if (viewId === 'view-belanja') renderRiwayatList('list-riwayat-belanja', dbBelanja);
+            if (viewId === 'view-penjualan') renderRiwayatList('list-riwayat-penjualan', dbPenjualan);
+            if (viewId === 'view-pengeluaran') renderRiwayatList('list-pengeluaran-lain', dbPengeluaran);
+            if (viewId === 'view-keuntungan') renderLaporanKeuntungan();
+        }
+
+        function navBackHome() {
+            let openModal = document.querySelector('.modal-overlay.active');
+            if (openModal) {
+                closeModalDirect();
+                return;
+            }
+            let activeView = document.querySelector('.view-content.active');
+            if (activeView && activeView.id !== 'view-main-menu') {
+                showView('view-main-menu');
+            }
+        }
+
+        // A. RENDER RIWAYAT URUT DARI TANGGAL TERBARU (KOLOM: TANGGAL | HARGA TOTAL | QTY TOTAL)
+        function renderRiwayatList(elementId, dataArray) {
+            let container = document.getElementById(elementId);
+            container.innerHTML = '';
+
+            // Urutkan dari tanggal terbaru ke terkini
+            let sortedData = [...dataArray].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+
+            if (sortedData.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Belum Ada Transaksi</div>';
+                return;
+            }
+
+            sortedData.forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'list-row-3col';
+                
+                // Format Tgl dd/mm/yyyy
+                let parts = item.tanggal.split('-');
+                let formattedDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : item.tanggal;
+
+                div.innerHTML = `
+                    <div class="col-left">${formattedDate}</div>
+                    <div class="col-center">Rp ${formatThousand(item.hargaTotal || item.nominal || 0)}</div>
+                    <div class="col-right">${formatThousand(item.qtyTotal || 1)} Item</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // B. RENDER LAPORAN KEUNTUNGAN (2x2 CARD, RINCIAN HARIAN, DIAGRAM JAN-DES MERAH-KUNING-HIJAU)
+        function renderLaporanKeuntungan() {
+            let todayStr = getTodayISO();
+            
+            let yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            let yyyy = yesterday.getFullYear();
+            let mm = String(yesterday.getMonth() + 1).padStart(2, '0');
+            let dd = String(yesterday.getDate()).padStart(2, '0');
+            let yesterdayStr = `${yyyy}-${mm}-${dd}`;
+
+            let currentMonthStr = todayStr.substring(0, 7); // yyyy-mm
+
+            // Calculate Metrics
+            let labaKemarin = 0, pengeluaranKemarin = 0;
+            let labaBulanIni = 0, pengeluaranBulanIni = 0;
+
+            let harianMap = {}; // { 'YYYY-MM-DD': { labaKotor, pengeluaran, labaBersih } }
+
+            // Process Penjualan (Laba Kotor = Omset)
+            dbPenjualan.forEach(p => {
+                let tgl = p.tanggal;
+                let total = p.hargaTotal || 0;
+
+                if (!harianMap[tgl]) harianMap[tgl] = { labaKotor: 0, pengeluaran: 0, labaBersih: 0 };
+                harianMap[tgl].labaKotor += total;
+
+                if (tgl === yesterdayStr) labaKemarin += total;
+                if (tgl.startsWith(currentMonthStr)) labaBulanIni += total;
+            });
+
+            // Process Pengeluaran
+            dbPengeluaran.forEach(e => {
+                let tgl = e.tanggal;
+                let nominal = e.hargaTotal || e.nominal || 0;
+
+                if (!harianMap[tgl]) harianMap[tgl] = { labaKotor: 0, pengeluaran: 0, labaBersih: 0 };
+                harianMap[tgl].pengeluaran += nominal;
+
+                if (tgl === yesterdayStr) pengeluaranKemarin += nominal;
+                if (tgl.startsWith(currentMonthStr)) pengeluaranBulanIni += nominal;
+            });
+
+            // Hitung Laba Bersih
+            for (let tgl in harianMap) {
+                harianMap[tgl].labaBersih = harianMap[tgl].labaKotor - harianMap[tgl].pengeluaran;
+            }
+
+            // Render KPI 2x2
+            document.getElementById('stat-laba-kemarin').innerText = 'Rp ' + formatThousand(labaKemarin - pengeluaranKemarin);
+            document.getElementById('stat-laba-bulan').innerText = 'Rp ' + formatThousand(labaBulanIni - pengeluaranBulanIni);
+            document.getElementById('stat-exp-kemarin').innerText = 'Rp ' + formatThousand(pengeluaranKemarin);
+            document.getElementById('stat-exp-bulan').innerText = 'Rp ' + formatThousand(pengeluaranBulanIni);
+
+            // Render Tabel Keuntungan Harian
+            let tbodyHarian = document.getElementById('list-keuntungan-harian');
+            tbodyHarian.innerHTML = '';
+            
+            let sortedDates = Object.keys(harianMap).sort((a,b) => new Date(b) - new Date(a));
+            sortedDates.forEach(tgl => {
+                let item = harianMap[tgl];
+                let parts = tgl.split('-');
+                let formattedDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : tgl;
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td style="color:#00e676; font-weight:bold;">Rp ${formatThousand(item.labaBersih)}</td>
+                    <td style="color:#ff5252;">Rp ${formatThousand(item.pengeluaran)}</td>
+                    <td style="color:#2196f3;">Rp ${formatThousand(item.labaKotor)}</td>
+                `;
+                tbodyHarian.appendChild(tr);
+            });
+
+            // Render Diagram Bulanan (Jan - Des Tahun Ini)
+            renderMonthlyChart(harianMap);
+        }
+
+        function renderMonthlyChart(harianMap) {
+            let container = document.getElementById('chart-bars-container');
+            container.innerHTML = '';
+
+            let currentYear = new Date().getFullYear();
+            let monthlyNet = Array(12).fill(0);
+
+            // Accumulate monthly
+            for (let tgl in harianMap) {
+                if (tgl.startsWith(currentYear.toString())) {
+                    let monthIdx = parseInt(tgl.split('-')[1], 10) - 1;
+                    monthlyNet[monthIdx] += harianMap[tgl].labaBersih;
+                }
+            }
+
+            let maxVal = Math.max(...monthlyNet, 1000);
+            let monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+
+            monthlyNet.forEach((val, idx) => {
+                let pct = Math.max(5, Math.min(100, (val / maxVal) * 100));
+
+                // Gradasi Warna: Merah (Rendah), Kuning (Menengah), Hijau (Tinggi)
+                let barColor = '#ff5252'; // Merah
+                if (pct > 35 && pct <= 70) barColor = '#ffb74d'; // Kuning
+                else if (pct > 70) barColor = '#00e676'; // Hijau
+
+                let wrapper = document.createElement('div');
+                wrapper.className = 'bar-wrapper';
+                wrapper.innerHTML = `
+                    <div class="bar-val">${val > 0 ? (val/1000).toFixed(0)+'k' : '0'}</div>
+                    <div class="bar" style="height:${pct}%; background:${barColor};"></div>
+                    <div class="bar-label">${monthNames[idx]}</div>
+                `;
+                container.appendChild(wrapper);
+            });
+        }
+
+        // Form Open Modals
+        function openFormBelanja() {
+            document.getElementById('bl-modal-title').innerText = "FORM BELANJA BARU";
+            document.getElementById('bl-id').value = "BLJ-" + Date.now();
+            document.getElementById('bl-tanggal').value = getTodayISO();
+            document.getElementById('modal-belanja').classList.add('active');
+            setTimeout(() => document.getElementById('bl-barcode').focus(), 300);
+        }
+
+        function openFormPenjualan() {
+            document.getElementById('pj-modal-title').innerText = "FORM PENJUALAN BARU";
+            document.getElementById('pj-id').value = "PJL-" + Date.now();
+            document.getElementById('pj-tanggal').value = getTodayISO();
+            document.getElementById('modal-penjualan').classList.add('active');
+            setTimeout(() => document.getElementById('pj-barcode').focus(), 300);
+        }
+
+        function openFormStok() {
+            document.getElementById('stok-modal-title').innerText = "FORM TAMBAH BARANG";
+            document.getElementById('modal-stok').classList.add('active');
+            setTimeout(() => document.getElementById('stok-barcode').focus(), 300);
+        }
+
+        function openFormPengeluaran() {
+            document.getElementById('exp-modal-title').innerText = "FORM PENGELUARAN LAIN";
+            document.getElementById('exp-id').value = "EXP-" + Date.now();
+            document.getElementById('exp-tanggal').value = getTodayISO();
+            document.getElementById('modal-pengeluaran').classList.add('active');
+            setTimeout(() => document.getElementById('exp-ket').focus(), 300);
+        }
+
+        function closeModalDirect() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        }
+
+        // FULLSCREEN SCANNER
+        function startScanner(formPrefix) {
+            activeScanForm = formPrefix;
+            document.getElementById('scanner-overlay').style.display = 'flex';
+            if (!html5QrcodeScanner) html5QrcodeScanner = new Html5Qrcode("interactive-reader");
+            
+            const config = { fps: 25, qrbox: { width: 280, height: 180 }, aspectRatio: 1.0 };
+            html5QrcodeScanner.start({ facingMode: "environment" }, config, (decodedText) => {
+                onScanSuccess(decodedText);
+            }, () => {}).catch(() => {
+                showToast("Kamera tidak dapat diakses", "error");
+                stopScanner();
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    document.getElementById('scanner-overlay').style.display = 'none';
+                }).catch(() => {
+                    document.getElementById('scanner-overlay').style.display = 'none';
+                });
+            } else {
+                document.getElementById('scanner-overlay').style.display = 'none';
+            }
+        }
+
+        function onScanSuccess(scannedCode) {
+            stopScanner();
+            let prefix = activeScanForm;
+            if (!prefix) return;
+            let barcodeEl = document.getElementById(prefix + '-barcode');
+            if (barcodeEl) {
+                barcodeEl.value = scannedCode;
+                lookupBarcode(scannedCode, prefix);
+            }
+            showToast("Barcode Terpindai: " + scannedCode);
+        }
+
+        function lookupBarcode(code, prefix) {
+            if (!code) return;
+            let item = dbStok.find(s => s.barcode === code);
+            if (item) {
+                if (prefix === 'bl') {
+                    document.getElementById('bl-nama').value = item.nama;
+                    document.getElementById('bl-satuan').value = item.satuan;
+                    document.getElementById('bl-harga').value = formatThousand(item.hargaBeli);
+                    document.getElementById('bl-qty').focus();
+                } else if (prefix === 'pj') {
+                    document.getElementById('pj-nama').value = item.nama;
+                    document.getElementById('pj-satuan').value = item.satuan;
+                    let price = (activeCustType === 'grosir') ? item.hargaGrosir : item.hargaRetail;
+                    document.getElementById('pj-harga').value = formatThousand(price);
+                    document.getElementById('pj-qty').focus();
+                }
+                calcSubtotal(prefix);
+            }
+        }
+
+        function searchAutocomplete(query, prefix) {
+            let listContainer = document.getElementById(prefix + '-auto-list');
+            if (!query || query.length < 1) {
+                listContainer.style.display = 'none';
+                return;
+            }
+            let matches = dbStok.filter(s => s.nama.toUpperCase().includes(query.toUpperCase()));
+            if (matches.length === 0) {
+                listContainer.style.display = 'none';
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            matches.forEach(m => {
+                let div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                div.innerText = `${m.nama} (${m.satuan}) - Rp ${formatThousand(m.hargaRetail)}`;
+                div.onclick = () => {
+                    document.getElementById(prefix + '-nama').value = m.nama;
+                    document.getElementById(prefix + '-barcode').value = m.barcode || '';
+                    document.getElementById(prefix + '-satuan').value = m.satuan || '';
+                    if (prefix === 'bl') {
+                        document.getElementById('bl-harga').value = formatThousand(m.hargaBeli);
+                    } else if (prefix === 'pj') {
+                        let price = (activeCustType === 'grosir') ? m.hargaGrosir : m.hargaRetail;
+                        document.getElementById('pj-harga').value = formatThousand(price);
+                    }
+                    listContainer.style.display = 'none';
+                    calcSubtotal(prefix);
+                    document.getElementById(prefix + '-qty').focus();
+                };
+                listContainer.appendChild(div);
+            });
+            listContainer.style.display = 'block';
+        }
+
+        function setCustType(type) {
+            activeCustType = type;
+            document.getElementById('btn-cust-grosir').classList.toggle('active', type === 'grosir');
+            document.getElementById('btn-cust-retail').classList.toggle('active', type === 'retail');
+            let barcode = document.getElementById('pj-barcode').value;
+            if (barcode) lookupBarcode(barcode, 'pj');
+        }
+
+        function calcSubtotal(prefix) {
+            let harga = parseFormattedNum(document.getElementById(prefix + '-harga').value);
+            let qty = parseFormattedNum(document.getElementById(prefix + '-qty').value);
+            let total = harga * qty;
+            document.getElementById(prefix + '-subtotal').value = formatThousand(total);
+        }
+
+        // ENTER KEYBOARD NAVIGATION & SHORTCUTS (D, E, F)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F5') {
+                e.preventDefault();
+                let activeView = document.querySelector('.view-content.active');
+                if (activeView) {
+                    if (activeView.id === 'view-belanja') openFormBelanja();
+                    else if (activeView.id === 'view-penjualan') openFormPenjualan();
+                    else if (activeView.id === 'view-stok') openFormStok();
+                    else if (activeView.id === 'view-pengeluaran') openFormPengeluaran();
+                }
+            } else if (e.key === 'F7') {
+                e.preventDefault();
+                navBackHome();
+            } else if (e.key === 'F8') {
+                e.preventDefault();
+                let activeModal = document.querySelector('.modal-overlay.active');
+                if (activeModal) {
+                    if (activeModal.id === 'modal-belanja') saveBelanja();
+                    else if (activeModal.id === 'modal-penjualan') savePenjualan();
+                    else if (activeModal.id === 'modal-stok') saveStok();
+                    else if (activeModal.id === 'modal-pengeluaran') savePengeluaran();
+                }
+            } else if (e.key === 'Enter') {
+                let target = e.target;
+                if (target.classList.contains('enter-chain')) {
+                    e.preventDefault();
+                    let form = target.closest('form');
+                    if (form) {
+                        let elements = Array.from(form.querySelectorAll('.enter-chain:not([readonly])'));
+                        let currentIndex = elements.indexOf(target);
+                        if (currentIndex > -1 && currentIndex < elements.length - 1) {
+                            elements[currentIndex + 1].focus();
+                        } else {
+                            if (form.id === 'form-chain-bl') addToCart('bl');
+                            else if (form.id === 'form-chain-pj') addToCart('pj');
+                            else if (form.id === 'form-chain-stok') saveStok();
+                            else if (form.id === 'form-chain-exp') savePengeluaran();
+                        }
+                    }
+                }
+            }
+        });
+
+        function addToCart(prefix) {
+            let nama = document.getElementById(prefix + '-nama').value;
+            let qty = parseFormattedNum(document.getElementById(prefix + '-qty').value);
+            let harga = parseFormattedNum(document.getElementById(prefix + '-harga').value);
+            let subtotal = harga * qty;
+
+            if (!nama || qty <= 0) {
+                showToast("Lengkapi Nama Barang & QTY!", "error");
+                return;
+            }
+
+            let tbody = document.getElementById(prefix + '-cart-body');
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${nama}</td>
+                <td>${formatThousand(qty)}</td>
+                <td>Rp ${formatThousand(subtotal)}</td>
+                <td><button class="btn-del-item" onclick="this.closest('tr').remove(); updateCartTotals('${prefix}');"><i class="fa-solid fa-trash"></i></button></td>
+            `;
+            tr.dataset.nama = nama;
+            tr.dataset.qty = qty;
+            tr.dataset.harga = harga;
+            tr.dataset.subtotal = subtotal;
+
+            tbody.appendChild(tr);
+            updateCartTotals(prefix);
+
+            document.getElementById(prefix + '-barcode').value = '';
+            document.getElementById(prefix + '-nama').value = '';
+            document.getElementById(prefix + '-satuan').value = '';
+            document.getElementById(prefix + '-harga').value = '';
+            document.getElementById(prefix + '-qty').value = '';
+            document.getElementById(prefix + '-subtotal').value = '';
+            
+            showToast("Item berhasil ditambahkan!");
+            document.getElementById(prefix + '-nama').focus();
+        }
+
+        function updateCartTotals(prefix) {
+            let tbody = document.getElementById(prefix + '-cart-body');
+            let totalQty = 0;
+            let totalHarga = 0;
+
+            Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+                totalQty += parseInt(tr.dataset.qty, 10);
+                totalHarga += parseInt(tr.dataset.subtotal, 10);
+            });
+
+            document.getElementById(prefix + '-total-qty').innerText = formatThousand(totalQty);
+            document.getElementById(prefix + '-total-harga').innerText = 'Rp ' + formatThousand(totalHarga);
+        }
+
+        function saveStok() {
+            let barcode = document.getElementById('stok-barcode').value;
+            let nama = document.getElementById('stok-nama').value;
+            let satuan = document.getElementById('stok-satuan').value;
+            let qty = parseFormattedNum(document.getElementById('stok-qty').value);
+            let min = parseFormattedNum(document.getElementById('stok-min').value);
+            let hbeli = parseFormattedNum(document.getElementById('stok-harga-beli').value);
+            let hgrosir = parseFormattedNum(document.getElementById('stok-harga-grosir').value);
+            let hretail = parseFormattedNum(document.getElementById('stok-harga-retail').value);
+
+            if (!nama) {
+                showToast("Nama Barang Wajib Diisi!", "error");
+                return;
+            }
+
+            let newItem = {
+                id: document.getElementById('stok-id').value || ("STK-" + Date.now()),
+                barcode, nama, satuan, stok: qty, minStok: min,
+                hargaBeli: hbeli, hargaGrosir: hgrosir, hargaRetail: hretail
+            };
+
+            let existingIndex = dbStok.findIndex(s => s.id === newItem.id);
+            if (existingIndex > -1) dbStok[existingIndex] = newItem;
+            else dbStok.push(newItem);
+
+            localStorage.setItem('arya_stok', JSON.stringify(dbStok));
+            showToast("Katalog Stok Berhasil Disimpan!");
+            closeModalDirect();
+        }
+
+        function saveBelanja() {
+            let tgl = document.getElementById('bl-tanggal').value;
+            let totalQty = parseFormattedNum(document.getElementById('bl-total-qty').innerText);
+            let totalHarga = parseFormattedNum(document.getElementById('bl-total-harga').innerText);
+
+            if (totalQty <= 0) {
+                showToast("Keranjang Belanja Masih Kosong!", "error");
+                return;
+            }
+
+            dbBelanja.push({
+                id: document.getElementById('bl-id').value,
+                tanggal: tgl,
+                hargaTotal: totalHarga,
+                qtyTotal: totalQty
+            });
+
+            localStorage.setItem('arya_belanja', JSON.stringify(dbBelanja));
+            showToast("Transaksi Belanja Berhasil Disimpan!");
+            closeModalDirect();
+            renderRiwayatList('list-riwayat-belanja', dbBelanja);
+        }
+
+        function savePenjualan() {
+            let tgl = document.getElementById('pj-tanggal').value;
+            let totalQty = parseFormattedNum(document.getElementById('pj-total-qty').innerText);
+            let totalHarga = parseFormattedNum(document.getElementById('pj-total-harga').innerText);
+
+            if (totalQty <= 0) {
+                showToast("Keranjang Penjualan Masih Kosong!", "error");
+                return;
+            }
+
+            dbPenjualan.push({
+                id: document.getElementById('pj-id').value,
+                tanggal: tgl,
+                hargaTotal: totalHarga,
+                qtyTotal: totalQty
+            });
+
+            localStorage.setItem('arya_penjualan', JSON.stringify(dbPenjualan));
+            showToast("Transaksi Penjualan Berhasil Disimpan!");
+            closeModalDirect();
+            renderRiwayatList('list-riwayat-penjualan', dbPenjualan);
+        }
+
+        function savePengeluaran() {
+            let tgl = document.getElementById('exp-tanggal').value;
+            let ket = document.getElementById('exp-ket').value;
+            let nominal = parseFormattedNum(document.getElementById('exp-nominal').value);
+
+            if (!ket || nominal <= 0) {
+                showToast("Lengkapi Keterangan & Nominal!", "error");
+                return;
+            }
+
+            dbPengeluaran.push({
+                id: document.getElementById('exp-id').value,
+                tanggal: tgl,
+                hargaTotal: nominal,
+                qtyTotal: 1,
+                keterangan: ket
+            });
+
+            localStorage.setItem('arya_pengeluaran', JSON.stringify(dbPengeluaran));
+            showToast("Pengeluaran Berhasil Disimpan!");
+            closeModalDirect();
+            renderRiwayatList('list-pengeluaran-lain', dbPengeluaran);
+        }
+
+        function copyAppScript() {
+            const copyText = document.getElementById("appscript-code");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            showToast("Kode AppScript Berhasil Disalin!");
+        }
+
+        function simpanUrlAppscript() {
+            const url = document.getElementById('appscript-url').value;
+            localStorage.setItem('arya_appscript_url', url);
+            showToast("URL WebApp Berhasil Disimpan!");
+        }
+
+        function tarikDataFromSheets() {
+            showToast("Menarik Data dari Google Sheets...", "info");
+        }
+
+        function backupDataToSheets() {
+            showToast("Mengunggah Data ke Google Sheets...", "info");
+        }
+    </script>
 </body>
 </html>
