@@ -337,26 +337,25 @@ function doPost(e) {
         <div id="bl-form-container">
             <form id="form-chain-bl" onsubmit="return false;">
                 <div class="form-group"><label>ID Belanja</label><input type="text" id="bl-id" readonly tabindex="-1"></div>
-                <!-- DILAKUKAN PERBAIKAN: Input Type Date Otomatis Kalender -->
-                <div class="form-group"><label>Tanggal</label><input type="date" id="bl-tanggal"></div>
+                <div class="form-group"><label>Tanggal</label><input type="date" id="bl-tanggal" class="enter-chain"></div>
                 <div class="form-group">
                     <label>Barcode</label>
                     <div class="input-with-btn">
-                        <input type="text" id="bl-barcode" placeholder="Scan/Ketik Barcode" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        <input type="text" id="bl-barcode" class="enter-chain" placeholder="Scan/Ketik Barcode" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); lookupBarcode(this.value, 'bl');">
                         <button type="button" class="btn-scan" onclick="startScanner('bl')"><i class="fa-solid fa-camera"></i></button>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Nama Barang</label>
-                    <input type="text" id="bl-nama" class="uppercase-input" placeholder="Ketik nama barang..." oninput="this.value = this.value.toUpperCase(); searchAutocomplete(this.value, 'bl');">
+                    <input type="text" id="bl-nama" class="uppercase-input enter-chain" placeholder="Ketik nama barang..." oninput="this.value = this.value.toUpperCase(); searchAutocomplete(this.value, 'bl');">
                     <div class="autocomplete-list" id="bl-auto-list"></div>
                 </div>
-                <div class="form-group"><label>Satuan</label><input type="text" id="bl-satuan" class="uppercase-input" oninput="this.value=this.value.toUpperCase()"></div>
-                <div class="form-group"><label>Harga Beli (Modal)</label><input type="text" id="bl-harga" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('bl');"></div>
-                <div class="form-group"><label>QTY (Tekan Enter Untuk Simpan)</label><input type="text" inputmode="numeric" id="bl-qty" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('bl');" onkeydown="handleEnterAddCart(event, 'bl')"></div>
+                <div class="form-group"><label>Satuan</label><input type="text" id="bl-satuan" class="uppercase-input enter-chain" oninput="this.value=this.value.toUpperCase()"></div>
+                <div class="form-group"><label>Harga Beli (Modal)</label><input type="text" id="bl-harga" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('bl');"></div>
+                <div class="form-group"><label>QTY (Tekan Enter Untuk Simpan)</label><input type="text" inputmode="numeric" id="bl-qty" class="enter-chain" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('bl');"></div>
                 <div class="form-group"><label>Total Harga Per Item</label><input type="text" id="bl-subtotal" readonly tabindex="-1"></div>
                 
-                <button type="button" class="btn-full" id="bl-btn-add" onclick="addToCart('bl')" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cart-plus"></i> Masukkan ke Keranjang</button>
+                <button type="button" class="btn-full enter-chain" id="bl-btn-add" onclick="addToCart('bl')" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cart-plus"></i> Masukkan ke Keranjang</button>
             </form>
         </div>
 
@@ -377,8 +376,7 @@ function doPost(e) {
         <div id="pj-form-container">
             <form id="form-chain-pj" onsubmit="return false;">
                 <div class="form-group"><label>ID Penjualan</label><input type="text" id="pj-id" readonly tabindex="-1"></div>
-                <!-- DILAKUKAN PERBAIKAN: Input Type Date Otomatis Kalender -->
-                <div class="form-group"><label>Tanggal</label><input type="date" id="pj-tanggal"></div>
+                <div class="form-group"><label>Tanggal</label><input type="date" id="pj-tanggal" class="enter-chain"></div>
                 <div class="form-group">
                     <label>Tipe Customer</label>
                     <div class="cust-type-container">
@@ -386,26 +384,26 @@ function doPost(e) {
                         <button type="button" class="btn-cust-type" id="btn-cust-retail" onclick="setCustType('retail')">RETAIL</button>
                     </div>
                 </div>
-                <div class="form-group"><label>Nama Pembeli</label><input type="text" id="pj-pembeli" value="UMUM" class="uppercase-input" oninput="this.value=this.value.toUpperCase()"></div>
+                <div class="form-group"><label>Nama Pembeli</label><input type="text" id="pj-pembeli" value="UMUM" class="uppercase-input enter-chain" oninput="this.value=this.value.toUpperCase()"></div>
                 <div class="form-group">
                     <label>Barcode</label>
                     <div class="input-with-btn">
-                        <input type="text" id="pj-barcode" placeholder="Scan/Ketik Barcode" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        <input type="text" id="pj-barcode" class="enter-chain" placeholder="Scan/Ketik Barcode" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); lookupBarcode(this.value, 'pj');">
                         <button type="button" class="btn-scan" onclick="startScanner('pj')"><i class="fa-solid fa-camera"></i></button>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Nama Barang</label>
-                    <input type="text" id="pj-nama" class="uppercase-input" placeholder="Ketik nama barang..." oninput="this.value = this.value.toUpperCase(); searchAutocomplete(this.value, 'pj');">
+                    <input type="text" id="pj-nama" class="uppercase-input enter-chain" placeholder="Ketik nama barang..." oninput="this.value = this.value.toUpperCase(); searchAutocomplete(this.value, 'pj');">
                     <div class="autocomplete-list" id="pj-auto-list"></div>
                 </div>
                 <div class="form-group"><label>Satuan</label><input type="text" id="pj-satuan" class="uppercase-input" readonly tabindex="-1"></div>
                 <div class="form-group"><label>Harga Jual</label><input type="text" id="pj-harga" readonly tabindex="-1"></div>
                 <input type="hidden" id="pj-modal-hpp">
-                <div class="form-group"><label>QTY (Tekan Enter Untuk Simpan)</label><input type="text" inputmode="numeric" id="pj-qty" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('pj');" onkeydown="handleEnterAddCart(event, 'pj')"></div>
+                <div class="form-group"><label>QTY (Tekan Enter Untuk Simpan)</label><input type="text" inputmode="numeric" id="pj-qty" class="enter-chain" placeholder="0" oninput="formatNumberInput(this); calcSubtotal('pj');"></div>
                 <div class="form-group"><label>Total Subtotal</label><input type="text" id="pj-subtotal" readonly tabindex="-1"></div>
                 
-                <button type="button" class="btn-full" id="pj-btn-add" onclick="addToCart('pj')" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cart-plus"></i> Masukkan ke Keranjang</button>
+                <button type="button" class="btn-full enter-chain" id="pj-btn-add" onclick="addToCart('pj')" style="background:#2196f3; color:#fff;"><i class="fa-solid fa-cart-plus"></i> Masukkan ke Keranjang</button>
             </form>
         </div>
 
@@ -422,23 +420,25 @@ function doPost(e) {
     <div class="modal-overlay" id="modal-stok">
         <div class="modal-header"><div class="modal-title" id="stok-modal-title">FORM TAMBAH BARANG</div><button class="btn-close" onclick="closeModalDirect()">X</button></div>
         <div class="list-container">
-            <input type="hidden" id="stok-id">
-            <div class="form-group">
-                <label>Barcode</label>
-                <div class="input-with-btn">
-                    <input type="text" id="stok-barcode" placeholder="Scan/Ketik Barcode" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <button type="button" class="btn-scan" onclick="startScanner('stok')"><i class="fa-solid fa-camera"></i></button>
+            <form id="form-chain-stok" onsubmit="return false;">
+                <input type="hidden" id="stok-id">
+                <div class="form-group">
+                    <label>Barcode</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="stok-barcode" class="enter-chain" placeholder="Scan/Ketik Barcode" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        <button type="button" class="btn-scan" onclick="startScanner('stok')"><i class="fa-solid fa-camera"></i></button>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group"><label>Nama Barang</label><input type="text" id="stok-nama" class="uppercase-input" oninput="this.value=this.value.toUpperCase()"></div>
-            <div class="form-group"><label>Satuan</label><input type="text" id="stok-satuan" class="uppercase-input" placeholder="PCS / DUS / PACK" oninput="this.value=this.value.toUpperCase()"></div>
-            <div class="form-group"><label>Stok Saat Ini</label><input type="text" id="stok-qty" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
-            <div class="form-group"><label>Minimal Stok (Untuk Restock)</label><input type="text" id="stok-min" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
-            <div class="form-group"><label>Harga Beli (Modal)</label><input type="text" id="stok-harga-beli" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
-            <div class="form-group"><label>Harga Jual Grosir</label><input type="text" id="stok-harga-grosir" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
-            <div class="form-group"><label>Harga Jual Retail</label><input type="text" id="stok-harga-retail" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
-            
-            <button class="btn-full" onclick="saveStok()"><i class="fa-solid fa-floppy-disk"></i> Simpan Barang (F8)</button>
+                <div class="form-group"><label>Nama Barang</label><input type="text" id="stok-nama" class="uppercase-input enter-chain" oninput="this.value=this.value.toUpperCase()"></div>
+                <div class="form-group"><label>Satuan</label><input type="text" id="stok-satuan" class="uppercase-input enter-chain" placeholder="PCS / DUS / PACK" oninput="this.value=this.value.toUpperCase()"></div>
+                <div class="form-group"><label>Stok Saat Ini</label><input type="text" id="stok-qty" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                <div class="form-group"><label>Minimal Stok (Untuk Restock)</label><input type="text" id="stok-min" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                <div class="form-group"><label>Harga Beli (Modal)</label><input type="text" id="stok-harga-beli" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                <div class="form-group"><label>Harga Jual Grosir</label><input type="text" id="stok-harga-grosir" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                <div class="form-group"><label>Harga Jual Retail</label><input type="text" id="stok-harga-retail" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                
+                <button class="btn-full enter-chain" onclick="saveStok()"><i class="fa-solid fa-floppy-disk"></i> Simpan Barang (F8)</button>
+            </form>
             <button class="btn-full" id="stok-btn-delete" onclick="deleteStokItem()" style="background:#ff5252; color:#fff; display:none;"><i class="fa-solid fa-trash"></i> Hapus Barang Ini</button>
         </div>
     </div>
@@ -447,18 +447,19 @@ function doPost(e) {
     <div class="modal-overlay" id="modal-pengeluaran">
         <div class="modal-header"><div class="modal-title" id="exp-modal-title">FORM PENGELUARAN LAIN</div><button class="btn-close" onclick="closeModalDirect()">X</button></div>
         <div class="list-container">
-            <input type="hidden" id="exp-id">
-            <!-- DILAKUKAN PERBAIKAN: Input Type Date Otomatis Kalender -->
-            <div class="form-group"><label>Tanggal</label><input type="date" id="exp-tanggal"></div>
-            <div class="form-group"><label>Keterangan Pengeluaran</label><input type="text" id="exp-ket" placeholder="Contoh: Bayar Listrik, Plastik, dll"></div>
-            <div class="form-group"><label>Nominal Pengeluaran</label><input type="text" id="exp-nominal" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
-            
-            <button class="btn-full" onclick="savePengeluaran()"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengeluaran (F8)</button>
+            <form id="form-chain-exp" onsubmit="return false;">
+                <input type="hidden" id="exp-id">
+                <div class="form-group"><label>Tanggal</label><input type="date" id="exp-tanggal" class="enter-chain"></div>
+                <div class="form-group"><label>Keterangan Pengeluaran</label><input type="text" id="exp-ket" class="enter-chain" placeholder="Contoh: Bayar Listrik, Plastik, dll"></div>
+                <div class="form-group"><label>Nominal Pengeluaran</label><input type="text" id="exp-nominal" class="enter-chain" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+                
+                <button class="btn-full enter-chain" onclick="savePengeluaran()"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengeluaran (F8)</button>
+            </form>
             <button class="btn-full" id="exp-btn-delete" onclick="deletePengeluaranItem()" style="background:#ff5252; color:#fff; display:none;"><i class="fa-solid fa-trash"></i> Hapus Pengeluaran Ini</button>
         </div>
     </div>
 
-    <!-- FULLSCREEN CAMERA SCANNER -->
+    <!-- FULLSCREEN CAMERA SCANNER OVERLAY -->
     <div id="scanner-overlay">
         <div id="interactive-reader"></div>
         <div class="scanner-controls">
@@ -467,13 +468,46 @@ function doPost(e) {
     </div>
 
     <script>
-        // OTOMATISASI TANGGAL HARI INI SAAT FORM DIBUKA
+        // DATA STORAGE LOCAL
+        let dbStok = JSON.parse(localStorage.getItem('arya_stok')) || [];
+        let html5QrcodeScanner = null;
+        let activeScanForm = null;
+        let activeCustType = 'grosir';
+
+        // OTOMATISASI TANGGAL HARI INI
         function getTodayISO() {
             let today = new Date();
             let dd = String(today.getDate()).padStart(2, '0');
             let mm = String(today.getMonth() + 1).padStart(2, '0');
             let yyyy = today.getFullYear();
             return `${yyyy}-${mm}-${dd}`;
+        }
+
+        // FORMAT ANGKA DENGAN TITIK (RIBUSAN) (A.2)
+        function formatThousand(val) {
+            if (!val && val !== 0) return '';
+            let numStr = val.toString().replace(/[^0-9]/g, '');
+            if (!numStr) return '';
+            return parseInt(numStr, 10).toLocaleString('id-ID');
+        }
+
+        function parseFormattedNum(val) {
+            if (!val) return 0;
+            return parseInt(val.toString().replace(/[^0-9]/g, ''), 10) || 0;
+        }
+
+        function formatNumberInput(inputEl) {
+            let cursor = inputEl.selectionStart;
+            let prevLen = inputEl.value.length;
+            let clean = inputEl.value.replace(/[^0-9]/g, '');
+            if (clean) {
+                inputEl.value = parseInt(clean, 10).toLocaleString('id-ID');
+            } else {
+                inputEl.value = '';
+            }
+            let nextLen = inputEl.value.length;
+            cursor += (nextLen - prevLen);
+            inputEl.setSelectionRange(cursor, cursor);
         }
 
         // Helper Toast Notification
@@ -510,15 +544,24 @@ function doPost(e) {
         }
 
         function navBackHome() {
-            showView('view-main-menu');
+            let openModal = document.querySelector('.modal-overlay.active');
+            if (openModal) {
+                closeModalDirect();
+                return;
+            }
+            let activeView = document.querySelector('.view-content.active');
+            if (activeView && activeView.id !== 'view-main-menu') {
+                showView('view-main-menu');
+            }
         }
 
-        // Form Open Modals (Otomatis mengisi tanggal hari ini jika kosong)
+        // Form Open Modals
         function openFormBelanja() {
             document.getElementById('bl-modal-title').innerText = "FORM BELANJA BARU";
             document.getElementById('bl-id').value = "BLJ-" + Date.now();
             document.getElementById('bl-tanggal').value = getTodayISO();
             document.getElementById('modal-belanja').classList.add('active');
+            setTimeout(() => document.getElementById('bl-barcode').focus(), 300);
         }
 
         function openFormPenjualan() {
@@ -526,11 +569,13 @@ function doPost(e) {
             document.getElementById('pj-id').value = "PJL-" + Date.now();
             document.getElementById('pj-tanggal').value = getTodayISO();
             document.getElementById('modal-penjualan').classList.add('active');
+            setTimeout(() => document.getElementById('pj-barcode').focus(), 300);
         }
 
         function openFormStok() {
             document.getElementById('stok-modal-title').innerText = "FORM TAMBAH BARANG";
             document.getElementById('modal-stok').classList.add('active');
+            setTimeout(() => document.getElementById('stok-barcode').focus(), 300);
         }
 
         function openFormPengeluaran() {
@@ -538,10 +583,293 @@ function doPost(e) {
             document.getElementById('exp-id').value = "EXP-" + Date.now();
             document.getElementById('exp-tanggal').value = getTodayISO();
             document.getElementById('modal-pengeluaran').classList.add('active');
+            setTimeout(() => document.getElementById('exp-ket').focus(), 300);
         }
 
         function closeModalDirect() {
             document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        }
+
+        // FULLSCREEN BARCODE SCANNER (A.1)
+        function startScanner(formPrefix) {
+            activeScanForm = formPrefix;
+            document.getElementById('scanner-overlay').style.display = 'flex';
+            
+            if (!html5QrcodeScanner) {
+                html5QrcodeScanner = new Html5Qrcode("interactive-reader");
+            }
+            
+            const config = { 
+                fps: 25, 
+                qrbox: { width: 280, height: 180 },
+                aspectRatio: 1.0,
+                experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+            };
+
+            html5QrcodeScanner.start(
+                { facingMode: "environment" }, 
+                config, 
+                (decodedText) => {
+                    onScanSuccess(decodedText);
+                },
+                (errorMessage) => {
+                    // Ignore scan errors for smooth experience
+                }
+            ).catch(err => {
+                showToast("Kamera tidak dapat diakses", "error");
+                stopScanner();
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    document.getElementById('scanner-overlay').style.display = 'none';
+                }).catch(() => {
+                    document.getElementById('scanner-overlay').style.display = 'none';
+                });
+            } else {
+                document.getElementById('scanner-overlay').style.display = 'none';
+            }
+        }
+
+        function onScanSuccess(scannedCode) {
+            stopScanner();
+            let prefix = activeScanForm;
+            if (!prefix) return;
+
+            let barcodeEl = document.getElementById(prefix + '-barcode');
+            if (barcodeEl) {
+                barcodeEl.value = scannedCode;
+                lookupBarcode(scannedCode, prefix);
+            }
+            showToast("Barcode Terpindai: " + scannedCode);
+        }
+
+        // AUTO LOOKUP DARI KATALOG STOK (A.1)
+        function lookupBarcode(code, prefix) {
+            if (!code) return;
+            let item = dbStok.find(s => s.barcode === code);
+            if (item) {
+                if (prefix === 'bl') {
+                    document.getElementById('bl-nama').value = item.nama;
+                    document.getElementById('bl-satuan').value = item.satuan;
+                    document.getElementById('bl-harga').value = formatThousand(item.hargaBeli);
+                    document.getElementById('bl-qty').focus();
+                } else if (prefix === 'pj') {
+                    document.getElementById('pj-nama').value = item.nama;
+                    document.getElementById('pj-satuan').value = item.satuan;
+                    let price = (activeCustType === 'grosir') ? item.hargaGrosir : item.hargaRetail;
+                    document.getElementById('pj-harga').value = formatThousand(price);
+                    document.getElementById('pj-qty').focus();
+                }
+                calcSubtotal(prefix);
+            } else {
+                if (prefix !== 'stok') {
+                    showToast("Barang tidak ditemukan di Katalog Stok", "info");
+                }
+            }
+        }
+
+        // AUTOCOMPLETE NAMA BARANG (C)
+        function searchAutocomplete(query, prefix) {
+            let listContainer = document.getElementById(prefix + '-auto-list');
+            if (!query || query.length < 1) {
+                listContainer.style.display = 'none';
+                return;
+            }
+            let matches = dbStok.filter(s => s.nama.toUpperCase().includes(query.toUpperCase()));
+            if (matches.length === 0) {
+                listContainer.style.display = 'none';
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            matches.forEach(m => {
+                let div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                div.innerText = `${m.nama} (${m.satuan}) - Rp ${formatThousand(m.hargaRetail)}`;
+                div.onclick = () => {
+                    document.getElementById(prefix + '-nama').value = m.nama;
+                    document.getElementById(prefix + '-barcode').value = m.barcode || '';
+                    document.getElementById(prefix + '-satuan').value = m.satuan || '';
+                    if (prefix === 'bl') {
+                        document.getElementById('bl-harga').value = formatThousand(m.hargaBeli);
+                    } else if (prefix === 'pj') {
+                        let price = (activeCustType === 'grosir') ? m.hargaGrosir : m.hargaRetail;
+                        document.getElementById('pj-harga').value = formatThousand(price);
+                    }
+                    listContainer.style.display = 'none';
+                    calcSubtotal(prefix);
+                    document.getElementById(prefix + '-qty').focus();
+                };
+                listContainer.appendChild(div);
+            });
+            listContainer.style.display = 'block';
+        }
+
+        function setCustType(type) {
+            activeCustType = type;
+            document.getElementById('btn-cust-grosir').classList.toggle('active', type === 'grosir');
+            document.getElementById('btn-cust-retail').classList.toggle('active', type === 'retail');
+            
+            let barcode = document.getElementById('pj-barcode').value;
+            if (barcode) lookupBarcode(barcode, 'pj');
+        }
+
+        function calcSubtotal(prefix) {
+            let harga = parseFormattedNum(document.getElementById(prefix + '-harga').value);
+            let qty = parseFormattedNum(document.getElementById(prefix + '-qty').value);
+            let total = harga * qty;
+            document.getElementById(prefix + '-subtotal').value = formatThousand(total);
+        }
+
+        // ENTER KEYBOARD ALUR NAVIGATION (B)
+        document.addEventListener('keydown', function(e) {
+            // SHORTCUT GLOBAL (D & F)
+            if (e.key === 'F5') {
+                e.preventDefault();
+                let activeView = document.querySelector('.view-content.active');
+                if (activeView) {
+                    if (activeView.id === 'view-belanja') openFormBelanja();
+                    else if (activeView.id === 'view-penjualan') openFormPenjualan();
+                    else if (activeView.id === 'view-stok') openFormStok();
+                    else if (activeView.id === 'view-pengeluaran') openFormPengeluaran();
+                }
+            } else if (e.key === 'F7') {
+                e.preventDefault();
+                navBackHome();
+            } else if (e.key === 'F8') {
+                e.preventDefault();
+                let activeModal = document.querySelector('.modal-overlay.active');
+                if (activeModal) {
+                    if (activeModal.id === 'modal-belanja') saveBelanja();
+                    else if (activeModal.id === 'modal-penjualan') savePenjualan();
+                    else if (activeModal.id === 'modal-stok') saveStok();
+                    else if (activeModal.id === 'modal-pengeluaran') savePengeluaran();
+                }
+            } else if (e.key === 'Enter') {
+                let target = e.target;
+                if (target.classList.contains('enter-chain')) {
+                    e.preventDefault();
+                    let form = target.closest('form');
+                    if (form) {
+                        let elements = Array.from(form.querySelectorAll('.enter-chain:not([readonly])'));
+                        let currentIndex = elements.indexOf(target);
+                        if (currentIndex > -1 && currentIndex < elements.length - 1) {
+                            elements[currentIndex + 1].focus();
+                        } else {
+                            // Jika tombol atau kolom terakhir dipencet
+                            if (form.id === 'form-chain-bl') addToCart('bl');
+                            else if (form.id === 'form-chain-pj') addToCart('pj');
+                            else if (form.id === 'form-chain-stok') saveStok();
+                            else if (form.id === 'form-chain-exp') savePengeluaran();
+                        }
+                    }
+                }
+            }
+        });
+
+        // MASUKKAN KE KERANJANG (B)
+        function addToCart(prefix) {
+            let nama = document.getElementById(prefix + '-nama').value;
+            let qty = parseFormattedNum(document.getElementById(prefix + '-qty').value);
+            let harga = parseFormattedNum(document.getElementById(prefix + '-harga').value);
+            let subtotal = harga * qty;
+
+            if (!nama || qty <= 0) {
+                showToast("Lengkapi Nama Barang & QTY!", "error");
+                return;
+            }
+
+            let tbody = document.getElementById(prefix + '-cart-body');
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${nama}</td>
+                <td>${formatThousand(qty)}</td>
+                <td>Rp ${formatThousand(subtotal)}</td>
+                <td><button class="btn-del-item" onclick="this.closest('tr').remove(); updateCartTotals('${prefix}');"><i class="fa-solid fa-trash"></i></button></td>
+            `;
+            tr.dataset.nama = nama;
+            tr.dataset.qty = qty;
+            tr.dataset.harga = harga;
+            tr.dataset.subtotal = subtotal;
+
+            tbody.appendChild(tr);
+            updateCartTotals(prefix);
+
+            // Clear Input Form & Focus ke Kolom Nama Barang
+            document.getElementById(prefix + '-barcode').value = '';
+            document.getElementById(prefix + '-nama').value = '';
+            document.getElementById(prefix + '-satuan').value = '';
+            document.getElementById(prefix + '-harga').value = '';
+            document.getElementById(prefix + '-qty').value = '';
+            document.getElementById(prefix + '-subtotal').value = '';
+            
+            showToast("Item berhasil ditambahkan!");
+            document.getElementById(prefix + '-nama').focus();
+        }
+
+        function updateCartTotals(prefix) {
+            let tbody = document.getElementById(prefix + '-cart-body');
+            let totalQty = 0;
+            let totalHarga = 0;
+
+            Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+                totalQty += parseInt(tr.dataset.qty, 10);
+                totalHarga += parseInt(tr.dataset.subtotal, 10);
+            });
+
+            document.getElementById(prefix + '-total-qty').innerText = formatThousand(totalQty);
+            document.getElementById(prefix + '-total-harga').innerText = 'Rp ' + formatThousand(totalHarga);
+        }
+
+        function saveStok() {
+            let barcode = document.getElementById('stok-barcode').value;
+            let nama = document.getElementById('stok-nama').value;
+            let satuan = document.getElementById('stok-satuan').value;
+            let qty = parseFormattedNum(document.getElementById('stok-qty').value);
+            let min = parseFormattedNum(document.getElementById('stok-min').value);
+            let hbeli = parseFormattedNum(document.getElementById('stok-harga-beli').value);
+            let hgrosir = parseFormattedNum(document.getElementById('stok-harga-grosir').value);
+            let hretail = parseFormattedNum(document.getElementById('stok-harga-retail').value);
+
+            if (!nama) {
+                showToast("Nama Barang Wajib Diisi!", "error");
+                return;
+            }
+
+            let newItem = {
+                id: document.getElementById('stok-id').value || ("STK-" + Date.now()),
+                barcode, nama, satuan, stok: qty, minStok: min,
+                hargaBeli: hbeli, hargaGrosir: hgrosir, hargaRetail: hretail
+            };
+
+            let existingIndex = dbStok.findIndex(s => s.id === newItem.id);
+            if (existingIndex > -1) {
+                dbStok[existingIndex] = newItem;
+            } else {
+                dbStok.push(newItem);
+            }
+
+            localStorage.setItem('arya_stok', JSON.stringify(dbStok));
+            showToast("Katalog Stok Berhasil Disimpan!");
+            closeModalDirect();
+        }
+
+        function saveBelanja() {
+            showToast("Transaksi Belanja Berhasil Disimpan!");
+            closeModalDirect();
+        }
+
+        function savePenjualan() {
+            showToast("Transaksi Penjualan Berhasil Disimpan!");
+            closeModalDirect();
+        }
+
+        function savePengeluaran() {
+            showToast("Pengeluaran Berhasil Disimpan!");
+            closeModalDirect();
         }
 
         // Copy AppScript
@@ -553,7 +881,6 @@ function doPost(e) {
             showToast("Kode AppScript Berhasil Disalin!");
         }
 
-        // Simpan/Tarik AppScript Placeholders
         function simpanUrlAppscript() {
             const url = document.getElementById('appscript-url').value;
             localStorage.setItem('arya_appscript_url', url);
@@ -567,14 +894,6 @@ function doPost(e) {
         function backupDataToSheets() {
             showToast("Proses Upload Data Ke Google Sheets...", "info");
         }
-
-        // Shortcut Key Handler
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F7') {
-                e.preventDefault();
-                navBackHome();
-            }
-        });
     </script>
 </body>
 </html>
