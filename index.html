@@ -51,7 +51,7 @@
 
   <!-- HEADER UTAMA -->
   <header class="flex flex-col items-center justify-center pt-2 pb-4">
-    <img src="logo web arya.png" alt="Arya Grosir Logo" class="h-16 sm:h-20 object-contain mb-2" onclick="goHome()">
+    <img src="logo web arya.png" alt="Arya Grosir Logo" class="h-16 sm:h-20 object-contain mb-2 cursor-pointer" onclick="goHome()">
     <div class="flex items-center gap-3 text-xs sm:text-sm">
       <span class="text-emerald-500 font-bold flex items-center gap-1.5">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> PREMIUM POS SYSTEM
@@ -106,7 +106,14 @@
       localStorage.setItem('ag_gas_url', db.gasUrl);
     }
 
-    // FORMAT RUPIAH & ANGK
+    // LIVE CLOCK
+    setInterval(() => {
+      const now = new Date();
+      const clockEl = document.getElementById('liveClock');
+      if (clockEl) clockEl.innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    // FORMAT RUPIAH & ANGKA
     function formatNumber(num) {
       if (!num && num !== 0) return '';
       return num.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -121,7 +128,7 @@
       return "Rp " + formatNumber(val || 0);
     }
 
-    // SYSTEM NAVIGASI & ANDROID BACK BUTTON (HISTORI ENGINE)
+    // SYSTEM NAVIGASI & HISTORI ENGINE
     function navigateTo(view, param = null) {
       window.history.pushState({ view: view, param: param }, '', '');
       renderView(view, param);
@@ -160,7 +167,9 @@
         e.preventDefault();
         if (currentRoute.view === 'BELANJA_FORM') checkoutBelanja();
         if (currentRoute.view === 'PENJUALAN_FORM') checkoutPenjualan();
-        if (currentRoute.view === 'STOK_FORM') saveKatalogForm();
+        if (currentRoute.view === 'STOK_FORM') {
+          saveKatalogForm(currentRoute.param);
+        }
       }
     });
 
@@ -209,9 +218,7 @@
         `;
       }
 
-      // ----------------------------------------------------
       // A. KATALOG STOK
-      // ----------------------------------------------------
       else if (view === 'STOK_LIST') {
         app.innerHTML = `
           <div class="flex justify-between items-center mb-4">
@@ -270,7 +277,7 @@
             <input type="text" id="kMinQty" value="${formatNumber(item['MINIMAL QTY'])}" placeholder="Minimal Stok" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kHargaPokok')">
             <input type="text" id="kHargaPokok" value="${formatNumber(item['HARGA POKOK'])}" placeholder="Harga Pokok" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kHargaGrosir')">
             <input type="text" id="kHargaGrosir" value="${formatNumber(item['HARGA JUAL GROSIR'])}" placeholder="Harga Jual Grosir" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kHargaRetail')">
-            <input type="text" id="kHargaRetail" value="${formatNumber(item['HARGA JUAL RETAIL'])}" placeholder="Harga Jual Retail" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="saveKatalogForm()">
+            <input type="text" id="kHargaRetail" value="${formatNumber(item['HARGA JUAL RETAIL'])}" placeholder="Harga Jual Retail" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="saveKatalogForm(${param})">
             <div class="flex gap-2 pt-2">
               <button onclick="saveKatalogForm(${param})" class="flex-1 bg-amber-600 py-2.5 rounded-xl text-xs font-bold">Simpan (F8)</button>
               <button onclick="window.history.back()" class="flex-1 bg-gray-800 py-2.5 rounded-xl text-xs font-bold">Batal/Cancel</button>
@@ -279,9 +286,7 @@
         `;
       }
 
-      // ----------------------------------------------------
       // B. BELANJA BARANG (RESTOK)
-      // ----------------------------------------------------
       else if (view === 'BELANJA_LIST') {
         app.innerHTML = `
           <div class="flex justify-between items-center mb-4">
@@ -356,9 +361,7 @@
         `;
       }
 
-      // ----------------------------------------------------
       // C. PENJUALAN BARANG
-      // ----------------------------------------------------
       else if (view === 'PENJUALAN_LIST') {
         app.innerHTML = `
           <div class="flex justify-between items-center mb-4">
@@ -446,9 +449,36 @@
         `;
       }
 
-      // ----------------------------------------------------
+      // PERKIRAAN BELANJA (LOW STOCK)
+      else if (view === 'PERKIRAAN') {
+        let lowStockList = db.katalog.filter(item => (item['QTY'] || 0) <= (item['MINIMAL QTY'] || 0));
+        let totalEst = lowStockList.reduce((acc, item) => acc + (((item['MINIMAL QTY'] || 0) - (item['QTY'] || 0)) * (item['HARGA POKOK'] || 0)), 0);
+        app.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <h2 class="font-bold text-base">Perkiraan Belanja (Stok Kritis)</h2>
+              <span class="text-xs font-bold text-amber-400">Est. Total: ${formatRp(totalEst)}</span>
+            </div>
+            <div class="space-y-2">
+              ${lowStockList.length === 0 ? '<p class="text-gray-500 text-xs text-center py-6">Semua stok barang masih mencukupi.</p>' : ''}
+              ${lowStockList.map(item => `
+                <div class="card-menu p-3 flex justify-between items-center">
+                  <div>
+                    <div class="font-bold text-sm text-red-400">${item['NAMA BARANG']}</div>
+                    <div class="text-xs text-gray-400">Min Stok: ${formatNumber(item['MINIMAL QTY'])} | Qty Sekarang: ${formatNumber(item['QTY'])}</div>
+                  </div>
+                  <div class="text-right text-xs">
+                    <div class="text-gray-400">Perlu Restok: <span class="text-amber-400 font-bold">${formatNumber((item['MINIMAL QTY'] || 0) - (item['QTY'] || 0))} ${item['SATUAN'] || ''}</span></div>
+                    <div class="font-bold text-emerald-400">${formatRp(((item['MINIMAL QTY'] || 0) - (item['QTY'] || 0)) * (item['HARGA POKOK'] || 0))}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
       // D. PENGELUARAN LAIN
-      // ----------------------------------------------------
       else if (view === 'PENGELUARAN') {
         app.innerHTML = `
           <div class="space-y-3">
@@ -480,9 +510,7 @@
         `;
       }
 
-      // ----------------------------------------------------
       // E. KEUNTUNGAN (DASHBOARD ANALITIK)
-      // ----------------------------------------------------
       else if (view === 'KEUNTUNGAN') {
         app.innerHTML = `
           <div class="space-y-3">
@@ -516,9 +544,7 @@
         setTimeout(renderChart, 100);
       }
 
-      // ----------------------------------------------------
       // F. SINKRONISASI
-      // ----------------------------------------------------
       else if (view === 'SYNC') {
         app.innerHTML = `
           <div class="card-menu p-4 space-y-4">
@@ -551,7 +577,7 @@
       }
     }
 
-    // KATALOG FORM SAVE
+    // KATALOG FORM SAVE & DELETE
     function saveKatalogForm(editIndex = null) {
       let barcode = document.getElementById('kBarcode').value;
       let nama = document.getElementById('kNama').value.toUpperCase();
@@ -565,28 +591,331 @@
       if (!nama) return alert('Nama barang wajib diisi!');
 
       let newItem = {
-        'BARCODE': barcode, 'NAMA BARANG': nama, 'QTY': qty, 'SATUAN': satuan,
-        'MINIMAL QTY': minQty, 'HARGA POKOK': hp, 'HARGA JUAL GROSIR': hg, 'HARGA JUAL RETAIL': hr
+        'BARCODE': barcode,
+        'NAMA BARANG': nama,
+        'QTY': qty,
+        'SATUAN': satuan,
+        'MINIMAL QTY': minQty,
+        'HARGA POKOK': hp,
+        'HARGA JUAL GROSIR': hg,
+        'HARGA JUAL RETAIL': hr
       };
 
-      if (editIndex !== null && editIndex !== undefined) {
+      if (editIndex !== null && editIndex !== undefined && editIndex !== '') {
         db.katalog[editIndex] = newItem;
       } else {
         db.katalog.push(newItem);
       }
+
       saveState();
-      window.history.back();
+      navigateTo('STOK_LIST');
     }
 
-    function deleteKatalog(idx) {
-      if (confirm('Yakin hapus barang ini dari katalog?')) {
-        db.katalog.splice(idx, 1);
+    function deleteKatalog(index) {
+      if (confirm("Yakin ingin menghapus barang ini?")) {
+        db.katalog.splice(index, 1);
         saveState();
         navigateTo('STOK_LIST');
       }
     }
 
-    // SCANNER LOGIC
+    // LOGIKA BELANJA BARANG
+    function autoCompleteBelanja(val) {
+      const suggestBox = document.getElementById('bSuggest');
+      if (!val) { suggestBox.classList.add('hidden'); return; }
+      const matches = db.katalog.filter(i => i['NAMA BARANG'].toLowerCase().includes(val.toLowerCase()));
+      if (matches.length === 0) { suggestBox.classList.add('hidden'); return; }
+
+      suggestBox.innerHTML = matches.map(m => `
+        <div class="p-2 border-b border-gray-800 cursor-pointer text-xs hover:bg-amber-600/20" onclick="selectSuggestBelanja('${m['NAMA BARANG']}', '${m['SATUAN']}')">
+          ${m['NAMA BARANG']} (${m['SATUAN']})
+        </div>
+      `).join('');
+      suggestBox.classList.remove('hidden');
+    }
+
+    function selectSuggestBelanja(nama, satuan) {
+      document.getElementById('bNama').value = nama;
+      document.getElementById('bSatuan').value = satuan;
+      document.getElementById('bSuggest').classList.add('hidden');
+      document.getElementById('bQty').focus();
+    }
+
+    function onScanBelanja(code) {
+      document.getElementById('bBarcode').value = code;
+      let match = db.katalog.find(i => i['BARCODE'] === code);
+      if (match) {
+        document.getElementById('bNama').value = match['NAMA BARANG'];
+        document.getElementById('bSatuan').value = match['SATUAN'];
+      }
+    }
+
+    function calcBelanjaTotal() {
+      // Optional live calculation logic if needed
+    }
+
+    function addToCartBelanja() {
+      let nama = document.getElementById('bNama').value.toUpperCase();
+      let qty = parseNumber(document.getElementById('bQty').value);
+      let satuan = document.getElementById('bSatuan').value.toUpperCase();
+      let total = parseNumber(document.getElementById('bTotal').value);
+
+      if (!nama || qty <= 0 || total <= 0) return alert('Lengkapi data belanja dengan benar!');
+
+      cartTemp.push({ nama, qty, satuan, total });
+      renderView('BELANJA_FORM');
+    }
+
+    function checkoutBelanja() {
+      if (cartTemp.length === 0) return alert('Keranjang belanja masih kosong!');
+
+      let id = 'BLJ-' + Date.now().toString().slice(-6);
+      let dateStr = new Date().toISOString().split('T')[0];
+      let totalHarga = cartTemp.reduce((a, b) => a + b.total, 0);
+
+      // Simpan transaksi
+      db.belanja.push({
+        ID: id,
+        TANGGAL: dateStr,
+        TOTAL_HARGA: totalHarga,
+        ITEMS: [...cartTemp]
+      });
+
+      // Update stok & harga pokok di katalog
+      cartTemp.forEach(item => {
+        let match = db.katalog.find(k => k['NAMA BARANG'] === item.nama);
+        let unitCost = Math.round(item.total / item.qty);
+        if (match) {
+          match['QTY'] = (match['QTY'] || 0) + item.qty;
+          match['HARGA POKOK'] = unitCost;
+        } else {
+          db.katalog.push({
+            'BARCODE': '',
+            'NAMA BARANG': item.nama,
+            'QTY': item.qty,
+            'SATUAN': item.satuan,
+            'MINIMAL QTY': 5,
+            'HARGA POKOK': unitCost,
+            'HARGA JUAL GROSIR': Math.round(unitCost * 1.1),
+            'HARGA JUAL RETAIL': Math.round(unitCost * 1.2)
+          });
+        }
+      });
+
+      cartTemp = [];
+      saveState();
+      navigateTo('BELANJA_LIST');
+    }
+
+    // LOGIKA PENJUALAN
+    function autoCompletePenjualan(val) {
+      const suggestBox = document.getElementById('pSuggest');
+      if (!val) { suggestBox.classList.add('hidden'); return; }
+      const matches = db.katalog.filter(i => i['NAMA BARANG'].toLowerCase().includes(val.toLowerCase()));
+      if (matches.length === 0) { suggestBox.classList.add('hidden'); return; }
+
+      suggestBox.innerHTML = matches.map(m => `
+        <div class="p-2 border-b border-gray-800 cursor-pointer text-xs hover:bg-amber-600/20" onclick="selectSuggestPenjualan('${m['NAMA BARANG']}', '${m['SATUAN']}')">
+          ${m['NAMA BARANG']} - Stok: ${m['QTY']} (${m['SATUAN']})
+        </div>
+      `).join('');
+      suggestBox.classList.remove('hidden');
+    }
+
+    function selectSuggestPenjualan(nama, satuan) {
+      document.getElementById('pNama').value = nama;
+      document.getElementById('pSatuan').value = satuan;
+      document.getElementById('pSuggest').classList.add('hidden');
+      document.getElementById('pQty').focus();
+      calcPenjualanTotal();
+    }
+
+    function onScanPenjualan(code) {
+      document.getElementById('pBarcode').value = code;
+      let match = db.katalog.find(i => i['BARCODE'] === code);
+      if (match) {
+        document.getElementById('pNama').value = match['NAMA BARANG'];
+        document.getElementById('pSatuan').value = match['SATUAN'];
+        calcPenjualanTotal();
+      }
+    }
+
+    function calcPenjualanTotal() {
+      let nama = document.getElementById('pNama').value.toUpperCase();
+      let qty = parseNumber(document.getElementById('pQty').value);
+      let type = document.getElementById('pType').value;
+      let match = db.katalog.find(i => i['NAMA BARANG'] === nama);
+
+      if (match && qty > 0) {
+        let unitPrice = (type === 'GROSIR') ? (match['HARGA JUAL GROSIR'] || 0) : (match['HARGA JUAL RETAIL'] || 0);
+        let total = unitPrice * qty;
+        document.getElementById('pTotalItem').value = formatRp(total);
+      } else {
+        document.getElementById('pTotalItem').value = '';
+      }
+    }
+
+    function addToCartPenjualan() {
+      let nama = document.getElementById('pNama').value.toUpperCase();
+      let qty = parseNumber(document.getElementById('pQty').value);
+      let satuan = document.getElementById('pSatuan').value.toUpperCase();
+      let type = document.getElementById('pType').value;
+      let match = db.katalog.find(i => i['NAMA BARANG'] === nama);
+
+      if (!match) return alert('Barang tidak ditemukan dalam katalog!');
+      if (qty <= 0) return alert('Jumlah Qty tidak valid!');
+      if (qty > match['QTY']) return alert('Stok barang tidak mencukupi! (Sisa: ' + match['QTY'] + ')');
+
+      let unitPrice = (type === 'GROSIR') ? match['HARGA JUAL GROSIR'] : match['HARGA JUAL RETAIL'];
+      let total = unitPrice * qty;
+      let modal = match['HARGA POKOK'] * qty;
+
+      cartTemp.push({ nama, qty, satuan, unitPrice, total, modal });
+      renderView('PENJUALAN_FORM');
+    }
+
+    function calcKembalian() {
+      let total = cartTemp.reduce((a, b) => a + b.total, 0);
+      let dibayar = parseNumber(document.getElementById('pDibayar').value);
+      let kembalian = dibayar - total;
+      document.getElementById('pKembalian').value = kembalian >= 0 ? formatRp(kembalian) : 'Kurang ' + formatRp(Math.abs(kembalian));
+    }
+
+    function checkoutPenjualan() {
+      if (cartTemp.length === 0) return alert('Keranjang penjualan masih kosong!');
+
+      let totalHarga = cartTemp.reduce((a, b) => a + b.total, 0);
+      let dibayar = parseNumber(document.getElementById('pDibayar').value);
+
+      if (dibayar < totalHarga) return alert('Jumlah pembayaran masih kurang!');
+
+      let id = 'PJL-' + Date.now().toString().slice(-6);
+      let dateStr = new Date().toISOString().split('T')[0];
+      let type = document.getElementById('pType').value;
+      let pembeli = document.getElementById('pPembeli').value || 'Umum';
+
+      // Simpan Transaksi Penjualan
+      db.penjualan.push({
+        ID: id,
+        TANGGAL: dateStr,
+        'TYPE PEMBELI': type,
+        'NAMA PEMBELI': pembeli,
+        TOTAL_HARGA: totalHarga,
+        DIBAYAR: dibayar,
+        KEMBALIAN: dibayar - totalHarga,
+        ITEMS: [...cartTemp]
+      });
+
+      // Potong Stok Katalog
+      cartTemp.forEach(item => {
+        let match = db.katalog.find(k => k['NAMA BARANG'] === item.nama);
+        if (match) {
+          match['QTY'] = Math.max(0, (match['QTY'] || 0) - item.qty);
+        }
+      });
+
+      cartTemp = [];
+      saveState();
+      navigateTo('PENJUALAN_LIST');
+    }
+
+    // LOGIKA PENGELUARAN LAIN
+    function savePengeluaran() {
+      let tanggal = document.getElementById('eTanggal').value;
+      let keterangan = document.getElementById('eKet').value;
+      let jumlah = parseNumber(document.getElementById('eJumlah').value);
+
+      if (!keterangan || jumlah <= 0) return alert('Lengkapi data pengeluaran dengan benar!');
+
+      db.pengeluaran.push({ TANGGAL: tanggal, KETERANGAN: keterangan, JUMLAH: jumlah });
+      saveState();
+      renderView('PENGELUARAN');
+    }
+
+    // PERHITUNGAN DASHBOARD ANALITIK
+    function calcLabaKemarin() {
+      let yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      let dateStr = yesterday.toISOString().split('T')[0];
+
+      let sales = db.penjualan.filter(p => p.TANGGAL === dateStr);
+      let grossProfit = sales.reduce((acc, p) => {
+        let itemProfit = (p.ITEMS || []).reduce((a, i) => a + (i.total - (i.modal || 0)), 0);
+        return acc + itemProfit;
+      }, 0);
+
+      let expenses = db.pengeluaran.filter(e => e.TANGGAL === dateStr).reduce((a, e) => a + e.JUMLAH, 0);
+      return grossProfit - expenses;
+    }
+
+    function calcLabaBulanIni() {
+      let nowMonth = new Date().toISOString().slice(0, 7);
+
+      let sales = db.penjualan.filter(p => (p.TANGGAL || '').startsWith(nowMonth));
+      let grossProfit = sales.reduce((acc, p) => {
+        let itemProfit = (p.ITEMS || []).reduce((a, i) => a + (i.total - (i.modal || 0)), 0);
+        return acc + itemProfit;
+      }, 0);
+
+      let expenses = db.pengeluaran.filter(e => (e.TANGGAL || '').startsWith(nowMonth)).reduce((a, e) => a + e.JUMLAH, 0);
+      return grossProfit - expenses;
+    }
+
+    function calcPengeluaranKemarin() {
+      let yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      let dateStr = yesterday.toISOString().split('T')[0];
+      return db.pengeluaran.filter(e => e.TANGGAL === dateStr).reduce((a, e) => a + e.JUMLAH, 0);
+    }
+
+    function calcPengeluaranBulanIni() {
+      let nowMonth = new Date().toISOString().slice(0, 7);
+      return db.pengeluaran.filter(e => (e.TANGGAL || '').startsWith(nowMonth)).reduce((a, e) => a + e.JUMLAH, 0);
+    }
+
+    function renderChart() {
+      const ctx = document.getElementById('profitChart');
+      if (!ctx) return;
+
+      let months = [];
+      let profitData = [];
+      for (let i = 5; i >= 0; i--) {
+        let d = new Date();
+        d.setMonth(d.getMonth() - i);
+        let mStr = d.toISOString().slice(0, 7);
+        months.push(mStr);
+
+        let sales = db.penjualan.filter(p => (p.TANGGAL || '').startsWith(mStr));
+        let gross = sales.reduce((acc, p) => acc + (p.ITEMS || []).reduce((a, item) => a + (item.total - (item.modal || 0)), 0), 0);
+        let exp = db.pengeluaran.filter(e => (e.TANGGAL || '').startsWith(mStr)).reduce((a, e) => a + e.JUMLAH, 0);
+        profitData.push(gross - exp);
+      }
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Laba Bersih',
+            data: profitData,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#9ca3af' }, grid: { color: '#1f2937' } },
+            y: { ticks: { color: '#9ca3af' }, grid: { color: '#1f2937' } }
+          }
+        }
+      });
+    }
+
+    // SCANNER ENGINE
     function openScanner(callback) {
       scanTargetCallback = callback;
       document.getElementById('scannerModal').classList.remove('hidden');
@@ -595,13 +924,16 @@
       html5QrCode = new Html5Qrcode("reader");
       html5QrCode.start(
         { facingMode: "environment" },
-        { fps: 15, qrbox: { width: 250, height: 150 } },
+        { fps: 10, qrbox: { width: 250, height: 150 } },
         (decodedText) => {
-          closeScanner();
           if (scanTargetCallback) scanTargetCallback(decodedText);
+          closeScanner();
         },
         (errorMessage) => {}
-      );
+      ).catch(err => {
+        alert("Gagal membuka kamera: " + err);
+        closeScanner();
+      });
     }
 
     function closeScanner() {
@@ -610,286 +942,57 @@
           html5QrCode.clear();
           document.getElementById('scannerModal').classList.add('hidden');
           document.getElementById('scannerModal').classList.remove('flex');
+        }).catch(() => {
+          document.getElementById('scannerModal').classList.add('hidden');
+          document.getElementById('scannerModal').classList.remove('flex');
         });
+      } else {
+        document.getElementById('scannerModal').classList.add('hidden');
+        document.getElementById('scannerModal').classList.remove('flex');
       }
     }
 
     function toggleTorch() {
-      torchState = !torchState;
       if (html5QrCode) {
-        html5QrCode.applyVideoConstraints({ advanced: [{ torch: torchState }] });
+        torchState = !torchState;
+        html5QrCode.applyVideoConstraints({
+          advanced: [{ torch: torchState }]
+        }).catch(e => alert("Senter tidak didukung pada perangkat ini."));
       }
     }
 
-    // BELANJA AUTOCOMPLETE & CART
-    let selectedBelanjaItem = null;
-    function onScanBelanja(code) {
-      document.getElementById('bBarcode').value = code;
-      let match = db.katalog.find(k => k.BARCODE === code);
-      if (match) {
-        selectedBelanjaItem = match;
-        document.getElementById('bNama').value = match['NAMA BARANG'];
-        document.getElementById('bSatuan').value = match['SATUAN'];
-        document.getElementById('bQty').focus();
-      }
+    // SINKRONISASI GOOGLE APPS SCRIPT
+    function syncPush() {
+      if (!db.gasUrl) return alert('Masukkan URL Google Apps Script terlebih dahulu!');
+      fetch(db.gasUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'push', data: db })
+      }).then(() => {
+        alert('Perintah Sync Push dikirim ke Apps Script.');
+      }).catch(err => alert('Gagal Sync: ' + err));
     }
 
-    function autoCompleteBelanja(val) {
-      let sug = document.getElementById('bSuggest');
-      if (!val) { sug.classList.add('hidden'); return; }
-      let matches = db.katalog.filter(k => k['NAMA BARANG'].toLowerCase().includes(val.toLowerCase()));
-      if (matches.length === 0) { sug.classList.add('hidden'); return; }
-
-      sug.innerHTML = matches.map(m => `
-        <div class="p-2 text-xs border-b border-gray-800 cursor-pointer hover:bg-gray-800" onclick="selectBelanjaItem('${m['NAMA BARANG']}')">
-          ${m['NAMA BARANG']} (${m['SATUAN']})
-        </div>
-      `).join('');
-      sug.classList.remove('hidden');
+    function syncPull() {
+      if (!db.gasUrl) return alert('Masukkan URL Google Apps Script terlebih dahulu!');
+      fetch(db.gasUrl + '?action=pull')
+        .then(res => res.json())
+        .then(data => {
+          if (data) {
+            db.katalog = data.katalog || db.katalog;
+            db.belanja = data.belanja || db.belanja;
+            db.penjualan = data.penjualan || db.penjualan;
+            db.pengeluaran = data.pengeluaran || db.pengeluaran;
+            saveState();
+            alert('Data berhasil ditarik dari cloud!');
+            renderView('MAIN');
+          }
+        })
+        .catch(err => alert('Gagal menarik data: ' + err));
     }
 
-    function selectBelanjaItem(nama) {
-      let match = db.katalog.find(k => k['NAMA BARANG'] === nama);
-      if (match) {
-        selectedBelanjaItem = match;
-        document.getElementById('bBarcode').value = match['BARCODE'] || '';
-        document.getElementById('bNama').value = match['NAMA BARANG'];
-        document.getElementById('bSatuan').value = match['SATUAN'];
-        document.getElementById('bSuggest').classList.add('hidden');
-        document.getElementById('bQty').focus();
-      }
-    }
-
-    function calcBelanjaTotal() {
-      let qty = parseNumber(document.getElementById('bQty').value);
-      if (selectedBelanjaItem && selectedBelanjaItem['HARGA POKOK']) {
-        let tot = qty * selectedBelanjaItem['HARGA POKOK'];
-        document.getElementById('bTotal').value = formatNumber(tot);
-      }
-    }
-
-    function addToCartBelanja() {
-      let nama = document.getElementById('bNama').value;
-      let qty = parseNumber(document.getElementById('bQty').value);
-      let satuan = document.getElementById('bSatuan').value;
-      let total = parseNumber(document.getElementById('bTotal').value);
-
-      if (!nama || qty <= 0) return alert('Lengkapi data belanja!');
-      cartTemp.push({ nama, qty, satuan, total, barcode: document.getElementById('bBarcode').value });
-      renderView('BELANJA_FORM');
-    }
-
-    function checkoutBelanja() {
-      if (cartTemp.length === 0) return alert('Keranjang belanja kosong!');
-      let idBelanja = 'BLJ-' + Date.now().toString().slice(-6);
-      let today = new Date().toISOString().split('T')[0];
-      let grandTotal = cartTemp.reduce((a,b)=>a+b.total, 0);
-
-      cartTemp.forEach(item => {
-        db.belanja.push({
-          'ID': idBelanja, 'TANGGAL': today, 'BARCODE': item.barcode,
-          'NAMA BARANG': item.nama, 'QTY': item.qty, 'SATUAN': item.satuan,
-          'TOTAL HARGA PER ITEM': item.total, 'TOTAL HARGA': grandTotal
-        });
-
-        // Auto Update Stok Katalog
-        let katMatch = db.katalog.find(k => k['NAMA BARANG'] === item.nama);
-        if (katMatch) {
-          katMatch.QTY = parseNumber(katMatch.QTY) + item.qty;
-        }
-      });
-
-      saveState();
-      alert('Transaksi Belanja Berhasil Disimpan & Stok Ditambahkan!');
-      cartTemp = [];
-      navigateTo('BELANJA_LIST');
-    }
-
-    // PENJUALAN AUTOCOMPLETE & CART
-    let selectedPenjualanItem = null;
-    function onScanPenjualan(code) {
-      document.getElementById('pBarcode').value = code;
-      let match = db.katalog.find(k => k.BARCODE === code);
-      if (match) {
-        selectedPenjualanItem = match;
-        document.getElementById('pNama').value = match['NAMA BARANG'];
-        document.getElementById('pSatuan').value = match['SATUAN'];
-        document.getElementById('pQty').focus();
-      }
-    }
-
-    function autoCompletePenjualan(val) {
-      let sug = document.getElementById('pSuggest');
-      if (!val) { sug.classList.add('hidden'); return; }
-      let matches = db.katalog.filter(k => k['NAMA BARANG'].toLowerCase().includes(val.toLowerCase()));
-      if (matches.length === 0) { sug.classList.add('hidden'); return; }
-
-      sug.innerHTML = matches.map(m => `
-        <div class="p-2 text-xs border-b border-gray-800 cursor-pointer hover:bg-gray-800" onclick="selectPenjualanItem('${m['NAMA BARANG']}')">
-          ${m['NAMA BARANG']} - Stok: ${m['QTY']}
-        </div>
-      `).join('');
-      sug.classList.remove('hidden');
-    }
-
-    function selectPenjualanItem(nama) {
-      let match = db.katalog.find(k => k['NAMA BARANG'] === nama);
-      if (match) {
-        selectedPenjualanItem = match;
-        document.getElementById('pBarcode').value = match['BARCODE'] || '';
-        document.getElementById('pNama').value = match['NAMA BARANG'];
-        document.getElementById('pSatuan').value = match['SATUAN'];
-        document.getElementById('pSuggest').classList.add('hidden');
-        document.getElementById('pQty').focus();
-      }
-    }
-
-    function calcPenjualanTotal() {
-      let qty = parseNumber(document.getElementById('pQty').value);
-      let type = document.getElementById('pType').value;
-      if (selectedPenjualanItem) {
-        let price = type === 'GROSIR' ? selectedPenjualanItem['HARGA JUAL GROSIR'] : selectedPenjualanItem['HARGA JUAL RETAIL'];
-        let tot = qty * parseNumber(price);
-        document.getElementById('pTotalItem').value = formatRp(tot);
-      }
-    }
-
-    function addToCartPenjualan() {
-      let nama = document.getElementById('pNama').value;
-      let qty = parseNumber(document.getElementById('pQty').value);
-      let satuan = document.getElementById('pSatuan').value;
-      let type = document.getElementById('pType').value;
-      
-      if (!selectedPenjualanItem || qty <= 0) return alert('Pilih barang dan jumlah valid!');
-      let price = type === 'GROSIR' ? selectedPenjualanItem['HARGA JUAL GROSIR'] : selectedPenjualanItem['HARGA JUAL RETAIL'];
-      let total = qty * parseNumber(price);
-
-      cartTemp.push({
-        nama, qty, satuan, total, barcode: document.getElementById('pBarcode').value,
-        hargaSatuan: price
-      });
-      renderView('PENJUALAN_FORM');
-    }
-
-    function calcKembalian() {
-      let grandTotal = cartTemp.reduce((a,b)=>a+b.total,0);
-      let dibayar = parseNumber(document.getElementById('pDibayar').value);
-      let kembalian = dibayar - grandTotal;
-      document.getElementById('pKembalian').value = formatRp(kembalian > 0 ? kembalian : 0);
-    }
-
-    function checkoutPenjualan() {
-      if (cartTemp.length === 0) return alert('Keranjang Penjualan Kosong!');
-      let grandTotal = cartTemp.reduce((a,b)=>a+b.total,0);
-      let dibayar = parseNumber(document.getElementById('pDibayar').value);
-      if (dibayar < grandTotal) return alert('Jumlah pembayaran kurang!');
-
-      let idPenjualan = 'PJL-' + Date.now().toString().slice(-6);
-      let today = new Date().toISOString().split('T')[0];
-      let typePembeli = document.getElementById('pType').value;
-      let namaPembeli = document.getElementById('pPembeli').value || 'Umum';
-
-      cartTemp.forEach(item => {
-        db.penjualan.push({
-          'ID': idPenjualan, 'TANGGAL': today, 'TYPE PEMBELI': typePembeli,
-          'NAMA PEMBELI': namaPembeli, 'BARCODE': item.barcode, 'NAMA BARANG': item.nama,
-          'SATUAN': item.satuan, 'QTY': item.qty, 'TOTAL HARGA PER ITEM': item.total,
-          'TOTAL HARGA': grandTotal
-        });
-
-        // Kurangi Stok Katalog
-        let katMatch = db.katalog.find(k => k['NAMA BARANG'] === item.nama);
-        if (katMatch) {
-          katMatch.QTY = parseNumber(katMatch.QTY) - item.qty;
-        }
-      });
-
-      saveState();
-      alert('Transaksi Penjualan Berhasil & Stok Diperbarui!');
-      cartTemp = [];
-      navigateTo('PENJUALAN_LIST');
-    }
-
-    function savePengeluaran() {
-      let tgl = document.getElementById('eTanggal').value;
-      let ket = document.getElementById('eKet').value;
-      let jml = parseNumber(document.getElementById('eJumlah').value);
-      if (!ket || jml <= 0) return alert('Isi keterangan dan jumlah!');
-
-      db.pengeluaran.push({ TANGGAL: tgl, KETERANGAN: ket, JUMLAH: jml });
-      saveState();
-      renderView('PENGELUARAN');
-    }
-
-    // ANALITIK LABA
-    function calcLabaBulanIni() {
-      return 0; // Kalkulasi dinamis berdasarkan data penjualan
-    }
-    function calcLabaKemarin() { return 0; }
-    function calcPengeluaranKemarin() { return 0; }
-    function calcPengeluaranBulanIni() { return 0; }
-
-    function renderChart() {
-      let ctx = document.getElementById('profitChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-          datasets: [{
-            label: 'Keuntungan Bersih',
-            data: [12, 19, 3, 5, 2, 3, 20, 15, 8, 10, 25, 30],
-            backgroundColor: 'rgba(245, 158, 11, 0.7)',
-            borderColor: '#f59e0b',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } }
-        }
-      });
-    }
-
-    // BACKEND SINKRONISASI 2-WAY
-    async function syncPush() {
-      if (!db.gasUrl) return alert('Masukkan Web App URL terlebih dahulu!');
-      try {
-        await fetch(db.gasUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'push', payload: db })
-        });
-        alert('Data berhasil dikirim ke Google Sheets Backend!');
-      } catch (err) {
-        alert('Gagal mengirim data: ' + err);
-      }
-    }
-
-    async function syncPull() {
-      if (!db.gasUrl) return alert('Masukkan Web App URL terlebih dahulu!');
-      try {
-        let res = await fetch(db.gasUrl + '?action=pull');
-        let data = await res.json();
-        db.katalog = data.katalog || [];
-        db.belanja = data.belanja || [];
-        db.penjualan = data.penjualan || [];
-        db.pengeluaran = data.pengeluaran || [];
-        saveState();
-        alert('Data berhasil ditarik dari Google Sheets!');
-        renderView('MAIN');
-      } catch (err) {
-        alert('Gagal menarik data: ' + err);
-      }
-    }
-
-    // JAM UTAMA
-    setInterval(() => {
-      let el = document.getElementById('liveClock');
-      if (el) el.innerText = new Date().toLocaleTimeString('id-ID');
-    }, 1000);
-
-    // INIT
+    // INITIAL RENDER
     renderView('MAIN');
   </script>
 </body>
