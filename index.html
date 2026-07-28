@@ -9,9 +9,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Barcode Scanner Library & Chart.js -->
+  <!-- Barcode Scanner Library & Chart.js + Plugin DataLabels -->
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 
   <style>
     body {
@@ -74,6 +75,17 @@
     <!-- UI RENDERED HERE -->
   </main>
 
+  <!-- MODAL NOTIFIKASI & KONFIRMASI CUSTOM (POIN 1) -->
+  <div id="customModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-amber-500/40 rounded-2xl p-5 max-w-sm w-full text-center space-y-4 shadow-2xl">
+      <div id="modalIcon" class="text-3xl text-amber-500"><i class="fa-solid fa-circle-info"></i></div>
+      <p id="modalMessage" class="text-sm font-semibold text-white"></p>
+      <div id="modalButtons" class="flex gap-2 justify-center pt-2">
+        <!-- Dynamic Buttons -->
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL FULLSCREEN SCANNER BARCODE -->
   <div id="scannerModal" class="fixed inset-0 bg-black z-50 hidden flex-col justify-between p-4">
     <div class="flex justify-between items-center z-10">
@@ -89,6 +101,9 @@
   </div>
 
   <script>
+    // Register ChartJS DataLabels Plugin
+    Chart.register(ChartDataLabels);
+
     // LOCAL STORAGE STATE
     let db = {
       katalog: JSON.parse(localStorage.getItem('ag_katalog')) || [],
@@ -134,6 +149,59 @@
       return "Rp " + formatNumber(val || 0);
     }
 
+    // HELPER FORMAT TANGGAL DD-MM-YYYY (POIN 2)
+    function formatDateDMY(dateStr) {
+      if (!dateStr) return '-';
+      const cleanStr = dateStr.split('T')[0];
+      const parts = cleanStr.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return dateStr;
+    }
+
+    // CUSTOM MODAL NOTIFIKASI & KONFIRMASI (POIN 1)
+    function showNotif(msg, callback = null) {
+      const modal = document.getElementById('customModal');
+      document.getElementById('modalIcon').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+      document.getElementById('modalMessage').innerText = msg;
+      const btnContainer = document.getElementById('modalButtons');
+      btnContainer.innerHTML = `<button onclick="closeCustomModal(${callback ? 'true' : 'false'})" class="bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded-xl text-xs font-bold">OK</button>`;
+      modal._callback = callback;
+      modal.classList.remove('hidden');
+    }
+
+    function showConfirm(msg, onConfirm) {
+      const modal = document.getElementById('customModal');
+      document.getElementById('modalIcon').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i>';
+      document.getElementById('modalMessage').innerText = msg;
+      const btnContainer = document.getElementById('modalButtons');
+      btnContainer.innerHTML = `
+        <button onclick="executeConfirm(true)" class="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-xl text-xs font-bold">Ya, Hapus</button>
+        <button onclick="executeConfirm(false)" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-5 py-2 rounded-xl text-xs font-bold">Batal</button>
+      `;
+      modal._onConfirm = onConfirm;
+      modal.classList.remove('hidden');
+    }
+
+    function closeCustomModal() {
+      const modal = document.getElementById('customModal');
+      modal.classList.add('hidden');
+      if (modal._callback) {
+        modal._callback();
+        modal._callback = null;
+      }
+    }
+
+    function executeConfirm(result) {
+      const modal = document.getElementById('customModal');
+      modal.classList.add('hidden');
+      if (result && modal._onConfirm) {
+        modal._onConfirm();
+      }
+      modal._onConfirm = null;
+    }
+
     function navigateTo(view, param = null) {
       window.history.pushState({ view: view, param: param }, '', '');
       renderView(view, param);
@@ -147,12 +215,9 @@
       if (event.state && event.state.view) {
         renderView(event.state.view, event.state.param);
       } else {
-        if (confirm("Keluar dari Aplikasi ARYA GROSIR?")) {
+        showConfirm("Keluar dari Aplikasi ARYA GROSIR?", () => {
           window.close();
-        } else {
-          window.history.pushState({ view: 'MAIN' }, '', '');
-          renderView('MAIN');
-        }
+        });
       }
     });
 
@@ -187,6 +252,53 @@
       activeTransactionId = 'PJL-' + Date.now().toString().slice(-6);
       activeTransactionDate = new Date().toISOString().split('T')[0];
       navigateTo('PENJUALAN_FORM');
+    }
+
+    // FUNGSI HAPUS TRANSAKSI & ITEM (POIN 3)
+    function deleteBelanja(id) {
+      showConfirm("Hapus riwayat belanja ini?", () => {
+        db.belanja = db.belanja.filter(item => item.ID !== id);
+        saveState();
+        renderView('BELANJA_LIST');
+        showNotif("Riwayat belanja berhasil dihapus!");
+      });
+    }
+
+    function deletePenjualan(id) {
+      showConfirm("Hapus riwayat penjualan ini?", () => {
+        db.penjualan = db.penjualan.filter(item => item.ID !== id);
+        saveState();
+        renderView('PENJUALAN_LIST');
+        showNotif("Riwayat penjualan berhasil dihapus!");
+      });
+    }
+
+    function deletePengeluaran(idx) {
+      showConfirm("Hapus catatan pengeluaran ini?", () => {
+        db.pengeluaran.splice(idx, 1);
+        saveState();
+        renderView('PENGELUARAN');
+        showNotif("Pengeluaran berhasil dihapus!");
+      });
+    }
+
+    function deleteKatalog(idx) {
+      showConfirm("Hapus barang dari katalog?", () => {
+        db.katalog.splice(idx, 1);
+        saveState();
+        renderView('STOK_LIST');
+        showNotif("Barang berhasil dihapus!");
+      });
+    }
+
+    function deleteKeuntunganPerTanggal(dateStr) {
+      showConfirm(`Hapus seluruh transaksi penjualan & pengeluaran pada tanggal ${formatDateDMY(dateStr)}?`, () => {
+        db.penjualan = db.penjualan.filter(p => p.TANGGAL !== dateStr);
+        db.pengeluaran = db.pengeluaran.filter(e => e.TANGGAL !== dateStr);
+        saveState();
+        renderView('KEUNTUNGAN');
+        showNotif(`Data keuntungan tanggal ${formatDateDMY(dateStr)} berhasil dihapus!`);
+      });
     }
 
     function renderView(view, param) {
@@ -233,7 +345,7 @@
         `;
       }
 
-      // a. KATALOG STOK BARANG (1 Barang 1 List)
+      // STOK LIST
       else if (view === 'STOK_LIST') {
         app.innerHTML = `
           <div class="flex justify-between items-center mb-4">
@@ -274,65 +386,8 @@
           </div>
         `;
       }
-      // b. FORM TAMBAH BARANG BARU
-      else if (view === 'STOK_FORM') {
-        let item = param !== null ? db.katalog[param] : {};
-        app.innerHTML = `
-          <div class="card-menu p-4 space-y-3">
-            <h3 class="font-bold border-b border-gray-800 pb-2">${param !== null ? 'Edit Barang' : 'Tambah Barang Baru'}</h3>
-            
-            <div>
-              <label class="label-field">Barcode Scanner</label>
-              <div class="flex gap-2">
-                <input type="text" id="kBarcode" value="${item['BARCODE'] || ''}" class="input-dark text-xs">
-                <button onclick="openScanner((code)=>{ document.getElementById('kBarcode').value=code; })" class="bg-amber-600 px-3 rounded-lg text-xs font-bold"><i class="fa-solid fa-camera"></i></button>
-              </div>
-            </div>
 
-            <div>
-              <label class="label-field">Nama Barang</label>
-              <input type="text" id="kNama" value="${item['NAMA BARANG'] || ''}" class="input-dark text-xs uppercase" onkeydown="handleNextInput(event, 'kQty')">
-            </div>
-
-            <div>
-              <label class="label-field">Qty</label>
-              <input type="text" id="kQty" value="${formatNumber(item['QTY'])}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kSatuan')">
-            </div>
-
-            <div>
-              <label class="label-field">Satuan (PCS/PACK/KG)</label>
-              <input type="text" id="kSatuan" value="${item['SATUAN'] || ''}" class="input-dark text-xs uppercase" onkeydown="handleNextInput(event, 'kMinQty')">
-            </div>
-
-            <div>
-              <label class="label-field">Minimal Stok</label>
-              <input type="text" id="kMinQty" value="${formatNumber(item['MINIMAL QTY'])}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kHargaPokok')">
-            </div>
-
-            <div>
-              <label class="label-field">Harga Pokok</label>
-              <input type="text" id="kHargaPokok" value="${formatNumber(item['HARGA POKOK'])}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kHargaGrosir')">
-            </div>
-
-            <div>
-              <label class="label-field">Harga Jual Grosir</label>
-              <input type="text" id="kHargaGrosir" value="${formatNumber(item['HARGA JUAL GROSIR'])}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kHargaRetail')">
-            </div>
-
-            <div>
-              <label class="label-field">Harga Jual Retail</label>
-              <input type="text" id="kHargaRetail" value="${formatNumber(item['HARGA JUAL RETAIL'])}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)">
-            </div>
-
-            <div class="flex gap-2 pt-2">
-              <button onclick="saveKatalogForm(${param})" class="flex-1 bg-amber-600 py-2.5 rounded-xl text-xs font-bold">Simpan (F8)</button>
-              <button onclick="window.history.back()" class="flex-1 bg-gray-800 py-2.5 rounded-xl text-xs font-bold">Batal/Cancel</button>
-            </div>
-          </div>
-        `;
-      }
-
-      // c. LIST RIWAYAT BELANJA BARANG (Sorted Terbaru)
+      // LIST RIWAYAT BELANJA (POIN 2 & 3)
       else if (view === 'BELANJA_LIST') {
         let sortedBelanja = [...db.belanja].sort((a, b) => new Date(b.TANGGAL) - new Date(a.TANGGAL));
         app.innerHTML = `
@@ -343,132 +398,20 @@
           <div class="space-y-2">
             ${sortedBelanja.length === 0 ? '<p class="text-gray-500 text-xs text-center py-6">Belum ada riwayat belanja.</p>' : ''}
             ${sortedBelanja.map((b) => `
-              <div onclick="navigateTo('BELANJA_DETAIL', '${b.ID}')" class="card-menu p-3 cursor-pointer hover:border-amber-500">
-                <div class="flex justify-between items-center text-xs">
-                  <span class="text-gray-300 font-mono w-28">${b.TANGGAL}</span>
-                  <span class="text-amber-400 font-bold flex-1 text-center">${b.ID}</span>
-                  <span class="text-emerald-400 font-bold w-28 text-right">${formatRp(b.TOTAL_HARGA || b['TOTAL HARGA'])}</span>
+              <div class="card-menu p-3 hover:border-amber-500 flex justify-between items-center text-xs">
+                <div onclick="navigateTo('BELANJA_DETAIL', '${b.ID}')" class="flex-1 grid grid-cols-3 items-center cursor-pointer">
+                  <span class="text-gray-300 font-mono">${formatDateDMY(b.TANGGAL)}</span>
+                  <span class="text-amber-400 font-bold text-center">${b.ID}</span>
+                  <span class="text-emerald-400 font-bold text-right">${formatRp(b.TOTAL_HARGA || b['TOTAL HARGA'])}</span>
                 </div>
+                <button onclick="deleteBelanja('${b.ID}')" class="ml-3 text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
               </div>
             `).join('')}
           </div>
         `;
       }
-      else if (view === 'BELANJA_DETAIL') {
-        let b = db.belanja.find(item => item.ID === param);
-        if(!b) return navigateTo('BELANJA_LIST');
-        app.innerHTML = `
-          <div class="card-menu p-4 space-y-3">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-              <h3 class="font-bold text-xs text-amber-400">Keranjang Belanja - ${b.ID} (${b.TANGGAL})</h3>
-              <button onclick="addMoreItemsToBelanja('${b.ID}')" class="bg-blue-600 px-2.5 py-1 rounded-lg text-[10px] font-bold">+ Tambah Barang</button>
-            </div>
-            <div class="space-y-2 max-h-60 overflow-y-auto">
-              ${(b.ITEMS || []).map((item, idx) => `
-                <div class="flex justify-between items-center text-xs bg-black/40 p-2.5 rounded-lg border border-gray-800">
-                  <div>
-                    <div class="font-bold text-white">${item.nama}</div>
-                    <div class="text-gray-400">Qty: ${formatNumber(item.qty)} ${item.satuan}</div>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="font-bold text-amber-400">${formatRp(item.total)}</span>
-                    <button onclick="deleteBelanjaItem('${b.ID}', ${idx})" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-            <div class="border-t border-gray-800 pt-2 flex justify-between text-xs font-bold">
-              <span>Total Belanja:</span>
-              <span class="text-emerald-400">${formatRp(b.TOTAL_HARGA || b['TOTAL HARGA'])}</span>
-            </div>
-            <button onclick="navigateTo('BELANJA_LIST')" class="w-full bg-gray-800 py-2 rounded-xl text-xs font-bold">Kembali</button>
-          </div>
-        `;
-      }
 
-      // d. FORM INPUT BELANJA BARU
-      else if (view === 'BELANJA_FORM') {
-        app.innerHTML = `
-          <div class="space-y-3">
-            <div class="card-menu p-4 space-y-2">
-              <h3 class="font-bold text-xs text-amber-400 border-b border-gray-800 pb-2">Input Form Belanja Baru</h3>
-              
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="label-field">ID Transaksi</label>
-                  <input type="text" id="bId" value="${activeTransactionId}" readonly class="input-dark text-xs bg-gray-900 text-amber-400 font-bold">
-                </div>
-                <div>
-                  <label class="label-field">Tanggal</label>
-                  <input type="date" id="bTanggal" value="${activeTransactionDate}" class="input-dark text-xs" onchange="activeTransactionDate=this.value">
-                </div>
-              </div>
-
-              <div>
-                <label class="label-field">Barcode Scanner</label>
-                <div class="flex gap-2">
-                  <input type="text" id="bBarcode" class="input-dark text-xs">
-                  <button onclick="openScanner(onScanBelanja)" class="bg-amber-600 px-3 rounded-lg text-xs font-bold"><i class="fa-solid fa-camera"></i></button>
-                </div>
-              </div>
-
-              <div class="relative">
-                <label class="label-field">Nama Barang</label>
-                <input type="text" id="bNama" class="input-dark text-xs uppercase" oninput="autoCompleteBelanja(this.value)">
-                <div id="bSuggest" class="absolute left-0 right-0 bg-gray-900 border border-gray-700 rounded-b-lg hidden max-h-40 overflow-y-auto z-20"></div>
-              </div>
-
-              <div>
-                <label class="label-field">Qty (Jumlah)</label>
-                <input type="text" id="bQty" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this); calcBelanjaTotalAuto()" onkeydown="handleQtyBelanjaKeyDown(event)">
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="label-field">Satuan (Otomatis)</label>
-                  <input type="text" id="bSatuan" readonly class="input-dark text-xs bg-gray-900 text-gray-400 uppercase">
-                </div>
-                <div>
-                  <label class="label-field">Total Harga (Otomatis)</label>
-                  <input type="text" id="bTotal" readonly class="input-dark text-xs bg-gray-900 text-amber-400 font-bold">
-                </div>
-              </div>
-
-              <button id="btnAddToCartBelanja" onclick="addToCartBelanja()" onkeydown="handleBtnBelanjaKeyDown(event)" class="w-full bg-blue-600 py-2.5 rounded-xl text-xs font-bold mt-2 focus:ring-2 focus:ring-amber-400">+ Masukkan ke Keranjang</button>
-            </div>
-
-            <div class="card-menu p-4 space-y-3">
-              <h3 class="font-bold text-xs text-gray-400">List Keranjang Belanja</h3>
-              <div class="space-y-2 max-h-48 overflow-y-auto">
-                ${cartTemp.length === 0 ? '<p class="text-xs text-gray-500 text-center py-2">Keranjang kosong</p>' : ''}
-                ${cartTemp.map((item, i) => `
-                  <div class="flex justify-between items-center text-xs bg-black/40 p-2 rounded-lg border border-gray-800">
-                    <div>
-                      <div class="font-bold">${item.nama}</div>
-                      <div class="text-gray-400">Qty: ${formatNumber(item.qty)} ${item.satuan}</div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span class="font-bold text-amber-400">${formatRp(item.total)}</span>
-                      <button onclick="cartTemp.splice(${i},1); renderView('BELANJA_FORM')" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-              <div class="border-t border-gray-800 pt-2 flex justify-between text-xs font-bold">
-                <span>Total Items: ${cartTemp.reduce((a,b)=>a+b.qty,0)}</span>
-                <span class="text-amber-400">Total: ${formatRp(cartTemp.reduce((a,b)=>a+b.total,0))}</span>
-              </div>
-              <div class="flex gap-2 pt-2">
-                <button onclick="checkoutBelanja()" class="flex-1 bg-amber-600 py-2.5 rounded-xl text-xs font-bold">Simpan & Tambah Stok (F8)</button>
-                <button onclick="window.history.back()" class="flex-1 bg-gray-800 py-2.5 rounded-xl text-xs font-bold">Batal/Cancel</button>
-              </div>
-            </div>
-          </div>
-        `;
-        setTimeout(() => { const el = document.getElementById('bNama'); if(el) el.focus(); }, 100);
-      }
-
-      // e. LIST RIWAYAT PENJUALAN BARANG (Sorted Terbaru)
+      // LIST RIWAYAT PENJUALAN (POIN 2 & 3)
       else if (view === 'PENJUALAN_LIST') {
         let sortedPenjualan = [...db.penjualan].sort((a, b) => new Date(b.TANGGAL) - new Date(a.TANGGAL));
         app.innerHTML = `
@@ -479,176 +422,141 @@
           <div class="space-y-2">
             ${sortedPenjualan.length === 0 ? '<p class="text-gray-500 text-xs text-center py-6">Belum ada riwayat penjualan.</p>' : ''}
             ${sortedPenjualan.map((p) => `
-              <div onclick="navigateTo('PENJUALAN_DETAIL', '${p.ID}')" class="card-menu p-3 cursor-pointer hover:border-amber-500">
-                <div class="flex justify-between items-center text-xs">
-                  <span class="text-gray-300 font-mono w-28">${p.TANGGAL}</span>
-                  <span class="text-amber-400 font-bold flex-1 text-center truncate px-2">${p['NAMA PEMBELI'] || 'Umum'}</span>
-                  <span class="text-emerald-400 font-bold w-28 text-right">${formatRp(p.TOTAL_HARGA || p['TOTAL HARGA'])}</span>
+              <div class="card-menu p-3 hover:border-amber-500 flex justify-between items-center text-xs">
+                <div onclick="navigateTo('PENJUALAN_DETAIL', '${p.ID}')" class="flex-1 grid grid-cols-3 items-center cursor-pointer">
+                  <span class="text-gray-300 font-mono">${formatDateDMY(p.TANGGAL)}</span>
+                  <span class="text-amber-400 font-bold text-center truncate px-1">${p['NAMA PEMBELI'] || 'Umum'}</span>
+                  <span class="text-emerald-400 font-bold text-right">${formatRp(p.TOTAL_HARGA || p['TOTAL HARGA'])}</span>
                 </div>
+                <button onclick="deletePenjualan('${p.ID}')" class="ml-3 text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
               </div>
             `).join('')}
           </div>
         `;
       }
-      else if (view === 'PENJUALAN_DETAIL') {
-        let p = db.penjualan.find(item => item.ID === param);
-        if(!p) return navigateTo('PENJUALAN_LIST');
+
+      // PENGELUARAN LAIN (POIN 2 & 3)
+      else if (view === 'PENGELUARAN') {
+        let sortedPengeluaran = [...db.pengeluaran].sort((a, b) => new Date(b.TANGGAL) - new Date(a.TANGGAL));
         app.innerHTML = `
-          <div class="card-menu p-4 space-y-3">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-              <h3 class="font-bold text-xs text-amber-400">Keranjang Penjualan - ${p['NAMA PEMBELI'] || 'Umum'} (${p.TANGGAL})</h3>
-              <button onclick="addMoreItemsToPenjualan('${p.ID}')" class="bg-blue-600 px-2.5 py-1 rounded-lg text-[10px] font-bold">+ Tambah Barang</button>
+          <div class="space-y-4">
+            <div class="card-menu p-4 space-y-3">
+              <h3 class="font-bold text-xs text-amber-400 border-b border-gray-800 pb-2">Tambah Pengeluaran Lain</h3>
+              <div>
+                <label class="label-field">Tanggal</label>
+                <input type="date" id="expTanggal" value="${new Date().toISOString().split('T')[0]}" class="input-dark text-xs">
+              </div>
+              <div>
+                <label class="label-field">Keterangan / Keperluan</label>
+                <input type="text" id="expKet" class="input-dark text-xs uppercase" placeholder="Contoh: Beli Plastik, Listrik, Operasional">
+              </div>
+              <div>
+                <label class="label-field">Nominal (Rp)</label>
+                <input type="text" id="expNominal" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)">
+              </div>
+              <button onclick="savePengeluaran()" class="w-full bg-emerald-600 py-2.5 rounded-xl text-xs font-bold">Simpan Pengeluaran</button>
             </div>
-            <div class="space-y-2 max-h-60 overflow-y-auto">
-              ${(p.ITEMS || []).map((item, idx) => `
+
+            <div class="card-menu p-4 space-y-2">
+              <h3 class="font-bold text-xs text-gray-400 mb-2">Riwayat Pengeluaran</h3>
+              ${sortedPengeluaran.length === 0 ? '<p class="text-xs text-gray-500 text-center py-4">Belum ada pengeluaran.</p>' : ''}
+              ${sortedPengeluaran.map((exp, idx) => `
                 <div class="flex justify-between items-center text-xs bg-black/40 p-2.5 rounded-lg border border-gray-800">
-                  <div>
-                    <div class="font-bold text-white">${item.nama}</div>
-                    <div class="text-gray-400">Qty: ${formatNumber(item.qty)} ${item.satuan}</div>
+                  <div class="flex-1">
+                    <div class="font-bold text-white">${exp.KETERANGAN}</div>
+                    <div class="text-[10px] text-gray-400">${formatDateDMY(exp.TANGGAL)}</div>
                   </div>
                   <div class="flex items-center gap-3">
-                    <span class="font-bold text-amber-400">${formatRp(item.total)}</span>
-                    <button onclick="deletePenjualanItem('${p.ID}', ${idx})" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                    <span class="font-bold text-red-400">${formatRp(exp.NOMINAL)}</span>
+                    <button onclick="deletePengeluaran(${idx})" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
                   </div>
                 </div>
               `).join('')}
             </div>
-            <div class="border-t border-gray-800 pt-2 flex justify-between text-xs font-bold">
-              <span>Total Penjualan:</span>
-              <span class="text-emerald-400">${formatRp(p.TOTAL_HARGA || p['TOTAL HARGA'])}</span>
-            </div>
-            <button onclick="navigateTo('PENJUALAN_LIST')" class="w-full bg-gray-800 py-2 rounded-xl text-xs font-bold">Kembali</button>
           </div>
         `;
       }
 
-      // f. FORM INPUT PENJUALAN BARU
-      else if (view === 'PENJUALAN_FORM') {
+      // KEUNTUNGAN & GRAFIK (POIN 2, 3, & 4)
+      else if (view === 'KEUNTUNGAN') {
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        let monthlyProfits = new Array(12).fill(0);
+
+        // Hitung Keuntungan per Tanggal
+        let dateMap = {};
+        
+        db.penjualan.forEach(p => {
+          let d = p.TANGGAL;
+          if(!dateMap[d]) dateMap[d] = { omset: 0, modal: 0, pengeluaran: 0 };
+          let totalPenjualan = parseNumber(p.TOTAL_HARGA || p['TOTAL HARGA']);
+          dateMap[d].omset += totalPenjualan;
+          
+          let modalPenjualan = 0;
+          (p.ITEMS || []).forEach(item => {
+            let kat = db.katalog.find(k => k['NAMA BARANG'] === item.nama);
+            let hgPokok = kat ? parseNumber(kat['HARGA POKOK']) : 0;
+            modalPenjualan += (hgPokok * (item.qty || 1));
+          });
+          dateMap[d].modal += modalPenjualan;
+
+          // Isi Grafik Bulanan
+          if(d) {
+            let mIdx = new Date(d).getMonth();
+            if(!isNaN(mIdx)) {
+              monthlyProfits[mIdx] += (totalPenjualan - modalPenjualan);
+            }
+          }
+        });
+
+        db.pengeluaran.forEach(e => {
+          let d = e.TANGGAL;
+          if(!dateMap[d]) dateMap[d] = { omset: 0, modal: 0, pengeluaran: 0 };
+          let nom = parseNumber(e.NOMINAL);
+          dateMap[d].pengeluaran += nom;
+
+          if(d) {
+            let mIdx = new Date(d).getMonth();
+            if(!isNaN(mIdx)) {
+              monthlyProfits[mIdx] -= nom;
+            }
+          }
+        });
+
+        let sortedDates = Object.keys(dateMap).sort((a,b) => new Date(b) - new Date(a));
+
         app.innerHTML = `
-          <div class="space-y-3">
+          <div class="space-y-4">
+            <!-- GRAFIK KEUNTUNGAN BULANAN (POIN 4) -->
+            <div class="card-menu p-4">
+              <h3 class="font-bold text-xs text-amber-400 mb-3 text-center">Grafik Keuntungan Bersih Bulanan (Jan - Des)</h3>
+              <div class="relative w-full overflow-x-auto">
+                <div class="min-w-[600px] h-64">
+                  <canvas id="chartKeuntungan"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- LAPORAN KEUNTUNGAN PER TANGGAL (POIN 2 & 3) -->
             <div class="card-menu p-4 space-y-2">
-              <h3 class="font-bold text-xs text-amber-400 border-b border-gray-800 pb-2">Input Form Penjualan Baru</h3>
-              
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="label-field">ID Transaksi</label>
-                  <input type="text" id="pId" value="${activeTransactionId}" readonly class="input-dark text-xs bg-gray-900 text-amber-400 font-bold">
-                </div>
-                <div>
-                  <label class="label-field">Tanggal</label>
-                  <input type="date" id="pTanggal" value="${activeTransactionDate}" class="input-dark text-xs" onchange="activeTransactionDate=this.value">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="label-field">Tipe Customer</label>
-                  <select id="pType" class="input-dark text-xs" onchange="calcPenjualanTotalAuto()">
-                    <option value="RETAIL">RETAIL</option>
-                    <option value="GROSIR">GROSIR</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="label-field">Nama Pembeli</label>
-                  <input type="text" id="pPembeli" placeholder="Umum" class="input-dark text-xs">
-                </div>
-              </div>
-
-              <div>
-                <label class="label-field">Barcode Scanner</label>
-                <div class="flex gap-2">
-                  <input type="text" id="pBarcode" class="input-dark text-xs">
-                  <button onclick="openScanner(onScanPenjualan)" class="bg-amber-600 px-3 rounded-lg text-xs font-bold"><i class="fa-solid fa-camera"></i></button>
-                </div>
-              </div>
-
-              <div class="relative">
-                <label class="label-field">Nama Barang</label>
-                <input type="text" id="pNama" class="input-dark text-xs uppercase" oninput="autoCompletePenjualan(this.value)">
-                <div id="pSuggest" class="absolute left-0 right-0 bg-gray-900 border border-gray-700 rounded-b-lg hidden max-h-40 overflow-y-auto z-20"></div>
-              </div>
-
-              <div>
-                <label class="label-field">Qty (Jumlah)</label>
-                <input type="text" id="pQty" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this); calcPenjualanTotalAuto()" onkeydown="handleQtyPenjualanKeyDown(event)">
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="label-field">Satuan (Otomatis)</label>
-                  <input type="text" id="pSatuan" readonly class="input-dark text-xs bg-gray-900 text-gray-400 uppercase">
-                </div>
-                <div>
-                  <label class="label-field">Total Harga (Otomatis)</label>
-                  <input type="text" id="pTotalItem" readonly class="input-dark text-xs bg-gray-900 text-amber-400 font-bold">
-                </div>
-              </div>
-
-              <button id="btnAddToCartPenjualan" onclick="addToCartPenjualan()" onkeydown="handleBtnPenjualanKeyDown(event)" class="w-full bg-blue-600 py-2.5 rounded-xl text-xs font-bold mt-2 focus:ring-2 focus:ring-amber-400">+ Masukkan ke Keranjang</button>
-            </div>
-
-            <div class="card-menu p-4 space-y-3">
-              <h3 class="font-bold text-xs text-gray-400">List Keranjang Penjualan</h3>
-              <div class="space-y-2 max-h-44 overflow-y-auto">
-                ${cartTemp.length === 0 ? '<p class="text-xs text-gray-500 text-center py-2">Keranjang kosong</p>' : ''}
-                ${cartTemp.map((item, i) => `
-                  <div class="flex justify-between items-center text-xs bg-black/40 p-2 rounded-lg border border-gray-800">
-                    <div>
-                      <div class="font-bold">${item.nama}</div>
-                      <div class="text-gray-400">Qty: ${formatNumber(item.qty)} ${item.satuan}</div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span class="font-bold text-amber-400">${formatRp(item.total)}</span>
-                      <button onclick="cartTemp.splice(${i},1); renderView('PENJUALAN_FORM')" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-              <div class="border-t border-gray-800 pt-2 space-y-1 text-xs">
-                <div class="flex justify-between font-bold">
-                  <span>Total Tagihan:</span>
-                  <span class="text-amber-400" id="grandTotalPenjualan">${formatRp(cartTemp.reduce((a,b)=>a+b.total,0))}</span>
-                </div>
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                  <div>
-                    <label class="label-field">Jumlah Dibayar</label>
-                    <input type="text" id="pDibayar" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this); calcKembalian()">
-                  </div>
-                  <div>
-                    <label class="label-field">Kembalian</label>
-                    <input type="text" id="pKembalian" class="input-dark text-xs bg-gray-900" readonly>
-                  </div>
-                </div>
-              </div>
-              <div class="flex gap-2 pt-2">
-                <button onclick="checkoutPenjualan()" class="flex-1 bg-amber-600 py-2.5 rounded-xl text-xs font-bold">Simpan & Kurangi Stok (F8)</button>
-                <button onclick="window.history.back()" class="flex-1 bg-gray-800 py-2.5 rounded-xl text-xs font-bold">Batal/Cancel</button>
-              </div>
-            </div>
-          </div>
-        `;
-        setTimeout(() => { const el = document.getElementById('pNama'); if(el) el.focus(); }, 100);
-      }
-
-      // g. PERKIRAAN BELANJA (Restock List)
-      else if (view === 'PERKIRAAN') {
-        let lowStockList = db.katalog.filter(item => (item['QTY'] || 0) <= (item['MINIMAL QTY'] || 0));
-        app.innerHTML = `
-          <div class="space-y-3">
-            <div class="flex justify-between items-center">
-              <h2 class="font-bold text-base">Daftar Barang Harus Di-Restock</h2>
-              <span class="text-xs font-bold text-red-400">${lowStockList.length} Barang Kritis</span>
-            </div>
-            <div class="space-y-2">
-              ${lowStockList.length === 0 ? '<p class="text-gray-500 text-xs text-center py-6">Semua stok barang aman/mencukupi.</p>' : ''}
-              ${lowStockList.map(item => {
-                let restockQty = Math.max(0, (item['MINIMAL QTY'] || 0) - (item['QTY'] || 0));
+              <h3 class="font-bold text-xs text-gray-400 mb-2">Laporan Keuntungan Per Tanggal</h3>
+              ${sortedDates.length === 0 ? '<p class="text-xs text-gray-500 text-center py-4">Belum ada data transaksi.</p>' : ''}
+              ${sortedDates.map(dateStr => {
+                let data = dateMap[dateStr];
+                let labaKotor = data.omset - data.modal;
+                let labaBersih = labaKotor - data.pengeluaran;
                 return `
-                  <div class="card-menu p-3">
-                    <div class="flex justify-between items-center text-xs">
-                      <span class="font-bold text-amber-400 w-1/3 truncate">${item['NAMA BARANG']}</span>
-                      <span class="text-gray-300 w-1/3 text-center">Sisa Stok: <strong class="text-red-400">${formatNumber(item['QTY'])}</strong> ${item['SATUAN']||''}</span>
-                      <span class="text-emerald-400 font-bold w-1/3 text-right">Restock: ${formatNumber(restockQty)} ${item['SATUAN']||''}</span>
+                  <div class="bg-black/40 p-3 rounded-xl border border-gray-800 space-y-1">
+                    <div class="flex justify-between items-center text-xs border-b border-gray-800/80 pb-1.5">
+                      <span class="font-mono text-amber-400 font-bold">${formatDateDMY(dateStr)}</span>
+                      <button onclick="deleteKeuntunganPerTanggal('${dateStr}')" class="text-red-500 hover:text-red-400 text-xs flex items-center gap-1 font-semibold">
+                        <i class="fa-solid fa-trash"></i> Hapus
+                      </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                      <div><span class="text-gray-400">Total Omset:</span> <span class="font-bold text-white">${formatRp(data.omset)}</span></div>
+                      <div><span class="text-gray-400">Modal HPP:</span> <span class="font-bold text-gray-300">${formatRp(data.modal)}</span></div>
+                      <div><span class="text-gray-400">Pengeluaran:</span> <span class="font-bold text-red-400">${formatRp(data.pengeluaran)}</span></div>
+                      <div><span class="text-gray-400">Laba Bersih:</span> <span class="font-bold ${labaBersih >= 0 ? 'text-emerald-400' : 'text-red-500'}">${formatRp(labaBersih)}</span></div>
                     </div>
                   </div>
                 `;
@@ -656,109 +564,76 @@
             </div>
           </div>
         `;
-      }
 
-      // h. SUB MENU KEUNTUNGAN
-      else if (view === 'KEUNTUNGAN') {
-        let dailyReports = getDailyKeuntunganReports();
-        app.innerHTML = `
-          <div class="space-y-3">
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="card-menu p-3">
-                <div class="text-gray-400">Laba Bersih Kemarin</div>
-                <div class="font-bold text-amber-400 text-sm mt-1">${formatRp(calcLabaKemarin())}</div>
-              </div>
-              <div class="card-menu p-3">
-                <div class="text-gray-400">Laba Bersih Bulan Ini</div>
-                <div class="font-bold text-emerald-400 text-sm mt-1">${formatRp(calcLabaBulanIni())}</div>
-              </div>
-            </div>
-
-            <!-- TABEL KEUNTUNGAN PERTANGGAL -->
-            <div class="card-menu p-3">
-              <h3 class="text-xs font-bold text-amber-400 mb-2 border-b border-gray-800 pb-1">Laporan Keuntungan Pertanggal</h3>
-              <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                ${dailyReports.length === 0 ? '<p class="text-[10px] text-gray-500 text-center">Belum ada data transaksi.</p>' : ''}
-                ${dailyReports.map(r => `
-                  <div class="grid grid-cols-4 gap-1 text-[11px] p-2 bg-black/40 rounded border border-gray-800/60 text-center">
-                    <span class="text-gray-300 font-mono text-left">${r.tanggal}</span>
-                    <span class="text-amber-400 font-bold">${formatRp(r.labaKotor)}</span>
-                    <span class="text-red-400">${formatRp(r.pengeluaran)}</span>
-                    <span class="text-emerald-400 font-bold text-right">${formatRp(r.labaBersih)}</span>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-
-            <!-- GRAFIK BULANAN DENGAN NOMINAL LABA BERSIH -->
-            <div class="card-menu p-3">
-              <h3 class="text-xs font-bold text-gray-400 mb-2">Grafik Keuntungan Bulanan</h3>
-              <canvas id="profitChart" class="w-full max-h-48"></canvas>
-            </div>
-          </div>
-        `;
-        setTimeout(renderChart, 100);
-      }
-
-      // i. RIWAYAT PENGELUARAN (Sorted Terbaru)
-      else if (view === 'PENGELUARAN') {
-        let sortedPengeluaran = [...db.pengeluaran].sort((a, b) => new Date(b.TANGGAL) - new Date(a.TANGGAL));
-        app.innerHTML = `
-          <div class="space-y-3">
-            <div class="card-menu p-4 space-y-2">
-              <h3 class="font-bold text-xs text-amber-400 border-b border-gray-800 pb-2">Form Tambah Pengeluaran</h3>
-              <div>
-                <label class="label-field">Tanggal</label>
-                <input type="date" id="eTanggal" value="${new Date().toISOString().split('T')[0]}" class="input-dark text-xs">
-              </div>
-              <div>
-                <label class="label-field">Keterangan Pengeluaran</label>
-                <input type="text" id="eKet" class="input-dark text-xs">
-              </div>
-              <div>
-                <label class="label-field">Jumlah (Rp)</label>
-                <input type="text" id="eJumlah" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)">
-              </div>
-              <button onclick="savePengeluaran()" class="w-full bg-amber-600 py-2 rounded-xl text-xs font-bold mt-1">Simpan Pengeluaran</button>
-            </div>
-
-            <div class="card-menu p-4">
-              <h3 class="font-bold text-xs text-gray-400 mb-2">Riwayat Pengeluaran</h3>
-              <div class="space-y-2">
-                ${sortedPengeluaran.length === 0 ? '<p class="text-xs text-gray-500 text-center py-2">Belum ada pengeluaran.</p>' : ''}
-                ${sortedPengeluaran.map((item, idx) => `
-                  <div class="flex justify-between items-center text-xs bg-black/40 p-2.5 rounded-lg border border-gray-800">
-                    <span class="text-gray-300 font-mono w-24">${item.TANGGAL}</span>
-                    <span class="text-red-400 font-bold w-24 text-center">${formatRp(item.JUMLAH)}</span>
-                    <span class="text-gray-200 flex-1 truncate px-2 text-right">${item.KETERANGAN}</span>
-                    <button onclick="deletePengeluaranByItem('${item.TANGGAL}', '${item.KETERANGAN}', ${item.JUMLAH})" class="text-red-500 ml-2"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      else if (view === 'SYNC') {
-        app.innerHTML = `
-          <div class="card-menu p-4 space-y-4">
-            <h3 class="font-bold text-sm border-b border-gray-800 pb-2">Pengaturan Sinkronisasi Backend</h3>
-            <div>
-              <label class="label-field">Google Apps Script Web App URL</label>
-              <input type="text" id="gasUrlInput" value="${db.gasUrl}" class="input-dark text-xs">
-            </div>
-            <button onclick="db.gasUrl = document.getElementById('gasUrlInput').value; saveState(); alert('URL Berhasil Disimpan!');" class="w-full bg-blue-600 py-2 rounded-xl text-xs font-bold">Simpan URL</button>
-            <div class="flex gap-2">
-              <button onclick="syncPush()" class="flex-1 bg-emerald-600 py-2.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-cloud-arrow-up"></i> Kirim Data</button>
-              <button onclick="syncPull()" class="flex-1 bg-amber-600 py-2.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-cloud-arrow-down"></i> Tarik Data</button>
-            </div>
-          </div>
-        `;
+        // INI CHARTJS DENGAN DATALABELS (POIN 4)
+        setTimeout(() => {
+          const ctx = document.getElementById('chartKeuntungan');
+          if(ctx) {
+            new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: months,
+                datasets: [{
+                  label: 'Keuntungan Bersih (Rp)',
+                  data: monthlyProfits,
+                  backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                  borderColor: '#f59e0b',
+                  borderWidth: 1,
+                  borderRadius: 6
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                  padding: { top: 25 }
+                },
+                plugins: {
+                  legend: { display: false },
+                  datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    color: '#10b981',
+                    font: { weight: 'bold', size: 9 },
+                    formatter: function(value) {
+                      return value !== 0 ? 'Rp ' + formatNumber(value) : '';
+                    }
+                  }
+                },
+                scales: {
+                  y: {
+                    ticks: { color: '#9ca3af', font: { size: 10 } },
+                    grid: { color: '#222222' }
+                  },
+                  x: {
+                    ticks: { color: '#9ca3af', font: { size: 10 } },
+                    grid: { display: false }
+                  }
+                }
+              }
+            });
+          }
+        }, 100);
       }
     }
 
-    // FORM INPUT HELPER & AUTO NEXT
+    // HANDLER PENGELUARAN
+    function savePengeluaran() {
+      let tanggal = document.getElementById('expTanggal').value;
+      let ket = document.getElementById('expKet').value.trim();
+      let nominal = parseNumber(document.getElementById('expNominal').value);
+
+      if(!ket || nominal <= 0) {
+        return showNotif("Isi keterangan dan nominal pengeluaran dengan benar!");
+      }
+
+      db.pengeluaran.push({ TANGGAL: tanggal, KETERANGAN: ket, NOMINAL: nominal });
+      saveState();
+      renderView('PENGELUARAN');
+      showNotif("Pengeluaran berhasil disimpan!");
+    }
+
+    // FORM INPUT UTILITY
     function formatInputNumber(el) {
       let val = parseNumber(el.value);
       el.value = formatNumber(val);
@@ -767,532 +642,46 @@
     function handleNextInput(e, nextId) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        let nextEl = document.getElementById(nextId);
+        const nextEl = document.getElementById(nextId);
         if (nextEl) nextEl.focus();
       }
     }
 
-    // KATALOG FORM SAVE & DELETE
-    function saveKatalogForm(editIndex = null) {
-      let barcode = document.getElementById('kBarcode').value;
-      let nama = document.getElementById('kNama').value.toUpperCase();
+    function saveKatalogForm(paramIdx) {
+      let barcode = document.getElementById('kBarcode').value.trim();
+      let nama = document.getElementById('kNama').value.trim();
       let qty = parseNumber(document.getElementById('kQty').value);
-      let satuan = document.getElementById('kSatuan').value.toUpperCase();
+      let satuan = document.getElementById('kSatuan').value.trim();
       let minQty = parseNumber(document.getElementById('kMinQty').value);
-      let hp = parseNumber(document.getElementById('kHargaPokok').value);
-      let hg = parseNumber(document.getElementById('kHargaGrosir').value);
-      let hr = parseNumber(document.getElementById('kHargaRetail').value);
+      let hgPokok = parseNumber(document.getElementById('kHargaPokok').value);
+      let hgGrosir = parseNumber(document.getElementById('kHargaGrosir').value);
+      let hgRetail = parseNumber(document.getElementById('kHargaRetail').value);
 
-      if (!nama) return alert('Nama barang wajib diisi!');
+      if(!nama) return showNotif("Nama barang wajib diisi!");
 
-      let newItem = {
+      let itemData = {
         'BARCODE': barcode,
         'NAMA BARANG': nama,
         'QTY': qty,
         'SATUAN': satuan,
         'MINIMAL QTY': minQty,
-        'HARGA POKOK': hp,
-        'HARGA JUAL GROSIR': hg,
-        'HARGA JUAL RETAIL': hr
+        'HARGA POKOK': hgPokok,
+        'HARGA JUAL GROSIR': hgGrosir,
+        'HARGA JUAL RETAIL': hgRetail
       };
 
-      if (editIndex !== null && editIndex !== undefined && editIndex !== '') {
-        db.katalog[editIndex] = newItem;
+      if(paramIdx !== null && paramIdx !== undefined) {
+        db.katalog[paramIdx] = itemData;
       } else {
-        db.katalog.push(newItem);
+        db.katalog.push(itemData);
       }
 
       saveState();
       navigateTo('STOK_LIST');
+      showNotif("Data barang berhasil disimpan!");
     }
 
-    function deleteKatalog(index) {
-      if (confirm("Yakin ingin menghapus barang ini?")) {
-        db.katalog.splice(index, 1);
-        saveState();
-        navigateTo('STOK_LIST');
-      }
-    }
-
-    // LOGIKA FORM BELANJA
-    function autoCompleteBelanja(val) {
-      const suggestBox = document.getElementById('bSuggest');
-      if (!val) { suggestBox.classList.add('hidden'); return; }
-      const matches = db.katalog.filter(i => i['NAMA BARANG'].toLowerCase().includes(val.toLowerCase()));
-      if (matches.length === 0) { suggestBox.classList.add('hidden'); return; }
-
-      suggestBox.innerHTML = matches.map(m => `
-        <div class="p-2 border-b border-gray-800 cursor-pointer text-xs hover:bg-amber-600/20" onclick="selectSuggestBelanja('${m['NAMA BARANG']}', '${m['SATUAN']}')">
-          ${m['NAMA BARANG']} (${m['SATUAN']})
-        </div>
-      `).join('');
-      suggestBox.classList.remove('hidden');
-    }
-
-    function selectSuggestBelanja(nama, satuan) {
-      document.getElementById('bNama').value = nama;
-      document.getElementById('bSatuan').value = satuan;
-      document.getElementById('bSuggest').classList.add('hidden');
-      document.getElementById('bQty').focus();
-      calcBelanjaTotalAuto();
-    }
-
-    function onScanBelanja(code) {
-      document.getElementById('bBarcode').value = code;
-      let match = db.katalog.find(i => i['BARCODE'] === code);
-      if (match) {
-        document.getElementById('bNama').value = match['NAMA BARANG'];
-        document.getElementById('bSatuan').value = match['SATUAN'];
-        calcBelanjaTotalAuto();
-      }
-    }
-
-    function calcBelanjaTotalAuto() {
-      let nama = document.getElementById('bNama').value.toUpperCase();
-      let qty = parseNumber(document.getElementById('bQty').value);
-      let match = db.katalog.find(i => i['NAMA BARANG'] === nama);
-      if (match) {
-        document.getElementById('bSatuan').value = match['SATUAN'] || '';
-        if (qty > 0) {
-          let total = (match['HARGA POKOK'] || 0) * qty;
-          document.getElementById('bTotal').value = formatRp(total);
-        } else {
-          document.getElementById('bTotal').value = '';
-        }
-      }
-    }
-
-    function handleQtyBelanjaKeyDown(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('btnAddToCartBelanja').focus();
-      }
-    }
-
-    function handleBtnBelanjaKeyDown(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        addToCartBelanja();
-      }
-    }
-
-    function addToCartBelanja() {
-      let nama = document.getElementById('bNama').value.toUpperCase();
-      let qty = parseNumber(document.getElementById('bQty').value);
-      let satuan = document.getElementById('bSatuan').value.toUpperCase();
-      let total = parseNumber(document.getElementById('bTotal').value);
-
-      if (!nama || qty <= 0) return alert('Lengkapi data barang dan Qty!');
-
-      cartTemp.push({ nama, qty, satuan, total });
-      renderView('BELANJA_FORM');
-    }
-
-    function checkoutBelanja() {
-      if (cartTemp.length === 0) return alert('Keranjang belanja masih kosong!');
-
-      let id = activeTransactionId;
-      let dateStr = activeTransactionDate;
-      let totalHarga = cartTemp.reduce((a, b) => a + b.total, 0);
-
-      db.belanja.push({
-        ID: id,
-        TANGGAL: dateStr,
-        TOTAL_HARGA: totalHarga,
-        ITEMS: [...cartTemp]
-      });
-
-      cartTemp.forEach(item => {
-        let match = db.katalog.find(k => k['NAMA BARANG'] === item.nama);
-        let unitCost = item.qty > 0 ? Math.round(item.total / item.qty) : 0;
-        if (match) {
-          match['QTY'] = (match['QTY'] || 0) + item.qty;
-          if(unitCost > 0) match['HARGA POKOK'] = unitCost;
-        } else {
-          db.katalog.push({
-            'BARCODE': '',
-            'NAMA BARANG': item.nama,
-            'QTY': item.qty,
-            'SATUAN': item.satuan,
-            'MINIMAL QTY': 5,
-            'HARGA POKOK': unitCost,
-            'HARGA JUAL GROSIR': Math.round(unitCost * 1.1),
-            'HARGA JUAL RETAIL': Math.round(unitCost * 1.2)
-          });
-        }
-      });
-
-      cartTemp = [];
-      saveState();
-      navigateTo('BELANJA_LIST');
-    }
-
-    function deleteBelanjaItem(id, itemIdx) {
-      let b = db.belanja.find(i => i.ID === id);
-      if(b && b.ITEMS) {
-        b.ITEMS.splice(itemIdx, 1);
-        b.TOTAL_HARGA = b.ITEMS.reduce((a, x) => a + x.total, 0);
-        saveState();
-        renderView('BELANJA_DETAIL', id);
-      }
-    }
-
-    function addMoreItemsToBelanja(id) {
-      activeTransactionId = id;
-      cartTemp = [];
-      navigateTo('BELANJA_FORM');
-    }
-
-    // LOGIKA FORM PENJUALAN
-    function autoCompletePenjualan(val) {
-      const suggestBox = document.getElementById('pSuggest');
-      if (!val) { suggestBox.classList.add('hidden'); return; }
-      const matches = db.katalog.filter(i => i['NAMA BARANG'].toLowerCase().includes(val.toLowerCase()));
-      if (matches.length === 0) { suggestBox.classList.add('hidden'); return; }
-
-      suggestBox.innerHTML = matches.map(m => `
-        <div class="p-2 border-b border-gray-800 cursor-pointer text-xs hover:bg-amber-600/20" onclick="selectSuggestPenjualan('${m['NAMA BARANG']}', '${m['SATUAN']}')">
-          ${m['NAMA BARANG']} - Stok: ${m['QTY']} (${m['SATUAN']})
-        </div>
-      `).join('');
-      suggestBox.classList.remove('hidden');
-    }
-
-    function selectSuggestPenjualan(nama, satuan) {
-      document.getElementById('pNama').value = nama;
-      document.getElementById('pSatuan').value = satuan;
-      document.getElementById('pSuggest').classList.add('hidden');
-      document.getElementById('pQty').focus();
-      calcPenjualanTotalAuto();
-    }
-
-    function onScanPenjualan(code) {
-      document.getElementById('pBarcode').value = code;
-      let match = db.katalog.find(i => i['BARCODE'] === code);
-      if (match) {
-        document.getElementById('pNama').value = match['NAMA BARANG'];
-        document.getElementById('pSatuan').value = match['SATUAN'];
-        calcPenjualanTotalAuto();
-      }
-    }
-
-    function calcPenjualanTotalAuto() {
-      let nama = document.getElementById('pNama').value.toUpperCase();
-      let qty = parseNumber(document.getElementById('pQty').value);
-      let type = document.getElementById('pType').value;
-      let match = db.katalog.find(i => i['NAMA BARANG'] === nama);
-
-      if (match) {
-        document.getElementById('pSatuan').value = match['SATUAN'] || '';
-        if (qty > 0) {
-          let unitPrice = (type === 'GROSIR') ? (match['HARGA JUAL GROSIR'] || 0) : (match['HARGA JUAL RETAIL'] || 0);
-          document.getElementById('pTotalItem').value = formatRp(unitPrice * qty);
-        } else {
-          document.getElementById('pTotalItem').value = '';
-        }
-      }
-    }
-
-    function handleQtyPenjualanKeyDown(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('btnAddToCartPenjualan').focus();
-      }
-    }
-
-    function handleBtnPenjualanKeyDown(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        addToCartPenjualan();
-      }
-    }
-
-    function addToCartPenjualan() {
-      let nama = document.getElementById('pNama').value.toUpperCase();
-      let qty = parseNumber(document.getElementById('pQty').value);
-      let satuan = document.getElementById('pSatuan').value.toUpperCase();
-      let type = document.getElementById('pType').value;
-      let match = db.katalog.find(i => i['NAMA BARANG'] === nama);
-
-      if (!match) return alert('Barang tidak ditemukan dalam katalog!');
-      if (qty <= 0) return alert('Jumlah Qty tidak valid!');
-      if (qty > match['QTY']) return alert('Stok barang tidak mencukupi! (Sisa: ' + match['QTY'] + ')');
-
-      let unitPrice = (type === 'GROSIR') ? match['HARGA JUAL GROSIR'] : match['HARGA JUAL RETAIL'];
-      let total = unitPrice * qty;
-      let modal = match['HARGA POKOK'] * qty;
-
-      cartTemp.push({ nama, qty, satuan, unitPrice, total, modal });
-      renderView('PENJUALAN_FORM');
-    }
-
-    function calcKembalian() {
-      let total = cartTemp.reduce((a, b) => a + b.total, 0);
-      let dibayar = parseNumber(document.getElementById('pDibayar').value);
-      let kembalian = dibayar - total;
-      document.getElementById('pKembalian').value = kembalian >= 0 ? formatRp(kembalian) : 'Kurang ' + formatRp(Math.abs(kembalian));
-    }
-
-    function checkoutPenjualan() {
-      if (cartTemp.length === 0) return alert('Keranjang penjualan masih kosong!');
-
-      let totalHarga = cartTemp.reduce((a, b) => a + b.total, 0);
-      let dibayar = parseNumber(document.getElementById('pDibayar').value);
-
-      if (dibayar < totalHarga) return alert('Jumlah pembayaran masih kurang!');
-
-      let id = activeTransactionId;
-      let dateStr = activeTransactionDate;
-      let type = document.getElementById('pType').value;
-      let pembeli = document.getElementById('pPembeli').value || 'Umum';
-
-      db.penjualan.push({
-        ID: id,
-        TANGGAL: dateStr,
-        'TYPE PEMBELI': type,
-        'NAMA PEMBELI': pembeli,
-        TOTAL_HARGA: totalHarga,
-        DIBAYAR: dibayar,
-        KEMBALIAN: dibayar - totalHarga,
-        ITEMS: [...cartTemp]
-      });
-
-      cartTemp.forEach(item => {
-        let match = db.katalog.find(k => k['NAMA BARANG'] === item.nama);
-        if (match) {
-          match['QTY'] = Math.max(0, (match['QTY'] || 0) - item.qty);
-        }
-      });
-
-      cartTemp = [];
-      saveState();
-      navigateTo('PENJUALAN_LIST');
-    }
-
-    function deletePenjualanItem(id, itemIdx) {
-      let p = db.penjualan.find(i => i.ID === id);
-      if(p && p.ITEMS) {
-        p.ITEMS.splice(itemIdx, 1);
-        p.TOTAL_HARGA = p.ITEMS.reduce((a, x) => a + x.total, 0);
-        saveState();
-        renderView('PENJUALAN_DETAIL', id);
-      }
-    }
-
-    function addMoreItemsToPenjualan(id) {
-      activeTransactionId = id;
-      cartTemp = [];
-      navigateTo('PENJUALAN_FORM');
-    }
-
-    // PENGELUARAN
-    function savePengeluaran() {
-      let tanggal = document.getElementById('eTanggal').value;
-      let keterangan = document.getElementById('eKet').value;
-      let jumlah = parseNumber(document.getElementById('eJumlah').value);
-
-      if (!keterangan || jumlah <= 0) return alert('Lengkapi data pengeluaran!');
-
-      db.pengeluaran.push({ TANGGAL: tanggal, KETERANGAN: keterangan, JUMLAH: jumlah });
-      saveState();
-      renderView('PENGELUARAN');
-    }
-
-    function deletePengeluaranByItem(tanggal, ket, jumlah) {
-      let idx = db.pengeluaran.findIndex(e => e.TANGGAL === tanggal && e.KETERANGAN === ket && e.JUMLAH === jumlah);
-      if(idx !== -1) {
-        db.pengeluaran.splice(idx, 1);
-        saveState();
-        renderView('PENGELUARAN');
-      }
-    }
-
-    // ANALITIK & LABA
-    function getDailyKeuntunganReports() {
-      let dates = new Set();
-      db.penjualan.forEach(p => p.TANGGAL && dates.add(p.TANGGAL));
-      db.pengeluaran.forEach(e => e.TANGGAL && dates.add(e.TANGGAL));
-
-      let sortedDates = Array.from(dates).sort((a, b) => new Date(b) - new Date(a));
-
-      return sortedDates.map(d => {
-        let sales = db.penjualan.filter(p => p.TANGGAL === d);
-        let labaKotor = sales.reduce((acc, p) => {
-          let itemProfit = (p.ITEMS || []).reduce((a, i) => a + (i.total - (i.modal || 0)), 0);
-          return acc + itemProfit;
-        }, 0);
-        let pengeluaran = db.pengeluaran.filter(e => e.TANGGAL === d).reduce((a, e) => a + e.JUMLAH, 0);
-        return {
-          tanggal: d,
-          labaKotor: labaKotor,
-          pengeluaran: pengeluaran,
-          labaBersih: labaKotor - pengeluaran
-        };
-      });
-    }
-
-    function calcLabaKemarin() {
-      let yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      let dateStr = yesterday.toISOString().split('T')[0];
-
-      let sales = db.penjualan.filter(p => p.TANGGAL === dateStr);
-      let grossProfit = sales.reduce((acc, p) => acc + (p.ITEMS || []).reduce((a, i) => a + (i.total - (i.modal || 0)), 0), 0);
-      let expenses = db.pengeluaran.filter(e => e.TANGGAL === dateStr).reduce((a, e) => a + e.JUMLAH, 0);
-      return grossProfit - expenses;
-    }
-
-    function calcLabaBulanIni() {
-      let nowMonth = new Date().toISOString().slice(0, 7);
-      let sales = db.penjualan.filter(p => (p.TANGGAL || '').startsWith(nowMonth));
-      let grossProfit = sales.reduce((acc, p) => acc + (p.ITEMS || []).reduce((a, i) => a + (i.total - (i.modal || 0)), 0), 0);
-      let expenses = db.pengeluaran.filter(e => (e.TANGGAL || '').startsWith(nowMonth)).reduce((a, e) => a + e.JUMLAH, 0);
-      return grossProfit - expenses;
-    }
-
-    function renderChart() {
-      const ctx = document.getElementById('profitChart');
-      if (!ctx) return;
-
-      let months = [];
-      let profitData = [];
-      for (let i = 5; i >= 0; i--) {
-        let d = new Date();
-        d.setMonth(d.getMonth() - i);
-        let mStr = d.toISOString().slice(0, 7);
-        months.push(mStr);
-
-        let sales = db.penjualan.filter(p => (p.TANGGAL || '').startsWith(mStr));
-        let gross = sales.reduce((acc, p) => acc + (p.ITEMS || []).reduce((a, item) => a + (item.total - (item.modal || 0)), 0), 0);
-        let exp = db.pengeluaran.filter(e => (e.TANGGAL || '').startsWith(mStr)).reduce((a, e) => a + e.JUMLAH, 0);
-        profitData.push(gross - exp);
-      }
-
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: months,
-          datasets: [{
-            label: 'Laba Bersih',
-            data: profitData,
-            borderColor: '#f59e0b',
-            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-            fill: true,
-            tension: 0.3
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return 'Laba Bersih: ' + formatRp(context.raw);
-                }
-              }
-            }
-          },
-          scales: {
-            x: { ticks: { color: '#9ca3af' }, grid: { color: '#1f2937' } },
-            y: { ticks: { color: '#9ca3af', callback: (val) => formatRp(val) }, grid: { color: '#1f2937' } }
-          }
-        },
-        plugins: [{
-          id: 'customNominalLabels',
-          afterDatasetsDraw(chart) {
-            const { ctx } = chart;
-            chart.data.datasets.forEach((dataset, i) => {
-              const meta = chart.getDatasetMeta(i);
-              meta.data.forEach((datapoint, index) => {
-                const val = dataset.data[index];
-                ctx.fillStyle = '#10b981';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(formatRp(val), datapoint.x, datapoint.y - 8);
-              });
-            });
-          }
-        }]
-      });
-    }
-
-    // SCANNER & SYNC ENGINE
-    function openScanner(callback) {
-      scanTargetCallback = callback;
-      document.getElementById('scannerModal').classList.remove('hidden');
-      document.getElementById('scannerModal').classList.add('flex');
-
-      html5QrCode = new Html5Qrcode("reader");
-      html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 150 } },
-        (decodedText) => {
-          if (scanTargetCallback) scanTargetCallback(decodedText);
-          closeScanner();
-        },
-        (errorMessage) => {}
-      ).catch(err => {
-        alert("Gagal membuka kamera: " + err);
-        closeScanner();
-      });
-    }
-
-    function closeScanner() {
-      if (html5QrCode) {
-        html5QrCode.stop().then(() => {
-          html5QrCode.clear();
-          document.getElementById('scannerModal').classList.add('hidden');
-          document.getElementById('scannerModal').classList.remove('flex');
-        }).catch(() => {
-          document.getElementById('scannerModal').classList.add('hidden');
-          document.getElementById('scannerModal').classList.remove('flex');
-        });
-      } else {
-        document.getElementById('scannerModal').classList.add('hidden');
-        document.getElementById('scannerModal').classList.remove('flex');
-      }
-    }
-
-    function toggleTorch() {
-      if (html5QrCode) {
-        torchState = !torchState;
-        html5QrCode.applyVideoConstraints({
-          advanced: [{ torch: torchState }]
-        }).catch(e => alert("Senter tidak didukung pada perangkat ini."));
-      }
-    }
-
-    function syncPush() {
-      if (!db.gasUrl) return alert('Masukkan URL Google Apps Script terlebih dahulu!');
-      fetch(db.gasUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'push', data: db })
-      }).then(() => {
-        alert('Perintah Sync Push dikirim ke Apps Script.');
-      }).catch(err => alert('Gagal Sync: ' + err));
-    }
-
-    function syncPull() {
-      if (!db.gasUrl) return alert('Masukkan URL Google Apps Script terlebih dahulu!');
-      fetch(db.gasUrl + '?action=pull')
-        .then(res => res.json())
-        .then(data => {
-          if (data) {
-            db.katalog = data.katalog || db.katalog;
-            db.belanja = data.belanja || db.belanja;
-            db.penjualan = data.penjualan || db.penjualan;
-            db.pengeluaran = data.pengeluaran || db.pengeluaran;
-            saveState();
-            alert('Data berhasil ditarik dari cloud!');
-            renderView('MAIN');
-          }
-        })
-        .catch(err => alert('Gagal menarik data: ' + err));
-    }
-
+    // INITIAL LOAD
     renderView('MAIN');
   </script>
 </body>
