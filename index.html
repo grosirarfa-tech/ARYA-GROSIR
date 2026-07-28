@@ -75,7 +75,7 @@
     <!-- UI RENDERED HERE -->
   </main>
 
-  <!-- MODAL NOTIFIKASI & KONFIRMASI CUSTOM (POIN 1) -->
+  <!-- MODAL NOTIFIKASI & KONFIRMASI CUSTOM (PERBAIKAN POIN 1) -->
   <div id="customModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-gray-900 border border-amber-500/40 rounded-2xl p-5 max-w-sm w-full text-center space-y-4 shadow-2xl">
       <div id="modalIcon" class="text-3xl text-amber-500"><i class="fa-solid fa-circle-info"></i></div>
@@ -149,7 +149,7 @@
       return "Rp " + formatNumber(val || 0);
     }
 
-    // HELPER FORMAT TANGGAL DD-MM-YYYY (POIN 2)
+    // FORMAT TANGGAL DD-MM-YYYY (PERBAIKAN POIN 2)
     function formatDateDMY(dateStr) {
       if (!dateStr) return '-';
       const cleanStr = dateStr.split('T')[0];
@@ -160,13 +160,13 @@
       return dateStr;
     }
 
-    // CUSTOM MODAL NOTIFIKASI & KONFIRMASI (POIN 1)
+    // MODAL NOTIFIKASI & KONFIRMASI CUSTOM (PERBAIKAN POIN 1)
     function showNotif(msg, callback = null) {
       const modal = document.getElementById('customModal');
       document.getElementById('modalIcon').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
       document.getElementById('modalMessage').innerText = msg;
       const btnContainer = document.getElementById('modalButtons');
-      btnContainer.innerHTML = `<button onclick="closeCustomModal(${callback ? 'true' : 'false'})" class="bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded-xl text-xs font-bold">OK</button>`;
+      btnContainer.innerHTML = `<button onclick="closeCustomModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded-xl text-xs font-bold">OK</button>`;
       modal._callback = callback;
       modal.classList.remove('hidden');
     }
@@ -254,7 +254,7 @@
       navigateTo('PENJUALAN_FORM');
     }
 
-    // FUNGSI HAPUS TRANSAKSI & ITEM (POIN 3)
+    // FUNGSI HAPUS TRANSAKSI & ITEM (PERBAIKAN POIN 3)
     function deleteBelanja(id) {
       showConfirm("Hapus riwayat belanja ini?", () => {
         db.belanja = db.belanja.filter(item => item.ID !== id);
@@ -345,7 +345,7 @@
         `;
       }
 
-      // STOK LIST
+      // STOK BARANG
       else if (view === 'STOK_LIST') {
         app.innerHTML = `
           <div class="flex justify-between items-center mb-4">
@@ -362,6 +362,55 @@
                 </div>
               </div>
             `).join('')}
+          </div>
+        `;
+      }
+      else if (view === 'STOK_FORM') {
+        let isEdit = param !== null && param !== undefined;
+        let item = isEdit ? db.katalog[param] : {};
+        app.innerHTML = `
+          <div class="card-menu p-4 space-y-3">
+            <h3 class="font-bold text-amber-400 border-b border-gray-800 pb-2">${isEdit ? 'Edit Barang' : 'Tambah Barang Baru'}</h3>
+            <div>
+              <label class="label-field">Barcode / SKU</label>
+              <div class="flex gap-2">
+                <input type="text" id="kBarcode" value="${item['BARCODE'] || ''}" class="input-dark text-xs" placeholder="Scan/Ketik Barcode" onkeydown="handleNextInput(event, 'kNama')">
+                <button onclick="openScanner('kBarcode')" class="bg-amber-600 px-3 rounded-lg text-xs font-bold"><i class="fa-solid fa-barcode"></i></button>
+              </div>
+            </div>
+            <div>
+              <label class="label-field">Nama Barang</label>
+              <input type="text" id="kNama" value="${item['NAMA BARANG'] || ''}" class="input-dark text-xs uppercase" placeholder="Nama Barang" onkeydown="handleNextInput(event, 'kQty')">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="label-field">Jumlah Stok (Qty)</label>
+                <input type="text" id="kQty" value="${formatNumber(item['QTY'] || 0)}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kSatuan')">
+              </div>
+              <div>
+                <label class="label-field">Satuan (Pcs, Box, Pack)</label>
+                <input type="text" id="kSatuan" value="${item['SATUAN'] || 'PCS'}" class="input-dark text-xs uppercase" placeholder="PCS" onkeydown="handleNextInput(event, 'kMinQty')">
+              </div>
+            </div>
+            <div>
+              <label class="label-field">Minimal Stok Warning</label>
+              <input type="text" id="kMinQty" value="${formatNumber(item['MINIMAL QTY'] || 5)}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kHargaPokok')">
+            </div>
+            <div>
+              <label class="label-field">Harga Pokok / Modal (Rp)</label>
+              <input type="text" id="kHargaPokok" value="${formatNumber(item['HARGA POKOK'] || 0)}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kHargaGrosir')">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="label-field">Harga Jual Grosir (Rp)</label>
+                <input type="text" id="kHargaGrosir" value="${formatNumber(item['HARGA JUAL GROSIR'] || 0)}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)" onkeydown="handleNextInput(event, 'kHargaRetail')">
+              </div>
+              <div>
+                <label class="label-field">Harga Jual Retail (Rp)</label>
+                <input type="text" id="kHargaRetail" value="${formatNumber(item['HARGA JUAL RETAIL'] || 0)}" class="input-dark text-xs" inputmode="numeric" oninput="formatInputNumber(this)">
+              </div>
+            </div>
+            <button onclick="saveKatalogForm(${isEdit ? param : 'null'})" class="w-full bg-emerald-600 py-2.5 rounded-xl text-xs font-bold mt-2">Simpan Katalog (F8)</button>
           </div>
         `;
       }
@@ -387,7 +436,7 @@
         `;
       }
 
-      // LIST RIWAYAT BELANJA (POIN 2 & 3)
+      // RIWAYAT & FORM BELANJA
       else if (view === 'BELANJA_LIST') {
         let sortedBelanja = [...db.belanja].sort((a, b) => new Date(b.TANGGAL) - new Date(a.TANGGAL));
         app.innerHTML = `
@@ -410,8 +459,86 @@
           </div>
         `;
       }
+      else if (view === 'BELANJA_FORM') {
+        let totalBelanja = cartTemp.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+        app.innerHTML = `
+          <div class="space-y-4">
+            <div class="card-menu p-4 space-y-3">
+              <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                <span class="text-xs font-bold text-amber-400">ID: ${activeTransactionId}</span>
+                <input type="date" id="bljTanggal" value="${activeTransactionDate}" onchange="activeTransactionDate=this.value" class="bg-gray-800 text-white text-xs px-2 py-1 rounded">
+              </div>
+              <div class="flex gap-2">
+                <input type="text" id="bljSearch" placeholder="Cari nama / scan barcode barang..." class="input-dark text-xs" oninput="renderSearchKatalog(this.value, 'BELANJA')">
+                <button onclick="openScannerForCart('BELANJA')" class="bg-amber-600 px-3 rounded-lg text-xs font-bold"><i class="fa-solid fa-barcode"></i></button>
+              </div>
+              <div id="searchResult" class="space-y-1 max-h-40 overflow-y-auto"></div>
+            </div>
 
-      // LIST RIWAYAT PENJUALAN (POIN 2 & 3)
+            <!-- TABEL KERANJANG BELANJA -->
+            <div class="card-menu p-4 space-y-3">
+              <h3 class="font-bold text-xs text-gray-400">Daftar Barang Dibeli</h3>
+              <div class="space-y-2">
+                ${cartTemp.length === 0 ? '<p class="text-xs text-gray-500 text-center py-4">Keranjang masih kosong.</p>' : ''}
+                ${cartTemp.map((item, idx) => `
+                  <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="font-bold text-amber-400">${item.nama}</span>
+                      <button onclick="removeFromCart(${idx}, 'BELANJA_FORM')" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <label class="text-[10px] text-gray-400">Qty Beli</label>
+                        <input type="text" value="${formatNumber(item.qty)}" oninput="updateCartQty(${idx}, this.value, 'BELANJA_FORM')" class="input-dark text-xs p-1">
+                      </div>
+                      <div>
+                        <label class="text-[10px] text-gray-400">Harga Beli/Modal (Rp)</label>
+                        <input type="text" value="${formatNumber(item.harga)}" oninput="updateCartHarga(${idx}, this.value, 'BELANJA_FORM')" class="input-dark text-xs p-1">
+                      </div>
+                    </div>
+                    <div class="text-right text-xs font-bold text-emerald-400">Subtotal: ${formatRp(item.qty * item.harga)}</div>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="flex justify-between items-center border-t border-gray-800 pt-3">
+                <span class="font-bold text-sm">TOTAL BELANJA:</span>
+                <span class="font-bold text-lg text-emerald-400">${formatRp(totalBelanja)}</span>
+              </div>
+              <button onclick="checkoutBelanja()" class="w-full bg-emerald-600 py-3 rounded-xl text-xs font-bold">Simpan Transaksi Belanja (F8)</button>
+            </div>
+          </div>
+        `;
+      }
+      else if (view === 'BELANJA_DETAIL') {
+        let b = db.belanja.find(x => x.ID === param);
+        if(!b) return navigateTo('BELANJA_LIST');
+        app.innerHTML = `
+          <div class="card-menu p-4 space-y-3">
+            <h3 class="font-bold text-amber-400 border-b border-gray-800 pb-2">Detail Transaksi Belanja</h3>
+            <div class="text-xs space-y-1">
+              <div><span class="text-gray-400">ID Transaksi:</span> <span class="font-mono font-bold">${b.ID}</span></div>
+              <div><span class="text-gray-400">Tanggal:</span> <span class="font-mono font-bold">${formatDateDMY(b.TANGGAL)}</span></div>
+            </div>
+            <div class="space-y-1.5 pt-2">
+              ${(b.ITEMS || []).map(i => `
+                <div class="flex justify-between items-center text-xs bg-black/40 p-2 rounded-lg border border-gray-800">
+                  <div>
+                    <div class="font-bold text-white">${i.nama}</div>
+                    <div class="text-[10px] text-gray-400">${formatNumber(i.qty)} x ${formatRp(i.harga)}</div>
+                  </div>
+                  <div class="font-bold text-amber-400">${formatRp(i.qty * i.harga)}</div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="flex justify-between items-center border-t border-gray-800 pt-3">
+              <span class="font-bold text-xs text-gray-400">Total Transaksi:</span>
+              <span class="font-bold text-base text-emerald-400">${formatRp(b.TOTAL_HARGA || b['TOTAL HARGA'])}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // RIWAYAT & FORM PENJUALAN
       else if (view === 'PENJUALAN_LIST') {
         let sortedPenjualan = [...db.penjualan].sort((a, b) => new Date(b.TANGGAL) - new Date(a.TANGGAL));
         app.innerHTML = `
@@ -434,8 +561,94 @@
           </div>
         `;
       }
+      else if (view === 'PENJUALAN_FORM') {
+        let totalPenjualan = cartTemp.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+        app.innerHTML = `
+          <div class="space-y-4">
+            <div class="card-menu p-4 space-y-3">
+              <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                <span class="text-xs font-bold text-amber-400">ID: ${activeTransactionId}</span>
+                <input type="date" id="pjlTanggal" value="${activeTransactionDate}" onchange="activeTransactionDate=this.value" class="bg-gray-800 text-white text-xs px-2 py-1 rounded">
+              </div>
+              <div>
+                <label class="label-field">Nama Pembeli / Pelanggan</label>
+                <input type="text" id="pjlPembeli" class="input-dark text-xs uppercase" placeholder="Nama Pembeli (opsional)">
+              </div>
+              <div class="flex gap-2">
+                <input type="text" id="pjlSearch" placeholder="Cari nama / scan barcode barang..." class="input-dark text-xs" oninput="renderSearchKatalog(this.value, 'PENJUALAN')">
+                <button onclick="openScannerForCart('PENJUALAN')" class="bg-amber-600 px-3 rounded-lg text-xs font-bold"><i class="fa-solid fa-barcode"></i></button>
+              </div>
+              <div id="searchResult" class="space-y-1 max-h-40 overflow-y-auto"></div>
+            </div>
 
-      // PENGELUARAN LAIN (POIN 2 & 3)
+            <!-- TABEL KERANJANG PENJUALAN -->
+            <div class="card-menu p-4 space-y-3">
+              <h3 class="font-bold text-xs text-gray-400">Daftar Barang Dijual</h3>
+              <div class="space-y-2">
+                ${cartTemp.length === 0 ? '<p class="text-xs text-gray-500 text-center py-4">Keranjang masih kosong.</p>' : ''}
+                ${cartTemp.map((item, idx) => `
+                  <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="font-bold text-amber-400">${item.nama}</span>
+                      <button onclick="removeFromCart(${idx}, 'PENJUALAN_FORM')" class="text-red-500 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <label class="text-[10px] text-gray-400">Qty Jual</label>
+                        <input type="text" value="${formatNumber(item.qty)}" oninput="updateCartQty(${idx}, this.value, 'PENJUALAN_FORM')" class="input-dark text-xs p-1">
+                      </div>
+                      <div>
+                        <label class="text-[10px] text-gray-400">Opsi Harga Jual</label>
+                        <select onchange="updateCartTypeHarga(${idx}, this.value)" class="input-dark text-xs p-1">
+                          <option value="retail" ${item.tipeHarga === 'retail' ? 'selected' : ''}>Retail (${formatRp(item.hargaRetail)})</option>
+                          <option value="grosir" ${item.tipeHarga === 'grosir' ? 'selected' : ''}>Grosir (${formatRp(item.hargaGrosir)})</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="text-right text-xs font-bold text-emerald-400">Subtotal: ${formatRp(item.qty * item.harga)}</div>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="flex justify-between items-center border-t border-gray-800 pt-3">
+                <span class="font-bold text-sm">TOTAL PENJUALAN:</span>
+                <span class="font-bold text-lg text-emerald-400">${formatRp(totalPenjualan)}</span>
+              </div>
+              <button onclick="checkoutPenjualan()" class="w-full bg-emerald-600 py-3 rounded-xl text-xs font-bold">Simpan Transaksi Penjualan (F8)</button>
+            </div>
+          </div>
+        `;
+      }
+      else if (view === 'PENJUALAN_DETAIL') {
+        let p = db.penjualan.find(x => x.ID === param);
+        if(!p) return navigateTo('PENJUALAN_LIST');
+        app.innerHTML = `
+          <div class="card-menu p-4 space-y-3">
+            <h3 class="font-bold text-amber-400 border-b border-gray-800 pb-2">Detail Transaksi Penjualan</h3>
+            <div class="text-xs space-y-1">
+              <div><span class="text-gray-400">ID Transaksi:</span> <span class="font-mono font-bold">${p.ID}</span></div>
+              <div><span class="text-gray-400">Tanggal:</span> <span class="font-mono font-bold">${formatDateDMY(p.TANGGAL)}</span></div>
+              <div><span class="text-gray-400">Pembeli:</span> <span class="font-bold text-amber-400">${p['NAMA PEMBELI'] || 'Umum'}</span></div>
+            </div>
+            <div class="space-y-1.5 pt-2">
+              ${(p.ITEMS || []).map(i => `
+                <div class="flex justify-between items-center text-xs bg-black/40 p-2 rounded-lg border border-gray-800">
+                  <div>
+                    <div class="font-bold text-white">${i.nama}</div>
+                    <div class="text-[10px] text-gray-400">${formatNumber(i.qty)} x ${formatRp(i.harga)}</div>
+                  </div>
+                  <div class="font-bold text-amber-400">${formatRp(i.qty * i.harga)}</div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="flex justify-between items-center border-t border-gray-800 pt-3">
+              <span class="font-bold text-xs text-gray-400">Total Transaksi:</span>
+              <span class="font-bold text-base text-emerald-400">${formatRp(p.TOTAL_HARGA || p['TOTAL HARGA'])}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // PENGELUARAN LAIN
       else if (view === 'PENGELUARAN') {
         let sortedPengeluaran = [...db.pengeluaran].sort((a, b) => new Date(b.TANGGAL) - new Date(a.TANGGAL));
         app.innerHTML = `
@@ -477,14 +690,53 @@
         `;
       }
 
-      // KEUNTUNGAN & GRAFIK (POIN 2, 3, & 4)
+      // PERKIRAAN BELANJA
+      else if (view === 'PERKIRAAN') {
+        let lowStockItems = db.katalog.filter(item => parseNumber(item['QTY']) <= parseNumber(item['MINIMAL QTY']));
+        let totalPerkiraan = lowStockItems.reduce((sum, item) => {
+          let recQty = parseNumber(item['MINIMAL QTY']) * 2 - parseNumber(item['QTY']);
+          return sum + (Math.max(recQty, 1) * parseNumber(item['HARGA POKOK']));
+        }, 0);
+
+        app.innerHTML = `
+          <div class="space-y-4">
+            <div class="card-menu p-4 flex justify-between items-center">
+              <div>
+                <div class="text-xs text-gray-400">Total Biaya Perkiraan Belanja</div>
+                <div class="text-lg font-bold text-emerald-400">${formatRp(totalPerkiraan)}</div>
+              </div>
+              <span class="bg-amber-500/20 text-amber-400 text-xs px-3 py-1 rounded-full font-bold">${lowStockItems.length} Barang Perlu Restok</span>
+            </div>
+            <div class="card-menu p-4 space-y-2">
+              <h3 class="font-bold text-xs text-gray-400 mb-2">Daftar Barang Menipis</h3>
+              ${lowStockItems.length === 0 ? '<p class="text-xs text-gray-500 text-center py-4">Semua stok barang masih aman.</p>' : ''}
+              ${lowStockItems.map(item => {
+                let recQty = Math.max(parseNumber(item['MINIMAL QTY']) * 2 - parseNumber(item['QTY']), 1);
+                let estCost = recQty * parseNumber(item['HARGA POKOK']);
+                return `
+                  <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800 space-y-1 text-xs">
+                    <div class="flex justify-between items-center">
+                      <span class="font-bold text-amber-400">${item['NAMA BARANG']}</span>
+                      <span class="text-red-400 font-bold">Stok: ${formatNumber(item['QTY'])} ${item['SATUAN']}</span>
+                    </div>
+                    <div class="flex justify-between text-[11px] text-gray-400">
+                      <span>Saran Restok: +${formatNumber(recQty)} ${item['SATUAN']}</span>
+                      <span class="text-emerald-400 font-bold">${formatRp(estCost)}</span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // KEUNTUNGAN & GRAFIK (PERBAIKAN POIN 2, 3, & 4)
       else if (view === 'KEUNTUNGAN') {
         const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         let monthlyProfits = new Array(12).fill(0);
-
-        // Hitung Keuntungan per Tanggal
         let dateMap = {};
-        
+
         db.penjualan.forEach(p => {
           let d = p.TANGGAL;
           if(!dateMap[d]) dateMap[d] = { omset: 0, modal: 0, pengeluaran: 0 };
@@ -499,7 +751,6 @@
           });
           dateMap[d].modal += modalPenjualan;
 
-          // Isi Grafik Bulanan
           if(d) {
             let mIdx = new Date(d).getMonth();
             if(!isNaN(mIdx)) {
@@ -526,7 +777,7 @@
 
         app.innerHTML = `
           <div class="space-y-4">
-            <!-- GRAFIK KEUNTUNGAN BULANAN (POIN 4) -->
+            <!-- GRAFIK KEUNTUNGAN BULANAN (PERBAIKAN POIN 4) -->
             <div class="card-menu p-4">
               <h3 class="font-bold text-xs text-amber-400 mb-3 text-center">Grafik Keuntungan Bersih Bulanan (Jan - Des)</h3>
               <div class="relative w-full overflow-x-auto">
@@ -536,7 +787,7 @@
               </div>
             </div>
 
-            <!-- LAPORAN KEUNTUNGAN PER TANGGAL (POIN 2 & 3) -->
+            <!-- LAPORAN KEUNTUNGAN PER TANGGAL (PERBAIKAN POIN 2 & 3) -->
             <div class="card-menu p-4 space-y-2">
               <h3 class="font-bold text-xs text-gray-400 mb-2">Laporan Keuntungan Per Tanggal</h3>
               ${sortedDates.length === 0 ? '<p class="text-xs text-gray-500 text-center py-4">Belum ada data transaksi.</p>' : ''}
@@ -565,7 +816,7 @@
           </div>
         `;
 
-        // INI CHARTJS DENGAN DATALABELS (POIN 4)
+        // RENDER CHARTJS (PERBAIKAN POIN 4)
         setTimeout(() => {
           const ctx = document.getElementById('chartKeuntungan');
           if(ctx) {
@@ -615,9 +866,170 @@
           }
         }, 100);
       }
+
+      // SINKRONISASI
+      else if (view === 'SYNC') {
+        app.innerHTML = `
+          <div class="card-menu p-4 space-y-3">
+            <h3 class="font-bold text-xs text-amber-400 border-b border-gray-800 pb-2">Pengaturan Google Apps Script Sync</h3>
+            <div>
+              <label class="label-field">URL Web App Google Apps Script (GAS)</label>
+              <input type="text" id="gasUrlInput" value="${db.gasUrl}" class="input-dark text-xs" placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+            <button onclick="saveGasUrl()" class="w-full bg-amber-600 py-2.5 rounded-xl text-xs font-bold">Simpan URL</button>
+            <div class="border-t border-gray-800 pt-3 space-y-2">
+              <button onclick="syncUpload()" class="w-full bg-emerald-600 py-2.5 rounded-xl text-xs font-bold">Upload Local -> Spreadsheet</button>
+              <button onclick="syncDownload()" class="w-full bg-cyan-600 py-2.5 rounded-xl text-xs font-bold">Download Spreadsheet -> Local</button>
+            </div>
+          </div>
+        `;
+      }
     }
 
-    // HANDLER PENGELUARAN
+    // KERANJANG HELPER FUNCTIONS
+    function renderSearchKatalog(query, type) {
+      const resultDiv = document.getElementById('searchResult');
+      if(!query.trim()) {
+        resultDiv.innerHTML = '';
+        return;
+      }
+      let matches = db.katalog.filter(k => 
+        (k['NAMA BARANG'] && k['NAMA BARANG'].toLowerCase().includes(query.toLowerCase())) ||
+        (k['BARCODE'] && k['BARCODE'].toLowerCase().includes(query.toLowerCase()))
+      );
+
+      resultDiv.innerHTML = matches.map(k => `
+        <div onclick="addToCart('${k['NAMA BARANG']}', '${type}')" class="bg-gray-800 hover:bg-amber-600 p-2 rounded-lg cursor-pointer text-xs flex justify-between items-center">
+          <span class="font-bold">${k['NAMA BARANG']}</span>
+          <span class="text-[10px] text-gray-300">Stok: ${formatNumber(k['QTY'])}</span>
+        </div>
+      `).join('');
+    }
+
+    function addToCart(namaBarang, type) {
+      let item = db.katalog.find(k => k['NAMA BARANG'] === namaBarang);
+      if(!item) return;
+
+      let existing = cartTemp.find(c => c.nama === namaBarang);
+      if(existing) {
+        existing.qty += 1;
+      } else {
+        if(type === 'BELANJA') {
+          cartTemp.push({
+            nama: item['NAMA BARANG'],
+            qty: 1,
+            harga: parseNumber(item['HARGA POKOK'])
+          });
+        } else {
+          cartTemp.push({
+            nama: item['NAMA BARANG'],
+            qty: 1,
+            hargaRetail: parseNumber(item['HARGA JUAL RETAIL']),
+            hargaGrosir: parseNumber(item['HARGA JUAL GROSIR']),
+            tipeHarga: 'retail',
+            harga: parseNumber(item['HARGA JUAL RETAIL'])
+          });
+        }
+      }
+
+      document.getElementById('searchResult').innerHTML = '';
+      if(type === 'BELANJA') {
+        const inputSearch = document.getElementById('bljSearch');
+        if(inputSearch) inputSearch.value = '';
+        renderView('BELANJA_FORM');
+      } else {
+        const inputSearch = document.getElementById('pjlSearch');
+        if(inputSearch) inputSearch.value = '';
+        renderView('PENJUALAN_FORM');
+      }
+    }
+
+    function updateCartQty(idx, val, currentView) {
+      cartTemp[idx].qty = parseNumber(val);
+      renderView(currentView);
+    }
+
+    function updateCartHarga(idx, val, currentView) {
+      cartTemp[idx].harga = parseNumber(val);
+      renderView(currentView);
+    }
+
+    function updateCartTypeHarga(idx, type) {
+      cartTemp[idx].tipeHarga = type;
+      cartTemp[idx].harga = type === 'grosir' ? cartTemp[idx].hargaGrosir : cartTemp[idx].hargaRetail;
+      renderView('PENJUALAN_FORM');
+    }
+
+    function removeFromCart(idx, currentView) {
+      cartTemp.splice(idx, 1);
+      renderView(currentView);
+    }
+
+    function checkoutBelanja() {
+      if(cartTemp.length === 0) return showNotif("Keranjang belanja kosong!");
+      let total = cartTemp.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+
+      // Tambah / Update Stok di Katalog
+      cartTemp.forEach(cItem => {
+        let kat = db.katalog.find(k => k['NAMA BARANG'] === cItem.nama);
+        if(kat) {
+          kat['QTY'] = parseNumber(kat['QTY']) + cItem.qty;
+          kat['HARGA POKOK'] = cItem.harga;
+        } else {
+          db.katalog.push({
+            'BARCODE': '',
+            'NAMA BARANG': cItem.nama,
+            'QTY': cItem.qty,
+            'SATUAN': 'PCS',
+            'MINIMAL QTY': 5,
+            'HARGA POKOK': cItem.harga,
+            'HARGA JUAL GROSIR': cItem.harga,
+            'HARGA JUAL RETAIL': cItem.harga
+          });
+        }
+      });
+
+      db.belanja.push({
+        ID: activeTransactionId,
+        TANGGAL: activeTransactionDate,
+        ITEMS: cartTemp,
+        TOTAL_HARGA: total
+      });
+
+      saveState();
+      showNotif("Transaksi Belanja Berhasil Disimpan!", () => {
+        navigateTo('BELANJA_LIST');
+      });
+    }
+
+    function checkoutPenjualan() {
+      if(cartTemp.length === 0) return showNotif("Keranjang penjualan kosong!");
+      let total = cartTemp.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+      let pembeli = document.getElementById('pjlPembeli') ? document.getElementById('pjlPembeli').value.trim() : 'Umum';
+
+      // Kurangi Stok Katalog
+      cartTemp.forEach(cItem => {
+        let kat = db.katalog.find(k => k['NAMA BARANG'] === cItem.nama);
+        if(kat) {
+          kat['QTY'] = Math.max(0, parseNumber(kat['QTY']) - cItem.qty);
+        }
+      });
+
+      db.penjualan.push({
+        ID: activeTransactionId,
+        TANGGAL: activeTransactionDate,
+        'NAMA PEMBELI': pembeli || 'Umum',
+        ITEMS: cartTemp,
+        TOTAL_HARGA: total
+      });
+
+      saveState();
+      showNotif("Transaksi Penjualan Berhasil Disimpan!", () => {
+        navigateTo('PENJUALAN_LIST');
+      });
+    }
+
+    // PENGELUARAN & FORM HANDLERS
     function savePengeluaran() {
       let tanggal = document.getElementById('expTanggal').value;
       let ket = document.getElementById('expKet').value.trim();
@@ -633,7 +1045,6 @@
       showNotif("Pengeluaran berhasil disimpan!");
     }
 
-    // FORM INPUT UTILITY
     function formatInputNumber(el) {
       let val = parseNumber(el.value);
       el.value = formatNumber(val);
@@ -663,7 +1074,7 @@
         'BARCODE': barcode,
         'NAMA BARANG': nama,
         'QTY': qty,
-        'SATUAN': satuan,
+        'SATUAN': satuan || 'PCS',
         'MINIMAL QTY': minQty,
         'HARGA POKOK': hgPokok,
         'HARGA JUAL GROSIR': hgGrosir,
@@ -677,8 +1088,110 @@
       }
 
       saveState();
-      navigateTo('STOK_LIST');
-      showNotif("Data barang berhasil disimpan!");
+      showNotif("Data barang berhasil disimpan!", () => {
+        navigateTo('STOK_LIST');
+      });
+    }
+
+    // SYNC HANDLERS
+    function saveGasUrl() {
+      db.gasUrl = document.getElementById('gasUrlInput').value.trim();
+      saveState();
+      showNotif("URL Google Apps Script disimpan!");
+    }
+
+    function syncUpload() {
+      if(!db.gasUrl) return showNotif("Isi URL GAS terlebih dahulu!");
+      fetch(db.gasUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'upload', data: db })
+      }).then(() => {
+        showNotif("Proses Upload selesai dikirim ke Spreadsheet!");
+      }).catch(err => {
+        showNotif("Gagal melakukan upload data: " + err);
+      });
+    }
+
+    function syncDownload() {
+      if(!db.gasUrl) return showNotif("Isi URL GAS terlebih dahulu!");
+      fetch(db.gasUrl + '?action=download')
+        .then(res => res.json())
+        .then(data => {
+          if(data) {
+            if(data.katalog) db.katalog = data.katalog;
+            if(data.belanja) db.belanja = data.belanja;
+            if(data.penjualan) db.penjualan = data.penjualan;
+            if(data.pengeluaran) db.pengeluaran = data.pengeluaran;
+            saveState();
+            showNotif("Data berhasil didownload dari Spreadsheet!", () => {
+              renderView('MAIN');
+            });
+          }
+        }).catch(err => {
+          showNotif("Gagal download data dari Spreadsheet: " + err);
+        });
+    }
+
+    // SCANNER BARCODE HANDLERS
+    function openScanner(targetInputId) {
+      scanTargetCallback = (code) => {
+        const input = document.getElementById(targetInputId);
+        if(input) input.value = code;
+      };
+      startScannerModal();
+    }
+
+    function openScannerForCart(type) {
+      scanTargetCallback = (code) => {
+        let kat = db.katalog.find(k => k['BARCODE'] === code);
+        if(kat) {
+          addToCart(kat['NAMA BARANG'], type);
+        } else {
+          showNotif("Barang dengan barcode " + code + " tidak ditemukan!");
+        }
+      };
+      startScannerModal();
+    }
+
+    function startScannerModal() {
+      document.getElementById('scannerModal').classList.remove('hidden');
+      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 150 } },
+        (decodedText) => {
+          if(scanTargetCallback) scanTargetCallback(decodedText);
+          closeScanner();
+        },
+        () => {}
+      ).catch(err => {
+        showNotif("Gagal membuka kamera: " + err);
+        closeScanner();
+      });
+    }
+
+    function closeScanner() {
+      if(html5QrCode) {
+        html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+          document.getElementById('scannerModal').classList.add('hidden');
+        }).catch(() => {
+          document.getElementById('scannerModal').classList.add('hidden');
+        });
+      } else {
+        document.getElementById('scannerModal').classList.add('hidden');
+      }
+    }
+
+    function toggleTorch() {
+      if(html5QrCode) {
+        torchState = !torchState;
+        html5QrCode.applyVideoConstraints({
+          advanced: [{ torch: torchState }]
+        }).catch(() => {});
+      }
     }
 
     // INITIAL LOAD
