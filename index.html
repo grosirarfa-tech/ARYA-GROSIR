@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ARYA GROSIR - POS System</title>
+  <title>POS ARYA GROSIR</title>
   
-  <!-- CSS & Dependencies -->
+  <!-- CSS & Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -14,376 +14,395 @@
 
   <style>
     :root {
-      --gold-primary: #D4AF37;
-      --gold-hover: #AA7C11;
-      --green-emerald: #10B981;
-      --bg-dark: #0f172a;
-      --card-dark: #1e293b;
+      --gold: #D4AF37;
+      --gold-light: #FFF0B3;
+      --emerald: #10B981;
+      --bg-dark: #000000;
+      --card-dark: #121212;
+      --input-bg: #1a1a1a;
     }
     body {
       background-color: var(--bg-dark);
-      color: #f8fafc;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #F8FAFC;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
     .gold-gradient-text {
-      background: linear-gradient(135deg, #FFE57F 0%, #D4AF37 50%, #996515 100%);
+      background: linear-gradient(135deg, #FFF0B3 0%, #D4AF37 50%, #AA7C11 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .btn-gold {
       background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
-      color: #000;
-      font-weight: bold;
+      color: #000000;
+      font-weight: 700;
     }
-    .btn-gold:hover { opacity: 0.9; }
     .btn-emerald {
-      background-color: var(--green-emerald);
-      color: #fff;
-      font-weight: bold;
+      background-color: var(--emerald);
+      color: #FFFFFF;
+      font-weight: 700;
     }
-    .border-gold { border-color: var(--gold-primary); }
     .card-menu {
-      background: var(--card-dark);
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      transition: all 0.2s ease-in-out;
+      background-color: var(--card-dark);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      transition: transform 0.15s ease, border-color 0.15s ease;
     }
-    .card-menu:active { transform: scale(0.96); }
+    .card-menu:active {
+      transform: scale(0.97);
+      border-color: var(--gold);
+    }
     input, select, textarea {
-      background-color: #020617 !important;
-      color: #f8fafc !important;
+      background-color: var(--input-bg) !important;
+      color: #FFFFFF !important;
       border: 1px solid #334155 !important;
     }
     input:focus, select:focus {
-      border-color: var(--gold-primary) !important;
+      border-color: var(--gold) !important;
       outline: none !important;
     }
-    /* Invoice Styles */
-    .invoice-preview {
-      background: #ffffff;
+    /* Invoice Preview Styles */
+    .invoice-card {
+      background-color: #FFFFFF;
       color: #000000;
       font-family: 'Courier New', Courier, monospace;
-      padding: 15px;
-      width: 100%;
-      max-width: 400px;
-      margin: 0 auto;
-      border-radius: 4px;
+      padding: 16px;
+      border-radius: 6px;
       position: relative;
     }
     .watermark-lunas {
       position: absolute;
-      top: 45%;
-      left: 20%;
-      transform: rotate(-30deg);
-      font-size: 3rem;
+      top: 40%;
+      left: 18%;
+      transform: rotate(-25deg);
+      font-size: 2.8rem;
       font-weight: 900;
-      color: rgba(220, 38, 38, 0.4);
-      border: 4px dashed rgba(220, 38, 38, 0.4);
-      padding: 5px 20px;
+      color: rgba(220, 38, 38, 0.45);
+      border: 4px dashed rgba(220, 38, 38, 0.45);
+      padding: 4px 18px;
       pointer-events: none;
       border-radius: 8px;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col pb-12">
+<body class="min-h-screen flex flex-col pb-10">
 
-  <!-- HEADER -->
-  <header class="bg-slate-900 border-b border-yellow-600/30 p-4 sticky top-0 z-40 shadow-lg">
-    <div class="max-w-4xl mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('MAIN_MENU')">
-        <img src="web arya.png" alt="Logo ARYA GROSIR" class="h-10 w-auto object-contain" onerror="this.src='https://via.placeholder.com/40?text=AG'">
-        <div>
-          <h1 class="text-xl font-extrabold gold-gradient-text tracking-wider">ARYA GROSIR</h1>
-          <p class="text-[10px] text-emerald-400 font-semibold tracking-widest">POS SYSTEM</p>
-        </div>
+  <!-- HEADER RATA TENGAH -->
+  <header class="bg-black border-b border-yellow-600/40 p-3 sticky top-0 z-40 shadow-xl">
+    <div class="max-w-3xl mx-auto flex flex-col items-center justify-center relative">
+      <div class="flex flex-col items-center cursor-pointer" onclick="navigateTo('MAIN_MENU')">
+        <img src="web arya.png" alt="ARYA GROSIR" class="h-12 w-auto object-contain mb-1" onerror="this.src='https://via.placeholder.com/120x40/000000/D4AF37?text=ARYA+GROSIR'">
+        <h1 class="text-xl font-extrabold gold-gradient-text tracking-wider uppercase">ARYA GROSIR</h1>
       </div>
-      <button onclick="navigateTo('MAIN_MENU')" class="text-gold-primary hover:text-yellow-400 p-2 text-xl">
+      <button onclick="navigateTo('MAIN_MENU')" class="absolute right-0 top-2 text-yellow-500 hover:text-yellow-400 p-2 text-xl">
         <i class="fa-solid fa-house"></i>
       </button>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-grow max-w-4xl w-full mx-auto p-3">
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-grow max-w-3xl w-full mx-auto p-3">
 
-    <!-- VIEW: MAIN MENU (GRID 2x4) -->
+    <!-- VIEW: MENU UTAMA (GRID 2x4) -->
     <div id="view-MAIN_MENU" class="view-panel space-y-4">
-      <div class="grid grid-cols-2 gap-3">
-        <div onclick="navigateTo('STOK_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[120px]">
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <div onclick="navigateTo('STOK_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[110px]">
           <i class="fa-solid fa-boxes-stacked text-3xl text-yellow-500 mb-2"></i>
-          <span class="font-bold text-sm tracking-wide">KATALOG STOK</span>
+          <span class="font-bold text-xs tracking-wide">KATALOG STOK</span>
         </div>
-        <div onclick="navigateTo('BELANJA_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[120px]">
+        <div onclick="navigateTo('BELANJA_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[110px]">
           <i class="fa-solid fa-cart-flatbed text-3xl text-emerald-500 mb-2"></i>
-          <span class="font-bold text-sm tracking-wide">BELANJA BARANG</span>
+          <span class="font-bold text-xs tracking-wide">BELANJA BARANG</span>
         </div>
-        <div onclick="navigateTo('PENJUALAN_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[120px]">
+        <div onclick="navigateTo('PENJUALAN_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[110px]">
           <i class="fa-solid fa-cash-register text-3xl text-yellow-500 mb-2"></i>
-          <span class="font-bold text-sm tracking-wide">PENJUALAN</span>
+          <span class="font-bold text-xs tracking-wide">PENJUALAN BARANG</span>
         </div>
-        <div onclick="navigateTo('PENGELUARAN_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[120px]">
+        <div onclick="navigateTo('PENGELUARAN_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[110px]">
           <i class="fa-solid fa-hand-holding-dollar text-3xl text-red-500 mb-2"></i>
-          <span class="font-bold text-sm tracking-wide">PENGELUARAN</span>
+          <span class="font-bold text-xs tracking-wide">PENGELUARAN LAIN</span>
         </div>
-        <div onclick="navigateTo('KEUNTUNGAN_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[120px]">
+        <div onclick="navigateTo('KEUNTUNGAN_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[110px]">
           <i class="fa-solid fa-chart-line text-3xl text-emerald-500 mb-2"></i>
-          <span class="font-bold text-sm tracking-wide">KEUNTUNGAN</span>
+          <span class="font-bold text-xs tracking-wide">KEUNTUNGAN</span>
         </div>
-        <div onclick="navigateTo('SYNC_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[120px]">
+        <div onclick="navigateTo('SYNC_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[110px]">
           <i class="fa-solid fa-arrows-rotate text-3xl text-yellow-500 mb-2"></i>
-          <span class="font-bold text-sm tracking-wide">SINKRONISASI</span>
+          <span class="font-bold text-xs tracking-wide">SINKRONISASI</span>
         </div>
-        <div onclick="navigateTo('FAKTUR_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[120px] col-span-2">
+        <div onclick="navigateTo('FAKTUR_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[110px] col-span-2">
           <i class="fa-solid fa-file-invoice-dollar text-3xl text-emerald-500 mb-2"></i>
-          <span class="font-bold text-sm tracking-wide">PENGATURAN FAKTUR</span>
+          <span class="font-bold text-xs tracking-wide">PENGATURAN FAKTUR</span>
         </div>
       </div>
     </div>
 
-    <!-- VIEW: KATALOG STOK -->
-    <div id="view-STOK_SUB" class="view-panel hidden space-y-4">
+    <!-- VIEW: KATALOG STOK SUBMENU -->
+    <div id="view-STOK_SUB" class="view-panel hidden space-y-3">
       <div class="flex justify-between items-center">
-        <h2 class="text-lg font-bold text-yellow-500"><i class="fa-solid fa-boxes-stacked mr-2"></i>Katalog Stok</h2>
-        <button onclick="openFormStok()" class="btn-gold px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i> Baru (F5)</button>
+        <h2 class="text-sm font-bold text-yellow-500 uppercase"><i class="fa-solid fa-boxes-stacked mr-1.5"></i>Katalog Stok</h2>
+        <button onclick="openFormStok()" class="btn-gold px-3 py-1.5 rounded-lg text-xs"><i class="fa-solid fa-plus mr-1"></i> Baru (F5)</button>
       </div>
       <div id="stok-list" class="space-y-2"></div>
     </div>
 
+    <!-- VIEW: FORM STOK BARU / EDIT -->
     <div id="view-STOK_FORM" class="view-panel hidden space-y-3">
-      <h2 id="stok-form-title" class="text-base font-bold text-yellow-500">Tambah / Edit Barang</h2>
+      <h2 id="stok-form-title" class="text-sm font-bold text-yellow-500 uppercase">Tambah / Edit Barang</h2>
       <div class="space-y-2 text-xs">
-        <label class="block">Barcode
+        <div>
+          <label class="block mb-1">Barcode</label>
           <div class="flex gap-2">
-            <input type="text" id="stok-barcode" class="w-full p-2 rounded" placeholder="Barcode">
+            <input type="text" id="stok-barcode" class="w-full p-2 rounded text-xs" placeholder="Barcode / Scan">
             <button onclick="openScanner('stok-barcode')" class="btn-emerald px-3 rounded"><i class="fa-solid fa-camera"></i></button>
           </div>
-        </label>
-        <label class="block">Nama Barang
-          <input type="text" id="stok-nama" class="w-full p-2 rounded uppercase" placeholder="NAMA BARANG">
-        </label>
-        <div class="grid grid-cols-2 gap-2">
-          <label class="block">Qty
-            <input type="text" id="stok-qty" inputmode="numeric" class="w-full p-2 rounded format-number" placeholder="0">
-          </label>
-          <label class="block">Minimal Qty
-            <input type="text" id="stok-min" inputmode="numeric" class="w-full p-2 rounded format-number" placeholder="0">
-          </label>
         </div>
-        <label class="block">Satuan
-          <input type="text" id="stok-satuan" class="w-full p-2 rounded uppercase" placeholder="PCS / DUS">
-        </label>
-        <label class="block">Harga Pokok
-          <input type="text" id="stok-hpokok" inputmode="numeric" class="w-full p-2 rounded format-number" placeholder="0">
-        </label>
+        <div>
+          <label class="block mb-1">Nama Barang</label>
+          <input type="text" id="stok-nama" class="w-full p-2 rounded text-xs uppercase" placeholder="NAMA BARANG">
+        </div>
         <div class="grid grid-cols-2 gap-2">
-          <label class="block">Harga Grosir
-            <input type="text" id="stok-hgrosir" inputmode="numeric" class="w-full p-2 rounded format-number" placeholder="0">
-          </label>
-          <label class="block">Harga Retail
-            <input type="text" id="stok-hretail" inputmode="numeric" class="w-full p-2 rounded format-number" placeholder="0">
-          </label>
+          <div>
+            <label class="block mb-1">Qty</label>
+            <input type="text" id="stok-qty" inputmode="numeric" class="w-full p-2 rounded text-xs format-number" placeholder="0">
+          </div>
+          <div>
+            <label class="block mb-1">Minimal Stok</label>
+            <input type="text" id="stok-min" inputmode="numeric" class="w-full p-2 rounded text-xs format-number" placeholder="0">
+          </div>
+        </div>
+        <div>
+          <label class="block mb-1">Satuan</label>
+          <input type="text" id="stok-satuan" class="w-full p-2 rounded text-xs uppercase" placeholder="PCS / DUS">
+        </div>
+        <div>
+          <label class="block mb-1">Harga Pokok</label>
+          <input type="text" id="stok-hpokok" inputmode="numeric" class="w-full p-2 rounded text-xs format-number" placeholder="0">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block mb-1">Harga Grosir</label>
+            <input type="text" id="stok-hgrosir" inputmode="numeric" class="w-full p-2 rounded text-xs format-number" placeholder="0">
+          </div>
+          <div>
+            <label class="block mb-1">Harga Retail</label>
+            <input type="text" id="stok-hretail" inputmode="numeric" class="w-full p-2 rounded text-xs format-number" placeholder="0">
+          </div>
         </div>
         <div class="flex gap-2 pt-2">
-          <button onclick="saveStok()" class="btn-emerald w-full py-2 rounded text-sm"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan (F8)</button>
-          <button onclick="navigateTo('STOK_SUB')" class="bg-slate-700 w-full py-2 rounded text-sm">Batal (F7)</button>
+          <button onclick="saveStok()" class="btn-emerald w-full py-2.5 rounded text-xs"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan (F8)</button>
+          <button onclick="navigateTo('STOK_SUB')" class="bg-slate-800 w-full py-2.5 rounded text-xs">Batal (F7)</button>
         </div>
       </div>
     </div>
 
-    <!-- VIEW: BELANJA BARANG -->
-    <div id="view-BELANJA_SUB" class="view-panel hidden space-y-4">
+    <!-- VIEW: BELANJA BARANG SUBMENU -->
+    <div id="view-BELANJA_SUB" class="view-panel hidden space-y-3">
       <div class="flex justify-between items-center">
-        <h2 class="text-lg font-bold text-emerald-400"><i class="fa-solid fa-cart-flatbed mr-2"></i>Riwayat Belanja</h2>
-        <button onclick="openFormBelanja()" class="btn-emerald px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i> Transaksi Baru (F5)</button>
+        <h2 class="text-sm font-bold text-emerald-400 uppercase"><i class="fa-solid fa-cart-flatbed mr-1.5"></i>Riwayat Belanja</h2>
+        <button onclick="openFormBelanja()" class="btn-emerald px-3 py-1.5 rounded-lg text-xs"><i class="fa-solid fa-plus mr-1"></i> Transaksi Baru (F5)</button>
       </div>
       <div id="belanja-list" class="space-y-2"></div>
     </div>
 
+    <!-- VIEW: FORM BELANJA BARU -->
     <div id="view-BELANJA_FORM" class="view-panel hidden space-y-3">
-      <h2 class="text-base font-bold text-emerald-400">Form Belanja (Restok)</h2>
+      <h2 class="text-sm font-bold text-emerald-400 uppercase">Form Belanja (Restok)</h2>
       <div class="space-y-2 text-xs">
         <div class="grid grid-cols-2 gap-2">
-          <label>ID Belanja <input type="text" id="belanja-id" readonly class="w-full p-2 rounded bg-slate-900"></label>
-          <label>Tanggal <input type="date" id="belanja-tgl" class="w-full p-2 rounded"></label>
+          <div><label class="block mb-1">ID Belanja</label><input type="text" id="belanja-id" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
+          <div><label class="block mb-1">Tanggal</label><input type="date" id="belanja-tgl" class="w-full p-2 rounded text-xs"></div>
         </div>
-        <label>Barcode
+        <div>
+          <label class="block mb-1">Barcode</label>
           <div class="flex gap-2">
-            <input type="text" id="belanja-barcode" class="w-full p-2 rounded" placeholder="Scan Barcode">
+            <input type="text" id="belanja-barcode" class="w-full p-2 rounded text-xs" placeholder="Scan Barcode">
             <button onclick="openScanner('belanja-barcode', autoFillBelanjaByBarcode)" class="btn-emerald px-3 rounded"><i class="fa-solid fa-camera"></i></button>
           </div>
-        </label>
-        <label class="block relative">Nama Barang
-          <input type="text" id="belanja-nama" oninput="searchCatalog(this.value, 'belanja')" class="w-full p-2 rounded" placeholder="Cari nama barang...">
-          <div id="belanja-dropdown" class="absolute left-0 right-0 bg-slate-800 z-50 rounded max-h-36 overflow-y-auto hidden border border-slate-600"></div>
-        </label>
+        </div>
+        <div class="relative">
+          <label class="block mb-1">Nama Barang</label>
+          <input type="text" id="belanja-nama" oninput="searchCatalog(this.value, 'belanja')" class="w-full p-2 rounded text-xs" placeholder="Ketik nama barang...">
+          <div id="belanja-dropdown" class="absolute left-0 right-0 bg-slate-900 z-50 rounded border border-slate-700 max-h-36 overflow-y-auto hidden mt-1"></div>
+        </div>
         <div class="grid grid-cols-3 gap-2">
-          <label>Qty <input type="text" id="belanja-qty" inputmode="numeric" oninput="calcTotalBelanjaItem()" class="w-full p-2 rounded format-number"></label>
-          <label>Satuan <input type="text" id="belanja-satuan" readonly class="w-full p-2 rounded bg-slate-900"></label>
-          <label>Total Harga <input type="text" id="belanja-totalitem" readonly class="w-full p-2 rounded bg-slate-900"></label>
+          <div><label class="block mb-1">Qty</label><input type="text" id="belanja-qty" inputmode="numeric" oninput="calcTotalBelanjaItem()" class="w-full p-2 rounded text-xs format-number"></div>
+          <div><label class="block mb-1">Satuan</label><input type="text" id="belanja-satuan" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
+          <div><label class="block mb-1">Total Harga</label><input type="text" id="belanja-totalitem" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
         </div>
         <button onclick="addBelanjaToCart()" class="btn-gold w-full py-2 rounded text-xs font-bold">+ Masukkan Ke Keranjang</button>
 
-        <div class="border-t border-slate-700 pt-3 mt-3">
-          <h3 class="font-bold mb-1">Keranjang Belanja</h3>
-          <div id="belanja-cart" class="space-y-1 max-h-40 overflow-y-auto mb-2"></div>
-          <div class="flex justify-between font-bold text-xs bg-slate-800 p-2 rounded">
+        <div class="border-t border-slate-800 pt-3 mt-3">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-bold text-xs uppercase">Keranjang Belanja</h3>
+            <button onclick="document.getElementById('belanja-nama').focus()" class="text-[10px] text-emerald-400 font-bold">+ Tambah Barang</button>
+          </div>
+          <div id="belanja-cart" class="space-y-1.5 max-h-36 overflow-y-auto mb-2"></div>
+          <div class="flex justify-between font-bold text-xs bg-slate-900 p-2 rounded border border-slate-800">
             <span>Total Qty: <span id="belanja-cart-totalqty">0</span></span>
             <span>Total: Rp <span id="belanja-cart-totalharga">0</span></span>
           </div>
-          <div class="flex gap-2 mt-2">
-            <button onclick="checkoutBelanja()" class="btn-emerald w-full py-2 rounded text-sm"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan & Tambah Stok (F8)</button>
-            <button onclick="navigateTo('BELANJA_SUB')" class="bg-slate-700 w-full py-2 rounded text-sm">Batal (F7)</button>
+          <div class="flex gap-2 mt-3">
+            <button onclick="checkoutBelanja()" class="btn-emerald w-full py-2.5 rounded text-xs"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan & Tambah Stok (F8)</button>
+            <button onclick="navigateTo('BELANJA_SUB')" class="bg-slate-800 w-full py-2.5 rounded text-xs">Batal (F7)</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- VIEW: PENJUALAN BARANG -->
-    <div id="view-PENJUALAN_SUB" class="view-panel hidden space-y-4">
+    <!-- VIEW: PENJUALAN BARANG SUBMENU -->
+    <div id="view-PENJUALAN_SUB" class="view-panel hidden space-y-3">
       <div class="flex justify-between items-center">
-        <h2 class="text-lg font-bold text-yellow-500"><i class="fa-solid fa-cash-register mr-2"></i>Riwayat Penjualan</h2>
-        <button onclick="openFormPenjualan()" class="btn-gold px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i> Transaksi Baru (F5)</button>
+        <h2 class="text-sm font-bold text-yellow-500 uppercase"><i class="fa-solid fa-cash-register mr-1.5"></i>Riwayat Penjualan</h2>
+        <button onclick="openFormPenjualan()" class="btn-gold px-3 py-1.5 rounded-lg text-xs"><i class="fa-solid fa-plus mr-1"></i> Transaksi Baru (F5)</button>
       </div>
       <div id="penjualan-list" class="space-y-2"></div>
     </div>
 
+    <!-- VIEW: FORM PENJUALAN BARU -->
     <div id="view-PENJUALAN_FORM" class="view-panel hidden space-y-3">
-      <h2 class="text-base font-bold text-yellow-500">Form Penjualan Baru</h2>
+      <h2 class="text-sm font-bold text-yellow-500 uppercase">Form Penjualan Baru</h2>
       <div class="space-y-2 text-xs">
         <div class="grid grid-cols-2 gap-2">
-          <label>ID Penjualan <input type="text" id="jual-id" readonly class="w-full p-2 rounded bg-slate-900"></label>
-          <label>Tanggal <input type="date" id="jual-tgl" class="w-full p-2 rounded"></label>
+          <div><label class="block mb-1">ID Penjualan</label><input type="text" id="jual-id" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
+          <div><label class="block mb-1">Tanggal</label><input type="date" id="jual-tgl" class="w-full p-2 rounded text-xs"></div>
         </div>
         <div class="grid grid-cols-2 gap-2">
-          <label>Tipe Customer
-            <select id="jual-tipe" class="w-full p-2 rounded" onchange="calcTotalJualItem()">
+          <div>
+            <label class="block mb-1">Tipe Customer</label>
+            <select id="jual-tipe" class="w-full p-2 rounded text-xs" onchange="calcTotalJualItem()">
               <option value="retail">Retail</option>
               <option value="grosir">Grosir</option>
             </select>
-          </label>
-          <label>Nama Pembeli <input type="text" id="jual-pembeli" class="w-full p-2 rounded" placeholder="Umum / Nama"></label>
+          </div>
+          <div><label class="block mb-1">Nama Pembeli</label><input type="text" id="jual-pembeli" class="w-full p-2 rounded text-xs" placeholder="Nama Pembeli"></div>
         </div>
-        <label>Barcode
+        <div>
+          <label class="block mb-1">Barcode</label>
           <div class="flex gap-2">
-            <input type="text" id="jual-barcode" class="w-full p-2 rounded" placeholder="Scan Barcode">
+            <input type="text" id="jual-barcode" class="w-full p-2 rounded text-xs" placeholder="Scan Barcode">
             <button onclick="openScanner('jual-barcode', autoFillJualByBarcode)" class="btn-emerald px-3 rounded"><i class="fa-solid fa-camera"></i></button>
           </div>
-        </label>
-        <label class="block relative">Nama Barang
-          <input type="text" id="jual-nama" oninput="searchCatalog(this.value, 'jual')" class="w-full p-2 rounded" placeholder="Cari nama barang...">
-          <div id="jual-dropdown" class="absolute left-0 right-0 bg-slate-800 z-50 rounded max-h-36 overflow-y-auto hidden border border-slate-600"></div>
-        </label>
+        </div>
+        <div class="relative">
+          <label class="block mb-1">Nama Barang</label>
+          <input type="text" id="jual-nama" oninput="searchCatalog(this.value, 'jual')" class="w-full p-2 rounded text-xs" placeholder="Ketik nama barang...">
+          <div id="jual-dropdown" class="absolute left-0 right-0 bg-slate-900 z-50 rounded border border-slate-700 max-h-36 overflow-y-auto hidden mt-1"></div>
+        </div>
         <div class="grid grid-cols-3 gap-2">
-          <label>Qty <input type="text" id="jual-qty" inputmode="numeric" oninput="calcTotalJualItem()" class="w-full p-2 rounded format-number"></label>
-          <label>Satuan <input type="text" id="jual-satuan" readonly class="w-full p-2 rounded bg-slate-900"></label>
-          <label>Total Harga <input type="text" id="jual-totalitem" readonly class="w-full p-2 rounded bg-slate-900"></label>
+          <div><label class="block mb-1">Qty</label><input type="text" id="jual-qty" inputmode="numeric" oninput="calcTotalJualItem()" class="w-full p-2 rounded text-xs format-number"></div>
+          <div><label class="block mb-1">Satuan</label><input type="text" id="jual-satuan" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
+          <div><label class="block mb-1">Total Harga</label><input type="text" id="jual-totalitem" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
         </div>
         <button onclick="addJualToCart()" class="btn-gold w-full py-2 rounded text-xs font-bold">+ Masukkan Ke Keranjang</button>
 
-        <div class="border-t border-slate-700 pt-3 mt-3">
-          <h3 class="font-bold mb-1">Keranjang Penjualan</h3>
-          <div id="jual-cart" class="space-y-1 max-h-40 overflow-y-auto mb-2"></div>
-          <div class="space-y-1 bg-slate-800 p-2 rounded text-xs">
+        <div class="border-t border-slate-800 pt-3 mt-3">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-bold text-xs uppercase">Keranjang Penjualan</h3>
+            <button onclick="document.getElementById('jual-nama').focus()" class="text-[10px] text-yellow-400 font-bold">+ Tambah Barang</button>
+          </div>
+          <div id="jual-cart" class="space-y-1.5 max-h-36 overflow-y-auto mb-2"></div>
+          <div class="space-y-1.5 bg-slate-900 p-2 rounded border border-slate-800 text-xs">
             <div class="flex justify-between font-bold"><span>Total Qty:</span><span id="jual-cart-totalqty">0</span></div>
             <div class="flex justify-between font-bold text-yellow-400"><span>Total Harga:</span><span>Rp <span id="jual-cart-totalharga">0</span></span></div>
-            <div class="grid grid-cols-2 gap-2 pt-1">
-              <label>Dibayar <input type="text" id="jual-dibayar" inputmode="numeric" oninput="calcKembalian()" class="w-full p-1.5 rounded format-number"></label>
-              <label>Kembalian <input type="text" id="jual-kembalian" readonly class="w-full p-1.5 rounded bg-slate-900 font-bold text-emerald-400"></label>
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800">
+              <div><label class="block text-[10px] mb-1">Dibayar</label><input type="text" id="jual-dibayar" inputmode="numeric" oninput="calcKembalian()" class="w-full p-1.5 rounded text-xs format-number"></div>
+              <div><label class="block text-[10px] mb-1">Kembalian</label><input type="text" id="jual-kembalian" readonly class="w-full p-1.5 rounded text-xs bg-slate-950 font-bold text-emerald-400"></div>
             </div>
           </div>
           <div class="flex gap-2 mt-3">
-            <button onclick="checkoutJual()" class="btn-emerald w-full py-2 rounded text-sm"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan & Kurangi Stok (F8)</button>
-            <button onclick="navigateTo('PENJUALAN_SUB')" class="bg-slate-700 w-full py-2 rounded text-sm">Batal (F7)</button>
+            <button onclick="checkoutJual()" class="btn-emerald w-full py-2.5 rounded text-xs"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan & Kurangi Stok (F8)</button>
+            <button onclick="navigateTo('PENJUALAN_SUB')" class="bg-slate-800 w-full py-2.5 rounded text-xs">Batal (F7)</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- VIEW: DETAIL CART TRANSAKSI -->
+    <!-- VIEW: DETAIL KERANJANG TRANSAKSI -->
     <div id="view-DETAIL_TRANSAKSI" class="view-panel hidden space-y-3">
-      <h2 id="detail-tx-title" class="text-base font-bold text-yellow-500">Detail Transaksi</h2>
+      <h2 id="detail-tx-title" class="text-sm font-bold text-yellow-500 uppercase">Detail Transaksi</h2>
       <div id="detail-tx-items" class="space-y-2"></div>
       <div class="flex gap-2 pt-2">
-        <button onclick="renderInvoicePDF()" class="btn-gold w-full py-2 rounded text-xs font-bold"><i class="fa-solid fa-file-pdf mr-1"></i> Cetak PDF Faktur</button>
-        <button onclick="shareToWA()" class="btn-emerald w-full py-2 rounded text-xs font-bold"><i class="fa-brands fa-whatsapp mr-1"></i> Share WA</button>
+        <button onclick="renderInvoicePDF()" class="btn-gold w-full py-2.5 rounded text-xs"><i class="fa-solid fa-file-pdf mr-1"></i> Cetak PDF Faktur</button>
+        <button onclick="shareToWA()" class="btn-emerald w-full py-2.5 rounded text-xs"><i class="fa-brands fa-whatsapp mr-1"></i> Share WA</button>
       </div>
     </div>
 
-    <!-- VIEW: PENGELUARAN -->
-    <div id="view-PENGELUARAN_SUB" class="view-panel hidden space-y-4">
-      <h2 class="text-lg font-bold text-red-400"><i class="fa-solid fa-hand-holding-dollar mr-2"></i>Pengeluaran Lain-lain</h2>
-      <div class="bg-slate-800 p-3 rounded-lg space-y-2 text-xs">
-        <label>Tanggal <input type="date" id="pengeluaran-tgl" class="w-full p-2 rounded"></label>
-        <label>Keterangan <input type="text" id="pengeluaran-ket" class="w-full p-2 rounded" placeholder="Keterangan"></label>
-        <label>Jumlah <input type="text" id="pengeluaran-jml" inputmode="numeric" class="w-full p-2 rounded format-number" placeholder="0"></label>
-        <button onclick="savePengeluaran()" class="btn-gold w-full py-2 rounded font-bold">+ Simpan Pengeluaran</button>
+    <!-- VIEW: PENGELUARAN LAIN-LAIN -->
+    <div id="view-PENGELUARAN_SUB" class="view-panel hidden space-y-3">
+      <h2 class="text-sm font-bold text-red-400 uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1.5"></i>Pengeluaran Lain-lain</h2>
+      <div class="card-menu p-3 rounded-lg space-y-2 text-xs">
+        <div><label class="block mb-1">Tanggal</label><input type="date" id="pengeluaran-tgl" class="w-full p-2 rounded text-xs"></div>
+        <div><label class="block mb-1">Keterangan</label><input type="text" id="pengeluaran-ket" class="w-full p-2 rounded text-xs uppercase" placeholder="KETERANGAN"></div>
+        <div><label class="block mb-1">Jumlah</label><input type="text" id="pengeluaran-jml" inputmode="numeric" class="w-full p-2 rounded text-xs format-number" placeholder="0"></div>
+        <button onclick="savePengeluaran()" class="btn-gold w-full py-2 rounded font-bold text-xs">+ Simpan Pengeluaran</button>
       </div>
       <div id="pengeluaran-list" class="space-y-2"></div>
     </div>
 
-    <!-- VIEW: KEUNTUNGAN -->
-    <div id="view-KEUNTUNGAN_SUB" class="view-panel hidden space-y-4">
-      <h2 class="text-lg font-bold text-emerald-400"><i class="fa-solid fa-chart-line mr-2"></i>Dashboard Keuntungan</h2>
+    <!-- VIEW: KEUNTUNGAN (DASHBOARD) -->
+    <div id="view-KEUNTUNGAN_SUB" class="view-panel hidden space-y-3">
+      <h2 class="text-sm font-bold text-emerald-400 uppercase"><i class="fa-solid fa-chart-line mr-1.5"></i>Dashboard Keuntungan</h2>
       <div class="grid grid-cols-2 gap-2 text-xs">
-        <div class="bg-slate-800 p-3 rounded border-l-4 border-emerald-500">
-          <p class="text-slate-400">Laba Bersih Kemarin</p>
-          <p class="text-base font-bold text-emerald-400" id="lb-kemarin">Rp 0</p>
+        <div class="bg-slate-900 p-2.5 rounded border-l-4 border-emerald-500">
+          <p class="text-[10px] text-slate-400">Laba Bersih Kemarin</p>
+          <p class="text-sm font-bold text-emerald-400" id="lb-kemarin">Rp 0</p>
         </div>
-        <div class="bg-slate-800 p-3 rounded border-l-4 border-emerald-500">
-          <p class="text-slate-400">Laba Bersih Bulan Ini</p>
-          <p class="text-base font-bold text-emerald-400" id="lb-bulanini">Rp 0</p>
+        <div class="bg-slate-900 p-2.5 rounded border-l-4 border-emerald-500">
+          <p class="text-[10px] text-slate-400">Laba Bersih Bulan Ini</p>
+          <p class="text-sm font-bold text-emerald-400" id="lb-bulanini">Rp 0</p>
         </div>
-        <div class="bg-slate-800 p-3 rounded border-l-4 border-red-500">
-          <p class="text-slate-400">Pengeluaran Kemarin</p>
-          <p class="text-base font-bold text-red-400" id="peng-kemarin">Rp 0</p>
+        <div class="bg-slate-900 p-2.5 rounded border-l-4 border-red-500">
+          <p class="text-[10px] text-slate-400">Pengeluaran Kemarin</p>
+          <p class="text-sm font-bold text-red-400" id="peng-kemarin">Rp 0</p>
         </div>
-        <div class="bg-slate-800 p-3 rounded border-l-4 border-red-500">
-          <p class="text-slate-400">Pengeluaran Bulan Ini</p>
-          <p class="text-base font-bold text-red-400" id="peng-bulanini">Rp 0</p>
+        <div class="bg-slate-900 p-2.5 rounded border-l-4 border-red-500">
+          <p class="text-[10px] text-slate-400">Pengeluaran Bulan Ini</p>
+          <p class="text-sm font-bold text-red-400" id="peng-bulanini">Rp 0</p>
         </div>
       </div>
       
-      <div class="bg-slate-800 p-3 rounded-lg">
-        <h3 class="text-xs font-bold mb-2">Grafik Laba Bersih Bulanan</h3>
-        <canvas id="profitChart" class="w-full max-h-60"></canvas>
+      <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+        <h3 class="text-xs font-bold mb-2">Grafik Keuntungan Bulanan</h3>
+        <canvas id="profitChart" class="w-full max-h-56"></canvas>
       </div>
 
       <div class="space-y-2">
-        <h3 class="text-xs font-bold">Rincian Keuntungan Harian</h3>
-        <div id="keuntungan-harian-list" class="space-y-1"></div>
+        <h3 class="text-xs font-bold uppercase">Rincian Keuntungan Harian</h3>
+        <div id="keuntungan-harian-list" class="space-y-1.5 text-xs"></div>
       </div>
     </div>
 
     <!-- VIEW: SINKRONISASI -->
-    <div id="view-SYNC_SUB" class="view-panel hidden space-y-4">
-      <h2 class="text-lg font-bold text-yellow-500"><i class="fa-solid fa-arrows-rotate mr-2"></i>Sinkronisasi Google Sheets</h2>
-      <div class="bg-slate-800 p-3 rounded-lg space-y-2 text-xs">
-        <label>Google Apps Script Web App URL
+    <div id="view-SYNC_SUB" class="view-panel hidden space-y-3">
+      <h2 class="text-sm font-bold text-yellow-500 uppercase"><i class="fa-solid fa-arrows-rotate mr-1.5"></i>Sinkronisasi Spreadsheet</h2>
+      <div class="card-menu p-3 rounded-lg space-y-2 text-xs">
+        <div>
+          <label class="block mb-1">Google Apps Script Web App URL</label>
           <input type="text" id="script-url" class="w-full p-2 rounded text-xs" placeholder="https://script.google.com/macros/s/.../exec">
-        </label>
+        </div>
         <button onclick="saveScriptUrl()" class="btn-gold w-full py-2 rounded font-bold">Simpan URL</button>
         <div class="flex gap-2 pt-2">
           <button onclick="syncData('PUSH')" class="btn-emerald w-full py-2 rounded font-bold"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Kirim Data</button>
-          <button onclick="syncData('PULL')" class="bg-blue-600 w-full py-2 rounded font-bold text-white"><i class="fa-solid fa-cloud-arrow-down mr-1"></i> Tarik Data</button>
+          <button onclick="syncData('PULL')" class="bg-blue-600 text-white w-full py-2 rounded font-bold"><i class="fa-solid fa-cloud-arrow-down mr-1"></i> Tarik Data</button>
         </div>
       </div>
 
-      <div class="bg-slate-800 p-3 rounded-lg text-xs space-y-2 text-slate-300">
-        <h3 class="font-bold text-yellow-400">Panduan Google Apps Script Backend:</h3>
+      <div class="bg-slate-900 p-3 rounded-lg text-xs space-y-2 border border-slate-800 text-slate-300">
+        <h3 class="font-bold text-yellow-400">Panduan Setup Apps Script:</h3>
         <ol class="list-decimal pl-4 space-y-1 text-[11px]">
-          <li>Buat Google Spreadsheet baru. Sertakan sheet: <code class="text-emerald-400">KATALOG BARANG, BELANJA, PENJUALAN, PERKIRAAN BELANJA, PENGELUARAN LAIN, KEUNTUNGAN HARIAN, KEUNTUNGAN PERBULAN, SINKRONISASI</code>.</li>
-          <li>Buka <b>Ekstensi > Apps Script</b>. Tempelkan Kode GAS yang disediakan.</li>
-          <li>Set pemicu / trigger waktu otomatis pkl 23.00 untuk auto-backup.</li>
-          <li>Deploy sebagai Web App (Akses: <i>Anyone / Siapa Saja</i>). Salin URL Ke aplikasi ini.</li>
+          <li>Buat Google Spreadsheet dengan sheet: <code class="text-emerald-400">KATALOG BARANG, BELANJA, PENJUALAN, PERKIRAAN BELANJA, PENGELUARAN LAIN, KEUNTUNGAN HARIAN, KEUNTUNGAN PERBULAN, SINKRONISASI</code>.</li>
+          <li>Buka <b>Ekstensi > Apps Script</b>, salin kode GAS backend.</li>
+          <li>Atur Pemicu / Trigger waktu pukul 23:00 untuk Auto-backup.</li>
+          <li>Deploy sebagai Web App (Akses: <i>Anyone / Siapa Saja</i>) dan masukkan URL ke form di atas.</li>
         </ol>
       </div>
     </div>
 
     <!-- VIEW: PENGATURAN FAKTUR -->
-    <div id="view-FAKTUR_SUB" class="view-panel hidden space-y-4">
-      <h2 class="text-lg font-bold text-emerald-400"><i class="fa-solid fa-file-invoice-dollar mr-2"></i>Preview Template Faktur</h2>
-      <div id="invoice-template" class="invoice-preview shadow-xl">
+    <div id="view-FAKTUR_SUB" class="view-panel hidden space-y-3">
+      <h2 class="text-sm font-bold text-emerald-400 uppercase"><i class="fa-solid fa-file-invoice-dollar mr-1.5"></i>Preview Template Faktur</h2>
+      <div id="invoice-template" class="invoice-card shadow-2xl">
         <div class="text-center border-b pb-2 mb-2">
           <img src="web arya.png" class="h-8 mx-auto mb-1" alt="Logo">
           <h2 class="font-bold text-sm">NOTA PENJUALAN</h2>
@@ -391,23 +410,23 @@
         </div>
         <div class="flex justify-between text-[10px] mb-2">
           <div>Pembeli: <span id="inv-pembeli">Umum</span></div>
-          <div>ID: <span id="inv-id">PJ-1001</span></div>
-          <div>Tgl: <span id="inv-tgl">01-01-2026</span></div>
+          <div>ID: <span id="inv-id">PJ-000001</span></div>
+          <div>Tgl: <span id="inv-tgl">31-07-2026</span></div>
         </div>
         <table class="w-full text-[10px] mb-2 border-t border-b">
           <thead>
             <tr class="border-b">
-              <th class="text-left">Item</th>
-              <th class="text-center">Qty</th>
-              <th class="text-right">Harga</th>
-              <th class="text-right">Total</th>
+              <th class="text-left py-1">Item</th>
+              <th class="text-center py-1">Qty</th>
+              <th class="text-right py-1">Harga</th>
+              <th class="text-right py-1">Total</th>
             </tr>
           </thead>
           <tbody id="inv-items">
-            <tr><td>Barang Contoh</td><td class="text-center">2</td><td class="text-right">5.000</td><td class="text-right">10.000</td></tr>
+            <tr><td class="py-0.5">Barang Sample</td><td class="text-center">2</td><td class="text-right">5.000</td><td class="text-right">10.000</td></tr>
           </tbody>
         </table>
-        <div class="text-[10px] space-y-1 text-right">
+        <div class="text-[10px] space-y-0.5 text-right">
           <div>Total: Rp <span id="inv-total">10.000</span></div>
           <div>Dibayar: Rp <span id="inv-dibayar">10.000</span></div>
           <div>Kembali: Rp <span id="inv-kembali">0</span></div>
@@ -418,20 +437,20 @@
 
   </main>
 
-  <!-- MODAL CAMERA SCANNER FULLSCREEN -->
+  <!-- CAMERA SCANNER MODAL -->
   <div id="scanner-modal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col justify-between p-4">
     <div class="flex justify-between items-center text-white">
-      <span class="font-bold text-sm">Scan Barcode / QR</span>
-      <button onclick="toggleTorch()" class="p-2 text-yellow-400"><i class="fa-solid fa-bolt text-xl"></i> Senter</button>
-      <button onclick="closeScanner()" class="p-2 text-red-500 text-xl"><i class="fa-solid fa-xmark"></i></button>
+      <span class="font-bold text-xs">Scan Barcode / QR</span>
+      <button onclick="toggleTorch()" class="p-2 text-yellow-400"><i class="fa-solid fa-bolt text-lg"></i> Senter</button>
+      <button onclick="closeScanner()" class="p-2 text-red-500 text-lg"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div id="interactive" class="w-full max-w-sm mx-auto overflow-hidden rounded-lg border-2 border-yellow-500"></div>
-    <div class="text-center text-xs text-slate-400 pb-4">Arahkan kamera ke kode barcode</div>
+    <div id="interactive" class="w-full max-w-xs mx-auto overflow-hidden rounded-lg border-2 border-yellow-500"></div>
+    <div class="text-center text-[11px] text-slate-400 pb-2">Arahkan kamera ke barcode barang</div>
   </div>
 
-  <!-- SCRIPT APPLICATION LOGIC -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // --- STATE MANAGEMENT ---
+    // --- APP STATE ---
     let appData = {
       katalog: [],
       belanja: [],
@@ -455,7 +474,6 @@
       setupKeyboardNavigation();
       renderAllData();
       
-      // Auto-backup pkl 23.00 check interval
       setInterval(checkAutoBackup, 60000);
     };
 
@@ -472,7 +490,7 @@
       localStorage.setItem('ARYA_POS_DATA', JSON.stringify(appData));
     }
 
-    // --- NAVIGATION LOGIC & ANDROID BACK BUTTON ---
+    // --- NAVIGASI & ANDROID BACK BUTTON ---
     function navigateTo(viewId) {
       if(navigationStack[navigationStack.length - 1] !== viewId) {
         navigationStack.push(viewId);
@@ -481,13 +499,13 @@
       renderView(viewId);
     }
 
-    window.onpopstate = function(e) {
+    window.onpopstate = function() {
       if (navigationStack.length > 1) {
         navigationStack.pop();
         const prevView = navigationStack[navigationStack.length - 1];
         renderView(prevView);
       } else {
-        if(confirm("Keluar dari Aplikasi ARYA GROSIR?")) {
+        if(confirm("Keluar dari Aplikasi Kasir ARYA GROSIR?")) {
           navigator.app ? navigator.app.exitApp() : window.close();
         } else {
           history.pushState({ view: 'MAIN_MENU' }, '');
@@ -527,10 +545,10 @@
       return navigationStack[navigationStack.length - 1];
     }
 
-    // --- INPUT FORMATTING & NAVIGATION ---
+    // --- INPUT FORMATTING & KEYBOARD ENTER ---
     function setupFormatInputs() {
       document.querySelectorAll('.format-number').forEach(input => {
-        input.addEventListener('input', function(e) {
+        input.addEventListener('input', function() {
           let val = this.value.replace(/\D/g, '');
           this.value = val ? parseInt(val, 10).toLocaleString('id-ID') : '';
         });
@@ -542,6 +560,15 @@
       return parseInt(val.toString().replace(/\./g, ''), 10) || 0;
     }
 
+    function formatDate(dateStr) {
+      if(!dateStr) return '';
+      const d = new Date(dateStr);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+
     function setupKeyboardNavigation() {
       document.addEventListener('keydown', function(e) {
         if(e.key === 'Enter') {
@@ -550,12 +577,14 @@
           if (index > -1 && index < focusable.length - 1) {
             e.preventDefault();
             focusable[index + 1].focus();
+          } else if(index === focusable.length - 1) {
+            document.activeElement.blur();
           }
         }
       });
     }
 
-    // --- CAMERA SCANNER (HTML5-QRCode) ---
+    // --- CAMERA SCANNER ---
     function openScanner(inputId, callback = null) {
       targetInputId = inputId;
       onScanCallback = callback;
@@ -564,13 +593,13 @@
       html5QrCode = new Html5Qrcode("interactive");
       html5QrCode.start(
         { facingMode: "environment" },
-        { fps: 15, qrbox: { width: 250, height: 150 } },
+        { fps: 20, qrbox: { width: 240, height: 140 } },
         (decodedText) => {
           document.getElementById(targetInputId).value = decodedText;
           closeScanner();
           if(onScanCallback) onScanCallback(decodedText);
         },
-        (errorMessage) => {}
+        () => {}
       ).catch(err => alert("Kamera gagal diakses: " + err));
     }
 
@@ -587,13 +616,12 @@
 
     function toggleTorch() {
       if(html5QrCode) {
-        html5QrCode.applyVideoConstraints({
-          advanced: [{ torch: true }]
-        }).catch(() => alert('Senter tidak didukung pada perangkat ini.'));
+        html5QrCode.applyVideoConstraints({ advanced: [{ torch: true }] })
+          .catch(() => alert('Senter tidak didukung pada perangkat ini.'));
       }
     }
 
-    // --- STOK MODULE ---
+    // --- KATALOG STOK MODULE ---
     function openFormStok(editBarcode = null) {
       navigateTo('STOK_FORM');
       if(editBarcode) {
@@ -639,7 +667,7 @@
     }
 
     function deleteStok(barcode) {
-      if(confirm("Hapus barang dari katalog?")) {
+      if(confirm("Hapus barang dari katalog stok?")) {
         appData.katalog = appData.katalog.filter(k => k.barcode !== barcode);
         saveData();
         renderStokList();
@@ -652,7 +680,7 @@
         <div class="card-menu p-3 rounded-lg flex justify-between items-center text-xs">
           <div onclick="openFormStok('${k.barcode}')" class="cursor-pointer flex-grow">
             <p class="font-bold text-yellow-400">${k.nama}</p>
-            <p class="text-[10px] text-slate-400">BC: ${k.barcode} | Sat: ${k.satuan}</p>
+            <p class="text-[10px] text-slate-400">Barcode: ${k.barcode} | Satuan: ${k.satuan}</p>
             <p class="text-[11px] ${k.qty <= k.minQty ? 'text-red-400 font-bold' : 'text-slate-300'}">Stok: ${k.qty.toLocaleString('id-ID')} (Min: ${k.minQty})</p>
           </div>
           <button onclick="deleteStok('${k.barcode}')" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
@@ -669,7 +697,7 @@
       if(matches.length === 0) { dropdown.classList.add('hidden'); return; }
 
       dropdown.innerHTML = matches.map(m => `
-        <div onclick="selectCatalogItem('${m.barcode}', '${module}')" class="p-2 hover:bg-slate-700 cursor-pointer border-b border-slate-700 text-xs">
+        <div onclick="selectCatalogItem('${m.barcode}', '${module}')" class="p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800 text-xs">
           <p class="font-bold text-yellow-400">${m.nama}</p>
           <p class="text-[10px] text-slate-400">Stok: ${m.qty} ${m.satuan}</p>
         </div>
@@ -699,12 +727,8 @@
       }
     }
 
-    function autoFillBelanjaByBarcode(barcode) {
-      selectCatalogItem(barcode, 'belanja');
-    }
-    function autoFillJualByBarcode(barcode) {
-      selectCatalogItem(barcode, 'jual');
-    }
+    function autoFillBelanjaByBarcode(barcode) { selectCatalogItem(barcode, 'belanja'); }
+    function autoFillJualByBarcode(barcode) { selectCatalogItem(barcode, 'jual'); }
 
     // --- BELANJA MODULE ---
     function openFormBelanja() {
@@ -728,12 +752,11 @@
       const satuan = document.getElementById('belanja-satuan').value;
       const total = parseNum(document.getElementById('belanja-totalitem').value);
 
-      if(!nama || qty <= 0) return alert("Pilih barang dan jumlah belanja!");
+      if(!nama || qty <= 0) return alert("Pilih barang dan jumlah Qty!");
 
       appData.cartBelanja.push({ barcode, nama, qty, satuan, total });
       renderBelanjaCart();
 
-      // Clear input
       ['belanja-barcode','belanja-nama','belanja-qty','belanja-satuan','belanja-totalitem'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('belanja-nama').focus();
     }
@@ -746,12 +769,15 @@
         totalQty += item.qty;
         totalHarga += item.total;
         return `
-          <div class="flex justify-between items-center bg-slate-900 p-2 rounded text-xs">
+          <div class="flex justify-between items-center bg-slate-900 p-2 rounded text-xs border border-slate-800">
             <div>
               <p class="font-bold">${item.nama}</p>
-              <p class="text-[10px] text-slate-400">${item.qty} ${item.satuan} x Rp ${(item.total/item.qty).toLocaleString('id-ID')}</p>
+              <p class="text-[10px] text-slate-400">${item.qty} ${item.satuan}</p>
             </div>
-            <button onclick="appData.cartBelanja.splice(${idx},1); renderBelanjaCart();" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-emerald-400">Rp ${item.total.toLocaleString('id-ID')}</span>
+              <button onclick="appData.cartBelanja.splice(${idx},1); renderBelanjaCart();" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+            </div>
           </div>
         `;
       }).join('');
@@ -765,12 +791,11 @@
 
       const tx = {
         id: document.getElementById('belanja-id').value,
-        tgl: document.getElementById('belanja-tgl').value,
+        tgl: formatDate(document.getElementById('belanja-tgl').value),
         items: [...appData.cartBelanja],
         totalHarga: parseNum(document.getElementById('belanja-cart-totalharga').innerText)
       };
 
-      // Auto Update Katalog Stok
       tx.items.forEach(item => {
         const target = appData.katalog.find(k => k.barcode === item.barcode);
         if(target) target.qty += item.qty;
@@ -820,9 +845,9 @@
       const satuan = document.getElementById('jual-satuan').value;
       const total = parseNum(document.getElementById('jual-totalitem').value);
 
-      if(!nama || qty <= 0) return alert("Pilih barang dan jumlah penjualan!");
+      if(!nama || qty <= 0) return alert("Pilih barang dan jumlah Qty!");
 
-      appData.cartJual.push({ barcode, nama, qty, satuan, total, hargaPokok: appData.currentSelectedBarang.hargaPokok });
+      appData.cartJual.push({ barcode, nama, qty, satuan, total, hargaPokok: appData.currentSelectedBarang ? appData.currentSelectedBarang.hargaPokok : 0 });
       renderJualCart();
 
       ['jual-barcode','jual-nama','jual-qty','jual-satuan','jual-totalitem'].forEach(id => document.getElementById(id).value = '');
@@ -837,12 +862,15 @@
         totalQty += item.qty;
         totalHarga += item.total;
         return `
-          <div class="flex justify-between items-center bg-slate-900 p-2 rounded text-xs">
+          <div class="flex justify-between items-center bg-slate-900 p-2 rounded text-xs border border-slate-800">
             <div>
               <p class="font-bold">${item.nama}</p>
-              <p class="text-[10px] text-slate-400">${item.qty} ${item.satuan} x Rp ${(item.total/item.qty).toLocaleString('id-ID')}</p>
+              <p class="text-[10px] text-slate-400">${item.qty} ${item.satuan}</p>
             </div>
-            <button onclick="appData.cartJual.splice(${idx},1); renderJualCart();" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-yellow-400">Rp ${item.total.toLocaleString('id-ID')}</span>
+              <button onclick="appData.cartJual.splice(${idx},1); renderJualCart();" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+            </div>
           </div>
         `;
       }).join('');
@@ -864,11 +892,11 @@
       const total = parseNum(document.getElementById('jual-cart-totalharga').innerText);
       const dibayar = parseNum(document.getElementById('jual-dibayar').value);
 
-      if(dibayar < total) return alert("Pembayaran kurang!");
+      if(dibayar < total) return alert("Jumlah pembayaran kurang!");
 
       const tx = {
         id: document.getElementById('jual-id').value,
-        tgl: document.getElementById('jual-tgl').value,
+        tgl: formatDate(document.getElementById('jual-tgl').value),
         pembeli: document.getElementById('jual-pembeli').value || 'Umum',
         tipe: document.getElementById('jual-tipe').value,
         items: [...appData.cartJual],
@@ -877,7 +905,6 @@
         kembalian: dibayar - total
       };
 
-      // Auto update katalog stok
       tx.items.forEach(item => {
         const target = appData.katalog.find(k => k.barcode === item.barcode);
         if(target) target.qty = Math.max(0, target.qty - item.qty);
@@ -898,12 +925,12 @@
             <p class="font-bold text-yellow-400">${p.id} - ${p.pembeli}</p>
             <p class="text-[10px] text-slate-400">Tgl: ${p.tgl} | Total: Rp ${p.totalHarga.toLocaleString('id-ID')}</p>
           </div>
-          <span class="text-[10px] px-2 py-1 rounded bg-emerald-900 text-emerald-300 font-bold">LUNAS</span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-bold border border-emerald-700">LUNAS</span>
         </div>
       `).join('');
     }
 
-    // --- DETAIL TRANSAKSI & INVOICE ---
+    // --- DETAIL & INVOICE ---
     let currentSelectedTx = null;
 
     function openDetailTx(txId, type) {
@@ -913,7 +940,7 @@
 
       document.getElementById('detail-tx-title').innerText = "Detail " + txId;
       document.getElementById('detail-tx-items').innerHTML = currentSelectedTx.items.map(item => `
-        <div class="bg-slate-800 p-2 rounded text-xs flex justify-between">
+        <div class="bg-slate-900 p-2.5 rounded text-xs flex justify-between border border-slate-800">
           <div>
             <p class="font-bold">${item.nama}</p>
             <p class="text-[10px] text-slate-400">${item.qty} ${item.satuan}</p>
@@ -950,9 +977,9 @@
 
       doc.text("----------------------------------", 40, y, { align: "center" });
       y += 4;
-      doc.text(`Total    : Rp ${currentSelectedTx.totalHarga}`, 5, y);
-      doc.text(`Dibayar  : Rp ${currentSelectedTx.dibayar || currentSelectedTx.totalHarga}`, 5, y + 4);
-      doc.text(`Kembalian: Rp ${currentSelectedTx.kembalian || 0}`, 5, y + 8);
+      doc.text(`Total    : Rp ${currentSelectedTx.totalHarga.toLocaleString('id-ID')}`, 5, y);
+      doc.text(`Dibayar  : Rp ${(currentSelectedTx.dibayar || currentSelectedTx.totalHarga).toLocaleString('id-ID')}`, 5, y + 4);
+      doc.text(`Kembalian: Rp ${(currentSelectedTx.kembalian || 0).toLocaleString('id-ID')}`, 5, y + 8);
 
       doc.text("*** LUNAS ***", 40, y + 15, { align: "center" });
 
@@ -961,9 +988,9 @@
 
     function shareToWA() {
       if(!currentSelectedTx) return;
-      let text = `*NOTA PENJUALAN ARYA GROSIR*\nWA: 089670179464\n--------------------------------\nID: ${currentSelectedTx.id}\nTgl: ${currentSelectedTx.tgl}\n\n`;
+      let text = `*NOTA PENJUALAN ARYA GROSIR*\nWA: 089670179464\n--------------------------------\nID: ${currentSelectedTx.id}\nTgl: ${currentSelectedTx.tgl}\nPembeli: ${currentSelectedTx.pembeli || 'Umum'}\n\n`;
       currentSelectedTx.items.forEach(i => {
-        text += `${i.nama}\n ${i.qty} ${i.satuan} x Rp ${(i.total/i.qty).toLocaleString('id-ID')} = Rp ${i.total.toLocaleString('id-ID')}\n`;
+        text += `${i.nama}\n  ${i.qty} ${i.satuan} x Rp ${(i.total/i.qty).toLocaleString('id-ID')} = Rp ${i.total.toLocaleString('id-ID')}\n`;
       });
       text += `--------------------------------\n*TOTAL: Rp ${currentSelectedTx.totalHarga.toLocaleString('id-ID')}*\nStatus: LUNAS\n\nTerima Kasih!`;
       
@@ -972,8 +999,8 @@
 
     // --- PENGELUARAN MODULE ---
     function savePengeluaran() {
-      const tgl = document.getElementById('pengeluaran-tgl').value;
-      const ket = document.getElementById('pengeluaran-ket').value;
+      const tgl = formatDate(document.getElementById('pengeluaran-tgl').value);
+      const ket = document.getElementById('pengeluaran-ket').value.trim().toUpperCase();
       const jml = parseNum(document.getElementById('pengeluaran-jml').value);
 
       if(!tgl || !ket || jml <= 0) return alert("Isi data pengeluaran dengan lengkap!");
@@ -988,7 +1015,7 @@
     function renderPengeluaranList() {
       const container = document.getElementById('pengeluaran-list');
       container.innerHTML = appData.pengeluaran.map((p, idx) => `
-        <div class="bg-slate-800 p-2.5 rounded text-xs flex justify-between items-center">
+        <div class="bg-slate-900 p-2.5 rounded text-xs flex justify-between items-center border border-slate-800">
           <div>
             <p class="font-bold text-red-400">${p.ket}</p>
             <p class="text-[10px] text-slate-400">${p.tgl}</p>
@@ -1003,30 +1030,28 @@
 
     // --- DASHBOARD KEUNTUNGAN & CHART ---
     function renderProfitDashboard() {
-      const today = new Date().toISOString().split('T')[0];
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-      const currentMonth = new Date().toISOString().slice(0, 7);
+      const today = new Date();
+      const yesterday = new Date(Date.now() - 86400000);
+      const formattedYesterday = formatDate(yesterday.toISOString().split('T')[0]);
+      const currentMonthStr = String(today.getMonth() + 1).padStart(2, '0') + '-' + today.getFullYear();
 
-      // Calculations
       let lbKemarin = 0, lbBulanIni = 0, pengKemarin = 0, pengBulanIni = 0;
 
       appData.penjualan.forEach(p => {
-        let labaLaba = 0;
-        p.items.forEach(i => {
-          labaLaba += (i.total - (i.qty * (i.hargaPokok || 0)));
-        });
+        let labaGross = 0;
+        p.items.forEach(i => labaGross += (i.total - (i.qty * (i.hargaPokok || 0))));
 
-        if(p.tgl === yesterday) lbKemarin += labaLaba;
-        if(p.tgl.startsWith(currentMonth)) lbBulanIni += labaLaba;
+        if(p.tgl === formattedYesterday) lbKemarin += labaGross;
+        if(p.tgl && p.tgl.endsWith(currentMonthStr)) lbBulanIni += labaGross;
       });
 
       appData.pengeluaran.forEach(pg => {
-        if(pg.tgl === yesterday) pengKemarin += pg.jml;
-        if(pg.tgl.startsWith(currentMonth)) pengBulanIni += pg.jml;
+        if(pg.tgl === formattedYesterday) pengKemarin += pg.jml;
+        if(pg.tgl && pg.tgl.endsWith(currentMonthStr)) pengBulanIni += pg.jml;
       });
 
-      document.getElementById('lb-kemarin').innerText = "Rp " + (lbKemarin - pengKemarin).toLocaleString('id-ID');
-      document.getElementById('lb-bulanini').innerText = "Rp " + (lbBulanIni - pengBulanIni).toLocaleString('id-ID');
+      document.getElementById('lb-kemarin').innerText = "Rp " + Math.max(0, lbKemarin - pengKemarin).toLocaleString('id-ID');
+      document.getElementById('lb-bulanini').innerText = "Rp " + Math.max(0, lbBulanIni - pengBulanIni).toLocaleString('id-ID');
       document.getElementById('peng-kemarin').innerText = "Rp " + pengKemarin.toLocaleString('id-ID');
       document.getElementById('peng-bulanini').innerText = "Rp " + pengBulanIni.toLocaleString('id-ID');
 
@@ -1036,15 +1061,18 @@
     function renderProfitChart() {
       const ctx = document.getElementById('profitChart').getContext('2d');
       const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-      const monthlyData = new Array(12).fill(0);
+      const monthlyProfit = new Array(12).fill(0);
 
       const currentYear = new Date().getFullYear();
       appData.penjualan.forEach(p => {
-        const d = new Date(p.tgl);
-        if(d.getFullYear() === currentYear) {
-          let profit = 0;
-          p.items.forEach(i => profit += (i.total - (i.qty * (i.hargaPokok || 0))));
-          monthlyData[d.getMonth()] += profit;
+        if(p.tgl) {
+          const parts = p.tgl.split('-');
+          if(parts.length === 3 && parseInt(parts[2], 10) === currentYear) {
+            const mIndex = parseInt(parts[1], 10) - 1;
+            let profit = 0;
+            p.items.forEach(i => profit += (i.total - (i.qty * (i.hargaPokok || 0))));
+            monthlyProfit[mIndex] += profit;
+          }
         }
       });
 
@@ -1055,9 +1083,8 @@
         data: {
           labels: months,
           datasets: [{
-            label: 'Laba Bersih',
-            data: monthlyData,
-            backgroundColor: monthlyData.map(val => val > 1000000 ? '#10B981' : (val > 500000 ? '#FBBF24' : '#EF4444'))
+            data: monthlyProfit,
+            backgroundColor: monthlyProfit.map(v => v > 1000000 ? '#10B981' : (v > 500000 ? '#FBBF24' : '#EF4444'))
           }]
         },
         options: {
@@ -1071,7 +1098,7 @@
       });
     }
 
-    // --- SINKRONISASI GOOGLE APPS SCRIPT ---
+    // --- SINKRONISASI SPREADSHEET ---
     function saveScriptUrl() {
       const url = document.getElementById('script-url').value.trim();
       localStorage.setItem('ARYA_POS_SCRIPT_URL', url);
@@ -1080,7 +1107,7 @@
 
     function syncData(action) {
       const url = localStorage.getItem('ARYA_POS_SCRIPT_URL');
-      if(!url) return alert("Isi URL Google Apps Script terlebih dahulu!");
+      if(!url) return alert("Masukkan URL Google Apps Script terlebih dahulu!");
 
       if(action === 'PUSH') {
         fetch(url, {
