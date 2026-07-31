@@ -10,6 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -103,7 +104,7 @@
   <!-- MAIN CONTENT CONTAINER -->
   <main class="flex-grow max-w-3xl w-full mx-auto p-3">
 
-    <!-- VIEW: MENU UTAMA (GRID 2x4) -->
+    <!-- VIEW: MENU UTAMA -->
     <div id="view-MAIN_MENU" class="view-panel space-y-4">
       <div class="grid grid-cols-2 gap-3 pt-2">
         <div onclick="navigateTo('STOK_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[110px]">
@@ -137,7 +138,7 @@
       </div>
     </div>
 
-    <!-- VIEW: KATALOG STOK SUBMENU -->
+    <!-- VIEW: KATALOG STOK SUBMENU (Point 3 Updated) -->
     <div id="view-STOK_SUB" class="view-panel hidden space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="text-sm font-bold text-yellow-500 uppercase"><i class="fa-solid fa-boxes-stacked mr-1.5"></i>Katalog Stok</h2>
@@ -196,7 +197,7 @@
       </div>
     </div>
 
-    <!-- VIEW: BELANJA BARANG SUBMENU -->
+    <!-- VIEW: BELANJA BARANG SUBMENU (Point 4 Updated) -->
     <div id="view-BELANJA_SUB" class="view-panel hidden space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="text-sm font-bold text-emerald-400 uppercase"><i class="fa-solid fa-cart-flatbed mr-1.5"></i>Riwayat Belanja</h2>
@@ -250,7 +251,7 @@
       </div>
     </div>
 
-    <!-- VIEW: PENJUALAN BARANG SUBMENU -->
+    <!-- VIEW: PENJUALAN BARANG SUBMENU (Point 5 Updated) -->
     <div id="view-PENJUALAN_SUB" class="view-panel hidden space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="text-sm font-bold text-yellow-500 uppercase"><i class="fa-solid fa-cash-register mr-1.5"></i>Riwayat Penjualan</h2>
@@ -318,7 +319,7 @@
       </div>
     </div>
 
-    <!-- VIEW: DETAIL KERANJANG TRANSAKSI -->
+    <!-- VIEW: DETAIL TRANSAKSI -->
     <div id="view-DETAIL_TRANSAKSI" class="view-panel hidden space-y-3">
       <h2 id="detail-tx-title" class="text-sm font-bold text-yellow-500 uppercase">Detail Transaksi</h2>
       <div id="detail-tx-items" class="space-y-2"></div>
@@ -340,7 +341,7 @@
       <div id="pengeluaran-list" class="space-y-2"></div>
     </div>
 
-    <!-- VIEW: KEUNTUNGAN (DASHBOARD) -->
+    <!-- VIEW: KEUNTUNGAN (Point 6 & 7 Updated) -->
     <div id="view-KEUNTUNGAN_SUB" class="view-panel hidden space-y-3">
       <h2 class="text-sm font-bold text-emerald-400 uppercase"><i class="fa-solid fa-chart-line mr-1.5"></i>Dashboard Keuntungan</h2>
       <div class="grid grid-cols-2 gap-2 text-xs">
@@ -362,11 +363,13 @@
         </div>
       </div>
       
+      <!-- Grafik Keuntungan dengan Angka di Atas Batang -->
       <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
         <h3 class="text-xs font-bold mb-2">Grafik Keuntungan Bulanan</h3>
         <canvas id="profitChart" class="w-full max-h-56"></canvas>
       </div>
 
+      <!-- List Rincian Keuntungan Per Tanggal Terkini -->
       <div class="space-y-2">
         <h3 class="text-xs font-bold uppercase">Rincian Keuntungan Harian</h3>
         <div id="keuntungan-harian-list" class="space-y-1.5 text-xs"></div>
@@ -387,25 +390,16 @@
           <button onclick="syncData('PULL')" class="bg-blue-600 text-white w-full py-2 rounded font-bold"><i class="fa-solid fa-cloud-arrow-down mr-1"></i> Tarik Data</button>
         </div>
       </div>
-
-      <div class="bg-slate-900 p-3 rounded-lg text-xs space-y-2 border border-slate-800 text-slate-300">
-        <h3 class="font-bold text-yellow-400">Panduan Setup Apps Script:</h3>
-        <ol class="list-decimal pl-4 space-y-1 text-[11px]">
-          <li>Buat Google Spreadsheet dengan sheet: <code class="text-emerald-400">KATALOG BARANG, BELANJA, PENJUALAN, PERKIRAAN BELANJA, PENGELUARAN LAIN, KEUNTUNGAN HARIAN, KEUNTUNGAN PERBULAN, SINKRONISASI</code>.</li>
-          <li>Buka <b>Ekstensi > Apps Script</b>, salin kode GAS backend.</li>
-          <li>Atur Pemicu / Trigger waktu pukul 23:00 untuk Auto-backup.</li>
-          <li>Deploy sebagai Web App (Akses: <i>Anyone / Siapa Saja</i>) dan masukkan URL ke form di atas.</li>
-        </ol>
-      </div>
     </div>
 
-    <!-- VIEW: PENGATURAN FAKTUR -->
+    <!-- VIEW: PENGATURAN FAKTUR (Point 8 Updated) -->
     <div id="view-FAKTUR_SUB" class="view-panel hidden space-y-3">
       <h2 class="text-sm font-bold text-emerald-400 uppercase"><i class="fa-solid fa-file-invoice-dollar mr-1.5"></i>Preview Template Faktur</h2>
       <div id="invoice-template" class="invoice-card shadow-2xl">
         <div class="text-center border-b pb-2 mb-2">
-          <img src="web arya.png" class="h-8 mx-auto mb-1" alt="Logo">
-          <h2 class="font-bold text-sm">NOTA PENJUALAN</h2>
+          <!-- Point 8: Tulisan ARYA GROSIR Warna Emas menggantikan Logo di atas Nota Penjualan -->
+          <h1 class="text-lg font-black tracking-wider uppercase mb-0.5" style="color: #D4AF37; text-shadow: 0px 0px 1px #8B6508;">ARYA GROSIR</h1>
+          <h2 class="font-bold text-xs">NOTA PENJUALAN</h2>
           <p class="text-[10px]">NO WA: 089670179464</p>
         </div>
         <div class="flex justify-between text-[10px] mb-2">
@@ -450,7 +444,6 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // --- APP STATE ---
     let appData = {
       katalog: [],
       belanja: [],
@@ -467,21 +460,17 @@
     let onScanCallback = null;
     let profitChartInstance = null;
 
-    // --- INITIALIZATION ---
     window.onload = function() {
       loadLocalStorage();
       setupFormatInputs();
       setupKeyboardNavigation();
       renderAllData();
-      
       setInterval(checkAutoBackup, 60000);
     };
 
     function loadLocalStorage() {
       const saved = localStorage.getItem('ARYA_POS_DATA');
-      if(saved) {
-        appData = Object.assign(appData, JSON.parse(saved));
-      }
+      if(saved) appData = Object.assign(appData, JSON.parse(saved));
       const url = localStorage.getItem('ARYA_POS_SCRIPT_URL');
       if(url) document.getElementById('script-url').value = url;
     }
@@ -490,7 +479,6 @@
       localStorage.setItem('ARYA_POS_DATA', JSON.stringify(appData));
     }
 
-    // --- NAVIGASI & ANDROID BACK BUTTON ---
     function navigateTo(viewId) {
       if(navigationStack[navigationStack.length - 1] !== viewId) {
         navigationStack.push(viewId);
@@ -517,11 +505,9 @@
       document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
       const activeView = document.getElementById('view-' + viewId);
       if(activeView) activeView.classList.remove('hidden');
-
       if(viewId === 'KEUNTUNGAN_SUB') renderProfitDashboard();
     }
 
-    // --- SHORTCUTS (F5, F7, F8) ---
     document.addEventListener('keydown', function(e) {
       if(e.key === 'F5') {
         e.preventDefault();
@@ -541,11 +527,8 @@
       }
     });
 
-    function getCurrentView() {
-      return navigationStack[navigationStack.length - 1];
-    }
+    function getCurrentView() { return navigationStack[navigationStack.length - 1]; }
 
-    // --- INPUT FORMATTING & KEYBOARD ENTER ---
     function setupFormatInputs() {
       document.querySelectorAll('.format-number').forEach(input => {
         input.addEventListener('input', function() {
@@ -584,7 +567,6 @@
       });
     }
 
-    // --- CAMERA SCANNER ---
     function openScanner(inputId, callback = null) {
       targetInputId = inputId;
       onScanCallback = callback;
@@ -621,7 +603,7 @@
       }
     }
 
-    // --- KATALOG STOK MODULE ---
+    // --- KATALOG STOK ---
     function openFormStok(editBarcode = null) {
       navigateTo('STOK_FORM');
       if(editBarcode) {
@@ -674,21 +656,25 @@
       }
     }
 
+    // POINT 3: UBAH TAMPILAN LIST KATALOG STOK (Nama Barang, Minimal Stok, Stok Kelihatan Jelas)
     function renderStokList() {
       const container = document.getElementById('stok-list');
       container.innerHTML = appData.katalog.map(k => `
         <div class="card-menu p-3 rounded-lg flex justify-between items-center text-xs">
-          <div onclick="openFormStok('${k.barcode}')" class="cursor-pointer flex-grow">
-            <p class="font-bold text-yellow-400">${k.nama}</p>
-            <p class="text-[10px] text-slate-400">Barcode: ${k.barcode} | Satuan: ${k.satuan}</p>
-            <p class="text-[11px] ${k.qty <= k.minQty ? 'text-red-400 font-bold' : 'text-slate-300'}">Stok: ${k.qty.toLocaleString('id-ID')} (Min: ${k.minQty})</p>
+          <div onclick="openFormStok('${k.barcode}')" class="cursor-pointer flex-grow space-y-1">
+            <p class="font-extrabold text-sm text-yellow-400 uppercase tracking-wide">${k.nama}</p>
+            <div class="flex items-center gap-3 text-xs">
+              <span class="text-slate-300 font-semibold">Min Stok: <strong class="text-slate-100">${k.minQty.toLocaleString('id-ID')}</strong></span>
+              <span class="px-2 py-0.5 rounded font-black text-xs ${k.qty <= k.minQty ? 'bg-red-950 text-red-400 border border-red-700' : 'bg-emerald-950 text-emerald-400 border border-emerald-700'}">
+                Stok: ${k.qty.toLocaleString('id-ID')} ${k.satuan}
+              </span>
+            </div>
           </div>
-          <button onclick="deleteStok('${k.barcode}')" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
+          <button onclick="deleteStok('${k.barcode}')" class="text-red-500 p-2 text-base"><i class="fa-solid fa-trash"></i></button>
         </div>
       `).join('');
     }
 
-    // --- AUTOCOMPLETE CATALOG ---
     function searchCatalog(query, module) {
       const dropdown = document.getElementById(module + '-dropdown');
       if(!query) { dropdown.classList.add('hidden'); return; }
@@ -730,7 +716,7 @@
     function autoFillBelanjaByBarcode(barcode) { selectCatalogItem(barcode, 'belanja'); }
     function autoFillJualByBarcode(barcode) { selectCatalogItem(barcode, 'jual'); }
 
-    // --- BELANJA MODULE ---
+    // --- BELANJA BARANG ---
     function openFormBelanja() {
       navigateTo('BELANJA_FORM');
       document.getElementById('belanja-id').value = 'BLJ-' + Date.now().toString().slice(-6);
@@ -789,10 +775,14 @@
     function checkoutBelanja() {
       if(appData.cartBelanja.length === 0) return alert("Keranjang belanja kosong!");
 
+      let totalQtySum = 0;
+      appData.cartBelanja.forEach(i => totalQtySum += i.qty);
+
       const tx = {
         id: document.getElementById('belanja-id').value,
         tgl: formatDate(document.getElementById('belanja-tgl').value),
         items: [...appData.cartBelanja],
+        totalQty: totalQtySum,
         totalHarga: parseNum(document.getElementById('belanja-cart-totalharga').innerText)
       };
 
@@ -808,20 +798,27 @@
       navigateTo('BELANJA_SUB');
     }
 
+    // POINT 4: UBAH TAMPILAN LIST RIWAYAT BELANJA (Tanggal, ID Belanja, Total Qty, Total Harga)
     function renderBelanjaList() {
       const container = document.getElementById('belanja-list');
       container.innerHTML = appData.belanja.map(b => `
         <div onclick="openDetailTx('${b.id}', 'BELANJA')" class="card-menu p-3 rounded-lg flex justify-between items-center text-xs cursor-pointer">
-          <div>
-            <p class="font-bold text-emerald-400">${b.id}</p>
-            <p class="text-[10px] text-slate-400">Tgl: ${b.tgl} | Total: Rp ${b.totalHarga.toLocaleString('id-ID')}</p>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-slate-400 font-mono">${b.tgl}</span>
+              <span class="font-bold text-emerald-400">${b.id}</span>
+            </div>
+            <div class="text-xs text-slate-200">
+              Total Qty: <strong class="text-slate-100">${b.totalQty ? b.totalQty.toLocaleString('id-ID') : 0}</strong> | 
+              Total Harga: <strong class="text-emerald-400">Rp ${b.totalHarga.toLocaleString('id-ID')}</strong>
+            </div>
           </div>
           <i class="fa-solid fa-chevron-right text-slate-500"></i>
         </div>
       `).join('');
     }
 
-    // --- PENJUALAN MODULE ---
+    // --- PENJUALAN BARANG ---
     function openFormPenjualan() {
       navigateTo('PENJUALAN_FORM');
       document.getElementById('jual-id').value = 'PJ-' + Date.now().toString().slice(-6);
@@ -894,12 +891,16 @@
 
       if(dibayar < total) return alert("Jumlah pembayaran kurang!");
 
+      let totalQtySum = 0;
+      appData.cartJual.forEach(i => totalQtySum += i.qty);
+
       const tx = {
         id: document.getElementById('jual-id').value,
         tgl: formatDate(document.getElementById('jual-tgl').value),
         pembeli: document.getElementById('jual-pembeli').value || 'Umum',
         tipe: document.getElementById('jual-tipe').value,
         items: [...appData.cartJual],
+        totalQty: totalQtySum,
         totalHarga: total,
         dibayar: dibayar,
         kembalian: dibayar - total
@@ -917,20 +918,26 @@
       navigateTo('PENJUALAN_SUB');
     }
 
+    // POINT 5: UBAH TAMPILAN LIST RIWAYAT PENJUALAN (Tanggal, Nama, ID Penjualan, Total Harga)
     function renderPenjualanList() {
       const container = document.getElementById('penjualan-list');
       container.innerHTML = appData.penjualan.map(p => `
         <div onclick="openDetailTx('${p.id}', 'PENJUALAN')" class="card-menu p-3 rounded-lg flex justify-between items-center text-xs cursor-pointer">
-          <div>
-            <p class="font-bold text-yellow-400">${p.id} - ${p.pembeli}</p>
-            <p class="text-[10px] text-slate-400">Tgl: ${p.tgl} | Total: Rp ${p.totalHarga.toLocaleString('id-ID')}</p>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-slate-400 font-mono">${p.tgl}</span>
+              <span class="font-extrabold text-yellow-400 uppercase">${p.pembeli}</span>
+            </div>
+            <div class="text-xs text-slate-200">
+              ID: <strong class="text-slate-100">${p.id}</strong> | Total: <strong class="text-yellow-400">Rp ${p.totalHarga.toLocaleString('id-ID')}</strong>
+            </div>
           </div>
           <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-bold border border-emerald-700">LUNAS</span>
         </div>
       `).join('');
     }
 
-    // --- DETAIL & INVOICE ---
+    // --- DETAIL TRANSAKSI & INVOICE ---
     let currentSelectedTx = null;
 
     function openDetailTx(txId, type) {
@@ -956,19 +963,20 @@
       const doc = new jsPDF({ unit: 'mm', format: [80, 150] });
 
       doc.setFont("courier", "bold");
-      doc.setFontSize(10);
-      doc.text("NOTA PENJUALAN", 40, 10, { align: "center" });
+      doc.setFontSize(11);
+      doc.text("ARYA GROSIR", 40, 8, { align: "center" });
+      doc.setFontSize(9);
+      doc.text("NOTA PENJUALAN", 40, 13, { align: "center" });
       doc.setFontSize(8);
-      doc.text("ARYA GROSIR", 40, 14, { align: "center" });
-      doc.text("WA: 089670179464", 40, 18, { align: "center" });
-      doc.text("----------------------------------", 40, 22, { align: "center" });
+      doc.text("WA: 089670179464", 40, 17, { align: "center" });
+      doc.text("----------------------------------", 40, 21, { align: "center" });
 
-      doc.text(`ID  : ${currentSelectedTx.id}`, 5, 26);
-      doc.text(`Tgl : ${currentSelectedTx.tgl}`, 5, 30);
-      doc.text(`Cust: ${currentSelectedTx.pembeli || 'Umum'}`, 5, 34);
-      doc.text("----------------------------------", 40, 38, { align: "center" });
+      doc.text(`ID  : ${currentSelectedTx.id}`, 5, 25);
+      doc.text(`Tgl : ${currentSelectedTx.tgl}`, 5, 29);
+      doc.text(`Cust: ${currentSelectedTx.pembeli || 'Umum'}`, 5, 33);
+      doc.text("----------------------------------", 40, 37, { align: "center" });
 
-      let y = 42;
+      let y = 41;
       currentSelectedTx.items.forEach(item => {
         doc.text(`${item.nama.substring(0, 18)}`, 5, y);
         doc.text(`${item.qty} x ${item.total/item.qty} = ${item.total}`, 5, y + 4);
@@ -988,7 +996,7 @@
 
     function shareToWA() {
       if(!currentSelectedTx) return;
-      let text = `*NOTA PENJUALAN ARYA GROSIR*\nWA: 089670179464\n--------------------------------\nID: ${currentSelectedTx.id}\nTgl: ${currentSelectedTx.tgl}\nPembeli: ${currentSelectedTx.pembeli || 'Umum'}\n\n`;
+      let text = `*ARYA GROSIR*\n*NOTA PENJUALAN*\nWA: 089670179464\n--------------------------------\nID: ${currentSelectedTx.id}\nTgl: ${currentSelectedTx.tgl}\nPembeli: ${currentSelectedTx.pembeli || 'Umum'}\n\n`;
       currentSelectedTx.items.forEach(i => {
         text += `${i.nama}\n  ${i.qty} ${i.satuan} x Rp ${(i.total/i.qty).toLocaleString('id-ID')} = Rp ${i.total.toLocaleString('id-ID')}\n`;
       });
@@ -997,7 +1005,7 @@
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    // --- PENGELUARAN MODULE ---
+    // --- PENGELUARAN ---
     function savePengeluaran() {
       const tgl = formatDate(document.getElementById('pengeluaran-tgl').value);
       const ket = document.getElementById('pengeluaran-ket').value.trim().toUpperCase();
@@ -1028,7 +1036,7 @@
       `).join('');
     }
 
-    // --- DASHBOARD KEUNTUNGAN & CHART ---
+    // --- DASHBOARD KEUNTUNGAN & RINCIAN (Point 6 & 7 Updated) ---
     function renderProfitDashboard() {
       const today = new Date();
       const yesterday = new Date(Date.now() - 86400000);
@@ -1056,8 +1064,10 @@
       document.getElementById('peng-bulanini').innerText = "Rp " + pengBulanIni.toLocaleString('id-ID');
 
       renderProfitChart();
+      renderKeuntunganHarianList();
     }
 
+    // POINT 6: UBAH TAMPILAN GRAFIK KEUNTUNGAN BULANAN (Total Keuntungan Bersih Perbulan di Atas Batang)
     function renderProfitChart() {
       const ctx = document.getElementById('profitChart').getContext('2d');
       const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
@@ -1069,9 +1079,20 @@
           const parts = p.tgl.split('-');
           if(parts.length === 3 && parseInt(parts[2], 10) === currentYear) {
             const mIndex = parseInt(parts[1], 10) - 1;
-            let profit = 0;
-            p.items.forEach(i => profit += (i.total - (i.qty * (i.hargaPokok || 0))));
-            monthlyProfit[mIndex] += profit;
+            let gross = 0;
+            p.items.forEach(i => gross += (i.total - (i.qty * (i.hargaPokok || 0))));
+            monthlyProfit[mIndex] += gross;
+          }
+        }
+      });
+
+      // Kurangi pengeluaran per bulan
+      appData.pengeluaran.forEach(pg => {
+        if(pg.tgl) {
+          const parts = pg.tgl.split('-');
+          if(parts.length === 3 && parseInt(parts[2], 10) === currentYear) {
+            const mIndex = parseInt(parts[1], 10) - 1;
+            monthlyProfit[mIndex] = Math.max(0, monthlyProfit[mIndex] - pg.jml);
           }
         }
       });
@@ -1080,6 +1101,7 @@
 
       profitChartInstance = new Chart(ctx, {
         type: 'bar',
+        plugins: [ChartDataLabels],
         data: {
           labels: months,
           datasets: [{
@@ -1089,13 +1111,75 @@
         },
         options: {
           responsive: true,
-          plugins: { legend: { display: false } },
+          layout: { padding: { top: 25 } },
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              color: '#D4AF37',
+              font: { weight: 'bold', size: 9 },
+              formatter: function(value) {
+                return value > 0 ? (value >= 1000000 ? (value/1000000).toFixed(1) + 'M' : (value/1000).toFixed(0) + 'k') : '0';
+              }
+            }
+          },
           scales: {
             y: { ticks: { color: '#94a3b8' } },
             x: { ticks: { color: '#94a3b8' } }
           }
         }
       });
+    }
+
+    // POINT 7: TAMPILKAN LIST RINCIAN KEUNTUNGAN PERTANGGAL URUT DARI ATAS TANGGAL TERBARU (Tanggal, Laba Bersih, Pengeluaran, Laba Kotor)
+    function renderKeuntunganHarianList() {
+      const container = document.getElementById('keuntungan-harian-list');
+      const dailyMap = {};
+
+      appData.penjualan.forEach(p => {
+        if(!p.tgl) return;
+        if(!dailyMap[p.tgl]) dailyMap[p.tgl] = { labaKotor: 0, pengeluaran: 0 };
+        p.items.forEach(i => {
+          dailyMap[p.tgl].labaKotor += (i.total - (i.qty * (i.hargaPokok || 0)));
+        });
+      });
+
+      appData.pengeluaran.forEach(pg => {
+        if(!pg.tgl) return;
+        if(!dailyMap[pg.tgl]) dailyMap[pg.tgl] = { labaKotor: 0, pengeluaran: 0 };
+        dailyMap[pg.tgl].pengeluaran += pg.jml;
+      });
+
+      // Urutkan tanggal dari terbaru ke terlama
+      const sortedDates = Object.keys(dailyMap).sort((a, b) => {
+        const pA = a.split('-'), pB = b.split('-');
+        const dA = new Date(pA[2], pA[1] - 1, pA[0]);
+        const dB = new Date(pB[2], pB[1] - 1, pB[0]);
+        return dB - dA;
+      });
+
+      if(sortedDates.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 text-[11px] text-center">Belum ada data keuntungan</p>`;
+        return;
+      }
+
+      container.innerHTML = sortedDates.map(date => {
+        const item = dailyMap[date];
+        const labaBersih = Math.max(0, item.labaKotor - item.pengeluaran);
+        return `
+          <div class="bg-slate-900 p-2.5 rounded border border-slate-800 space-y-1">
+            <div class="flex justify-between items-center font-bold text-yellow-400">
+              <span>${date}</span>
+              <span class="text-emerald-400">Laba Bersih: Rp ${labaBersih.toLocaleString('id-ID')}</span>
+            </div>
+            <div class="flex justify-between text-[11px] text-slate-300 pt-1 border-t border-slate-800/60">
+              <span>Laba Kotor: Rp ${item.labaKotor.toLocaleString('id-ID')}</span>
+              <span class="text-red-400">Pengeluaran: Rp ${item.pengeluaran.toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // --- SINKRONISASI SPREADSHEET ---
@@ -1138,7 +1222,6 @@
       }
     }
 
-    // --- GLOBAL RENDER ---
     function renderAllData() {
       renderStokList();
       renderBelanjaList();
