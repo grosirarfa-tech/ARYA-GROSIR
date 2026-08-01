@@ -104,7 +104,7 @@
   <!-- MAIN CONTENT CONTAINER -->
   <main class="flex-grow max-w-3xl w-full mx-auto p-3">
 
-    <!-- VIEW: MENU UTAMA (POIN 4: Tata Letak Grid 2x4) -->
+    <!-- VIEW: MENU UTAMA -->
     <div id="view-MAIN_MENU" class="view-panel space-y-4">
       <div class="grid grid-cols-2 gap-3 pt-2">
         <div onclick="navigateTo('BELANJA_SUB')" class="card-menu p-4 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[110px]">
@@ -151,7 +151,7 @@
       <div id="stok-list" class="space-y-2"></div>
     </div>
 
-    <!-- VIEW: FORM STOK BARU / EDIT (POIN 1: Pemisah Titik Ribuan) -->
+    <!-- VIEW: FORM STOK BARU / EDIT -->
     <div id="view-STOK_FORM" class="view-panel hidden space-y-3">
       <h2 id="stok-form-title" class="text-sm font-bold text-yellow-500 uppercase">Tambah / Edit Barang</h2>
       <div class="space-y-2 text-xs">
@@ -210,7 +210,7 @@
       <div id="belanja-list" class="space-y-2"></div>
     </div>
 
-    <!-- VIEW: FORM BELANJA BARU (POIN 1: Pemisah Titik Ribuan) -->
+    <!-- VIEW: FORM BELANJA BARU -->
     <div id="view-BELANJA_FORM" class="view-panel hidden space-y-3">
       <h2 class="text-sm font-bold text-emerald-400 uppercase">Form Belanja (Restok)</h2>
       <div class="space-y-2 text-xs">
@@ -231,9 +231,9 @@
           <div id="belanja-dropdown" class="absolute left-0 right-0 bg-slate-900 z-50 rounded border border-slate-700 max-h-36 overflow-y-auto hidden mt-1"></div>
         </div>
         <div class="grid grid-cols-3 gap-2">
-          <div><label class="block mb-1">Qty</label><input type="text" id="belanja-qty" inputmode="numeric" oninput="calcTotalBelanjaItem()" class="w-full p-2 rounded text-xs format-number"></div>
+          <div><label class="block mb-1">Qty</label><input type="text" id="belanja-qty" inputmode="numeric" oninput="calcTotalBelanjaItem()" class="w-full p-2 rounded text-xs format-number" placeholder="0"></div>
           <div><label class="block mb-1">Satuan</label><input type="text" id="belanja-satuan" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
-          <div><label class="block mb-1">Total Harga</label><input type="text" id="belanja-totalitem" readonly class="w-full p-2 rounded bg-slate-900 text-xs format-number"></div>
+          <div><label class="block mb-1">Total Harga</label><input type="text" id="belanja-totalitem" readonly class="w-full p-2 rounded bg-slate-900 text-xs format-number" placeholder="0"></div>
         </div>
         <button onclick="addBelanjaToCart()" class="btn-gold w-full py-2 rounded text-xs font-bold">+ Masukkan Ke Keranjang</button>
 
@@ -264,7 +264,7 @@
       <div id="penjualan-list" class="space-y-2"></div>
     </div>
 
-    <!-- VIEW: FORM PENJUALAN BARU (POIN 1: Pemisah Titik Ribuan) -->
+    <!-- VIEW: FORM PENJUALAN BARU -->
     <div id="view-PENJUALAN_FORM" class="view-panel hidden space-y-3">
       <h2 class="text-sm font-bold text-yellow-500 uppercase">Form Penjualan Baru</h2>
       <div class="space-y-2 text-xs">
@@ -295,9 +295,9 @@
           <div id="jual-dropdown" class="absolute left-0 right-0 bg-slate-900 z-50 rounded border border-slate-700 max-h-36 overflow-y-auto hidden mt-1"></div>
         </div>
         <div class="grid grid-cols-3 gap-2">
-          <div><label class="block mb-1">Qty</label><input type="text" id="jual-qty" inputmode="numeric" oninput="calcTotalJualItem()" class="w-full p-2 rounded text-xs format-number"></div>
+          <div><label class="block mb-1">Qty</label><input type="text" id="jual-qty" inputmode="numeric" oninput="calcTotalJualItem()" class="w-full p-2 rounded text-xs format-number" placeholder="0"></div>
           <div><label class="block mb-1">Satuan</label><input type="text" id="jual-satuan" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
-          <div><label class="block mb-1">Total Harga</label><input type="text" id="jual-totalitem" readonly class="w-full p-2 rounded bg-slate-900 text-xs format-number"></div>
+          <div><label class="block mb-1">Total Harga</label><input type="text" id="jual-totalitem" readonly class="w-full p-2 rounded bg-slate-900 text-xs format-number" placeholder="0"></div>
         </div>
         <button onclick="addJualToCart()" class="btn-gold w-full py-2 rounded text-xs font-bold">+ Masukkan Ke Keranjang</button>
 
@@ -311,8 +311,8 @@
             <div class="flex justify-between font-bold"><span>Total Qty:</span><span id="jual-cart-totalqty">0</span></div>
             <div class="flex justify-between font-bold text-yellow-400"><span>Total Harga:</span><span>Rp <span id="jual-cart-totalharga">0</span></span></div>
             <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800">
-              <div><label class="block text-[10px] mb-1">Dibayar</label><input type="text" id="jual-dibayar" inputmode="numeric" oninput="calcKembalian()" class="w-full p-1.5 rounded text-xs format-number"></div>
-              <div><label class="block text-[10px] mb-1">Kembalian</label><input type="text" id="jual-kembalian" readonly class="w-full p-1.5 rounded text-xs bg-slate-950 font-bold text-emerald-400 format-number"></div>
+              <div><label class="block text-[10px] mb-1">Dibayar</label><input type="text" id="jual-dibayar" inputmode="numeric" oninput="calcKembalian()" class="w-full p-1.5 rounded text-xs format-number" placeholder="0"></div>
+              <div><label class="block text-[10px] mb-1">Kembalian</label><input type="text" id="jual-kembalian" readonly class="w-full p-1.5 rounded text-xs bg-slate-950 font-bold text-emerald-400 format-number" placeholder="0"></div>
             </div>
           </div>
           <div class="flex gap-2 mt-3">
@@ -323,7 +323,7 @@
       </div>
     </div>
 
-    <!-- VIEW: PERKIRAAN BELANJA (POIN 2: Fitur Baru) -->
+    <!-- VIEW: PERKIRAAN BELANJA -->
     <div id="view-PERKIRAAN_BELANJA_SUB" class="view-panel hidden space-y-3">
       <h2 class="text-sm font-bold text-blue-400 uppercase"><i class="fa-solid fa-clipboard-list mr-1.5"></i>Perkiraan Belanja Barang</h2>
       
@@ -360,7 +360,7 @@
       </div>
     </div>
 
-    <!-- VIEW: DETAIL TRANSAKSI (POIN 5: Perbaikan Cetak PDF & Share WA) -->
+    <!-- VIEW: DETAIL TRANSAKSI -->
     <div id="view-DETAIL_TRANSAKSI" class="view-panel hidden space-y-3">
       <h2 id="detail-tx-title" class="text-sm font-bold text-yellow-500 uppercase">Detail Transaksi</h2>
       <div id="detail-tx-items" class="space-y-2"></div>
@@ -370,7 +370,7 @@
       </div>
     </div>
 
-    <!-- VIEW: PENGELUARAN LAIN-LAIN (POIN 1: Pemisah Titik Ribuan) -->
+    <!-- VIEW: PENGELUARAN LAIN-LAIN -->
     <div id="view-PENGELUARAN_SUB" class="view-panel hidden space-y-3">
       <h2 class="text-sm font-bold text-red-400 uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1.5"></i>Pengeluaran Lain-lain</h2>
       <div class="card-menu p-3 rounded-lg space-y-2 text-xs">
@@ -487,7 +487,7 @@
       belanja: [],
       penjualan: [],
       pengeluaran: [],
-      pesananManual: [], // Data pesanan manual perkiraan belanja
+      pesananManual: [],
       cartBelanja: [],
       cartJual: [],
       currentSelectedBarang: null
@@ -570,19 +570,32 @@
 
     function getCurrentView() { return navigationStack[navigationStack.length - 1]; }
 
-    // POIN 1: FORMAT INPUT NOMOR (Menambahkan Titik Ribuan Secara Otomatis)
+    // EVENT LISTENER FORMAT TITIK RIBUAN SECARA REAL-TIME
     function setupFormatInputs() {
       document.addEventListener('input', function(e) {
         if (e.target && e.target.classList.contains('format-number')) {
+          let cursorPosition = e.target.selectionStart;
+          let originalLength = e.target.value.length;
+          
           let val = e.target.value.replace(/\D/g, '');
-          e.target.value = val ? parseInt(val, 10).toLocaleString('id-ID') : '';
+          if(val) {
+            e.target.value = parseInt(val, 10).toLocaleString('id-ID');
+          } else {
+            e.target.value = '';
+          }
+
+          let newLength = e.target.value.length;
+          cursorPosition += (newLength - originalLength);
+          try {
+            e.target.setSelectionRange(cursorPosition, cursorPosition);
+          } catch(err) {}
         }
       });
     }
 
     function parseNum(val) {
       if(!val) return 0;
-      return parseInt(val.toString().replace(/\./g, ''), 10) || 0;
+      return parseInt(val.toString().replace(/\D/g, ''), 10) || 0;
     }
 
     function formatDate(dateStr) {
@@ -653,12 +666,12 @@
         if(item) {
           document.getElementById('stok-barcode').value = item.barcode;
           document.getElementById('stok-nama').value = item.nama;
-          document.getElementById('stok-qty').value = item.qty.toLocaleString('id-ID');
-          document.getElementById('stok-min').value = item.minQty.toLocaleString('id-ID');
+          document.getElementById('stok-qty').value = item.qty ? item.qty.toLocaleString('id-ID') : '';
+          document.getElementById('stok-min').value = item.minQty ? item.minQty.toLocaleString('id-ID') : '';
           document.getElementById('stok-satuan').value = item.satuan;
-          document.getElementById('stok-hpokok').value = item.hargaPokok.toLocaleString('id-ID');
-          document.getElementById('stok-hgrosir').value = item.hargaGrosir.toLocaleString('id-ID');
-          document.getElementById('stok-hretail').value = item.hargaRetail.toLocaleString('id-ID');
+          document.getElementById('stok-hpokok').value = item.hargaPokok ? item.hargaPokok.toLocaleString('id-ID') : '';
+          document.getElementById('stok-hgrosir').value = item.hargaGrosir ? item.hargaGrosir.toLocaleString('id-ID') : '';
+          document.getElementById('stok-hretail').value = item.hargaRetail ? item.hargaRetail.toLocaleString('id-ID') : '';
         }
       } else {
         ['stok-barcode','stok-nama','stok-qty','stok-min','stok-satuan','stok-hpokok','stok-hgrosir','stok-hretail'].forEach(id => document.getElementById(id).value = '');
@@ -726,7 +739,7 @@
       dropdown.innerHTML = matches.map(m => `
         <div onclick="selectCatalogItem('${m.barcode}', '${module}')" class="p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800 text-xs">
           <p class="font-bold text-yellow-400">${m.nama}</p>
-          <p class="text-[10px] text-slate-400">Stok: ${m.qty} ${m.satuan}</p>
+          <p class="text-[10px] text-slate-400">Stok: ${m.qty.toLocaleString('id-ID')} ${m.satuan}</p>
         </div>
       `).join('');
       dropdown.classList.remove('hidden');
@@ -769,7 +782,8 @@
     function calcTotalBelanjaItem() {
       const qty = parseNum(document.getElementById('belanja-qty').value);
       const hPokok = appData.currentSelectedBarang ? appData.currentSelectedBarang.hargaPokok : 0;
-      document.getElementById('belanja-totalitem').value = (qty * hPokok).toLocaleString('id-ID');
+      const total = qty * hPokok;
+      document.getElementById('belanja-totalitem').value = total ? total.toLocaleString('id-ID') : '';
     }
 
     function addBelanjaToCart() {
@@ -799,7 +813,7 @@
           <div class="flex justify-between items-center bg-slate-900 p-2 rounded text-xs border border-slate-800">
             <div>
               <p class="font-bold">${item.nama}</p>
-              <p class="text-[10px] text-slate-400">${item.qty} ${item.satuan}</p>
+              <p class="text-[10px] text-slate-400">${item.qty.toLocaleString('id-ID')} ${item.satuan}</p>
             </div>
             <div class="flex items-center gap-2">
               <span class="font-bold text-emerald-400">Rp ${item.total.toLocaleString('id-ID')}</span>
@@ -839,7 +853,6 @@
       navigateTo('BELANJA_SUB');
     }
 
-    // POIN 3: HAPUS RIWAYAT BELANJA (Otomatis Mengurangi Stok Kembali)
     function deleteBelanja(txId, event) {
       if(event) event.stopPropagation();
       if(confirm(`Yakin ingin menghapus transaksi belanja ${txId}? Stok katalog akan berkurang otomatis.`)) {
@@ -894,7 +907,8 @@
       const tipe = document.getElementById('jual-tipe').value;
       if(!appData.currentSelectedBarang) return;
       const harga = tipe === 'grosir' ? appData.currentSelectedBarang.hargaGrosir : appData.currentSelectedBarang.hargaRetail;
-      document.getElementById('jual-totalitem').value = (qty * harga).toLocaleString('id-ID');
+      const total = qty * harga;
+      document.getElementById('jual-totalitem').value = total ? total.toLocaleString('id-ID') : '';
     }
 
     function addJualToCart() {
@@ -924,7 +938,7 @@
           <div class="flex justify-between items-center bg-slate-900 p-2 rounded text-xs border border-slate-800">
             <div>
               <p class="font-bold">${item.nama}</p>
-              <p class="text-[10px] text-slate-400">${item.qty} ${item.satuan}</p>
+              <p class="text-[10px] text-slate-400">${item.qty.toLocaleString('id-ID')} ${item.satuan}</p>
             </div>
             <div class="flex items-center gap-2">
               <span class="font-bold text-yellow-400">Rp ${item.total.toLocaleString('id-ID')}</span>
@@ -980,7 +994,6 @@
       navigateTo('PENJUALAN_SUB');
     }
 
-    // POIN 3: HAPUS RIWAYAT PENJUALAN (Otomatis Mengembalikan Stok)
     function deletePenjualan(txId, event) {
       if(event) event.stopPropagation();
       if(confirm(`Yakin ingin menghapus transaksi penjualan ${txId}? Stok katalog akan bertambah kembali.`)) {
@@ -1020,7 +1033,7 @@
       `).join('');
     }
 
-    // --- POIN 2: PERKIRAAN BELANJA & INPUT PESANAN MANUAL ---
+    // --- PERKIRAAN BELANJA & INPUT PESANAN MANUAL ---
     function tambahPesananManual() {
       const nama = document.getElementById('pesanan-nama').value.trim().toUpperCase();
       const qty = parseNum(document.getElementById('pesanan-qty').value);
@@ -1049,7 +1062,6 @@
       let grandTotalQty = 0;
       let grandTotalHarga = 0;
 
-      // 1. Ambil Barang yang Stok Kurang dari Minimal Stok
       const lowStockItems = appData.katalog.filter(k => k.qty < k.minQty).map(k => {
         const qtyBeli = k.minQty - k.qty;
         const totalEst = qtyBeli * (k.hargaPokok || 0);
@@ -1065,7 +1077,6 @@
         };
       });
 
-      // 2. Ambil Barang Pesanan Manual
       const manualItems = appData.pesananManual.map(m => {
         const totalEst = m.qty * m.harga;
         return {
@@ -1099,8 +1110,8 @@
                   <span class="font-black text-yellow-400 text-sm">${item.nama}</span>
                   <span class="bg-red-950 text-red-400 border border-red-700 text-[9px] px-1.5 py-0.5 rounded font-bold">Stok Kurang</span>
                 </div>
-                <p class="text-[11px] text-slate-400 mt-0.5">Min Stok: <strong>${item.minQty}</strong> | Stok Sekarang: <strong class="text-red-400">${item.qtySaatIni}</strong></p>
-                <p class="text-[11px] text-emerald-400 font-bold">Harus Beli: ${item.qtyBeli} ${item.satuan}</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">Min Stok: <strong>${item.minQty.toLocaleString('id-ID')}</strong> | Stok Sekarang: <strong class="text-red-400">${item.qtySaatIni.toLocaleString('id-ID')}</strong></p>
+                <p class="text-[11px] text-emerald-400 font-bold">Harus Beli: ${item.qtyBeli.toLocaleString('id-ID')} ${item.satuan}</p>
               </div>
               <div class="text-right">
                 <span class="text-xs font-bold text-slate-200">Rp ${item.totalEst.toLocaleString('id-ID')}</span>
@@ -1115,7 +1126,7 @@
                   <span class="font-black text-blue-400 text-sm">${item.nama}</span>
                   <span class="bg-blue-950 text-blue-400 border border-blue-700 text-[9px] px-1.5 py-0.5 rounded font-bold">Pesanan Manual</span>
                 </div>
-                <p class="text-[11px] text-emerald-400 font-bold mt-0.5">Qty Pesanan: ${item.qtyBeli}</p>
+                <p class="text-[11px] text-emerald-400 font-bold mt-0.5">Qty Pesanan: ${item.qtyBeli.toLocaleString('id-ID')}</p>
               </div>
               <div class="flex items-center gap-3">
                 <span class="text-xs font-bold text-slate-200">Rp ${item.totalEst.toLocaleString('id-ID')}</span>
@@ -1143,14 +1154,13 @@
         <div class="bg-slate-900 p-2.5 rounded text-xs flex justify-between border border-slate-800">
           <div>
             <p class="font-bold">${item.nama}</p>
-            <p class="text-[10px] text-slate-400">${item.qty} ${item.satuan}</p>
+            <p class="text-[10px] text-slate-400">${item.qty.toLocaleString('id-ID')} ${item.satuan}</p>
           </div>
           <p class="font-bold text-yellow-400">Rp ${item.total.toLocaleString('id-ID')}</p>
         </div>
       `).join('');
     }
 
-    // POIN 5: PERBAIKAN CETAK PDF FAKTUR
     function renderInvoicePDF() {
       if(!currentSelectedTx) return alert("Pilih transaksi terlebih dahulu!");
       
@@ -1175,7 +1185,7 @@
       currentSelectedTx.items.forEach(item => {
         const unitPrice = item.qty > 0 ? Math.round(item.total / item.qty) : 0;
         doc.text(`${item.nama.substring(0, 20)}`, 5, y);
-        doc.text(`${item.qty} x ${unitPrice.toLocaleString('id-ID')} = ${item.total.toLocaleString('id-ID')}`, 5, y + 4);
+        doc.text(`${item.qty.toLocaleString('id-ID')} x ${unitPrice.toLocaleString('id-ID')} = ${item.total.toLocaleString('id-ID')}`, 5, y + 4);
         y += 9;
       });
 
@@ -1190,7 +1200,6 @@
       doc.save(`Faktur-${currentSelectedTx.id}.pdf`);
     }
 
-    // POIN 5: PERBAIKAN SHARE WHATSAPP
     function shareToWA() {
       if(!currentSelectedTx) return alert("Pilih transaksi terlebih dahulu!");
 
@@ -1198,7 +1207,7 @@
       
       currentSelectedTx.items.forEach(i => {
         const unitPrice = i.qty > 0 ? Math.round(i.total / i.qty) : 0;
-        text += `${i.nama}\n  ${i.qty} ${i.satuan || 'PCS'} x Rp ${unitPrice.toLocaleString('id-ID')} = Rp ${i.total.toLocaleString('id-ID')}\n`;
+        text += `${i.nama}\n  ${i.qty.toLocaleString('id-ID')} ${i.satuan || 'PCS'} x Rp ${unitPrice.toLocaleString('id-ID')} = Rp ${i.total.toLocaleString('id-ID')}\n`;
       });
 
       text += `--------------------------------\n*TOTAL: Rp ${currentSelectedTx.totalHarga.toLocaleString('id-ID')}*\n`;
