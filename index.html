@@ -4,8 +4,310 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POS ARYA GROSIR</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* CSS ALL THEME DARK MODE */
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-header: #000000;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent-color: #00adb5;
+            --accent-hover: #008c93;
+            --border-color: #333333;
+            --btn-success: #2e7d32;
+            --btn-danger: #c62828;
+            --btn-warning: #f57f17;
+            --btn-info: #0288d1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* HEADER & LOGO RATA TENGAH */
+        .main-header {
+            background-color: var(--bg-header);
+            padding: 15px 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .site-logo {
+            max-height: 60px;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+
+        .logo-container h1 {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: #181818;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: var(--accent-color);
+            border-bottom: 3px solid var(--accent-color);
+            background-color: #222;
+        }
+
+        /* CONTAINER & CARD */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* POS LAYOUT */
+        .pos-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 850px) {
+            .pos-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* PROFIT SUMMARY CARDS */
+        .profit-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profit-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .profit-card h4 {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .profit-card p {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #4caf50;
+        }
+
+        /* FORM STYLES */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: #2a2a2a;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-primary { background-color: var(--accent-color); color: #fff; }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+
+        .btn-success { background-color: var(--btn-success); color: #fff; }
+        .btn-danger { background-color: var(--btn-danger); color: #fff; }
+        .btn-warning { background-color: var(--btn-warning); color: #fff; }
+        .btn-info { background-color: var(--btn-info); color: #fff; }
+        .btn-secondary { background-color: #555; color: #fff; }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-block {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            margin-top: 15px;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
+
+        /* TABLES */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #252525;
+            color: var(--accent-color);
+        }
+
+        /* SUMMARY POS */
+        .cart-summary {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed var(--border-color);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .total-row {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        /* MODAL FORM */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            max-width: 500px;
+            margin: 5% auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .close-btn {
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
@@ -216,6 +518,379 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // DATA POS INITIALIZATION
+        let dataBarang = JSON.parse(localStorage.getItem('arya_barang')) || [];
+        let dataKeranjang = [];
+        let dataLaporan = JSON.parse(localStorage.getItem('arya_laporan')) || [];
+
+        // INITIAL LOAD
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedUrl = localStorage.getItem('arya_script_url');
+            if (savedUrl) {
+                document.getElementById('script-url').value = savedUrl;
+            }
+
+            renderStokTable();
+            renderPosList();
+            renderLaporanTable();
+        });
+
+        // FORMAT INPUT RIBUAN (TITIK '.')
+        function formatInputRibuan(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value === "") {
+                input.value = "";
+                return;
+            }
+            input.value = parseInt(value, 10).toLocaleString('id-ID');
+        }
+
+        function cleanNumber(value) {
+            if (!value) return 0;
+            return parseFloat(value.toString().replace(/\./g, '')) || 0;
+        }
+
+        function formatRupiah(angka) {
+            return 'Rp ' + Number(angka).toLocaleString('id-ID');
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            if(element) element.classList.add('active');
+        }
+
+        /* --- LOGIC KATALOG STOK --- */
+        function openModalBarang(index = null) {
+            const modal = document.getElementById('modal-barang');
+            const title = document.getElementById('modal-title');
+            
+            if (index !== null) {
+                title.innerText = "Edit Barang";
+                document.getElementById('barang-index').value = index;
+                document.getElementById('input-kode').value = dataBarang[index].kode;
+                document.getElementById('input-nama').value = dataBarang[index].nama;
+                document.getElementById('input-harga-beli').value = dataBarang[index].hargaBeli.toLocaleString('id-ID');
+                document.getElementById('input-harga-jual').value = dataBarang[index].hargaJual.toLocaleString('id-ID');
+                document.getElementById('input-stok').value = dataBarang[index].stok;
+            } else {
+                title.innerText = "Tambah Barang Baru";
+                document.getElementById('form-barang').reset();
+                document.getElementById('barang-index').value = "";
+            }
+            
+            modal.style.display = "block";
+        }
+
+        function closeModalBarang() {
+            document.getElementById('modal-barang').style.display = "none";
+        }
+
+        function simpanBarang(e) {
+            e.preventDefault();
+            const index = document.getElementById('barang-index').value;
+            
+            const barangObj = {
+                kode: document.getElementById('input-kode').value,
+                nama: document.getElementById('input-nama').value,
+                hargaBeli: cleanNumber(document.getElementById('input-harga-beli').value),
+                hargaJual: cleanNumber(document.getElementById('input-harga-jual').value),
+                stok: parseInt(document.getElementById('input-stok').value) || 0
+            };
+
+            if (index === "") {
+                dataBarang.push(barangObj);
+            } else {
+                dataBarang[index] = barangObj;
+            }
+
+            localStorage.setItem('arya_barang', JSON.stringify(dataBarang));
+            closeModalBarang();
+            renderStokTable();
+            renderPosList();
+            alert("Data Barang Berhasil Disimpan!");
+        }
+
+        function hapusBarang(index) {
+            if (confirm("Yakin ingin menghapus barang ini?")) {
+                dataBarang.splice(index, 1);
+                localStorage.setItem('arya_barang', JSON.stringify(dataBarang));
+                renderStokTable();
+                renderPosList();
+            }
+        }
+
+        function renderStokTable() {
+            const tbody = document.getElementById('stok-table-body');
+            tbody.innerHTML = '';
+            
+            dataBarang.forEach((item, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.kode}</td>
+                        <td>${item.nama}</td>
+                        <td>${formatRupiah(item.hargaBeli)}</td>
+                        <td>${formatRupiah(item.hargaJual)}</td>
+                        <td>${item.stok}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="openModalBarang(${index})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="hapusBarang(${index})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        /* --- LOGIC KASIR & TRANSAKSI --- */
+        function resetTransaksi() {
+            dataKeranjang = [];
+            renderCart();
+            document.getElementById('bayar-input').value = '';
+            document.getElementById('kembalian-text').innerText = 'Rp 0';
+        }
+
+        function renderPosList(filter = '') {
+            const tbody = document.getElementById('pos-search-list');
+            tbody.innerHTML = '';
+
+            dataBarang.filter(item => 
+                item.nama.toLowerCase().includes(filter.toLowerCase()) || 
+                item.kode.toLowerCase().includes(filter.toLowerCase())
+            ).forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.kode}</td>
+                        <td>${item.nama}</td>
+                        <td>${formatRupiah(item.hargaJual)}</td>
+                        <td>${item.stok}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="tambahKeKeranjang('${item.kode}')"><i class="fas fa-plus"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterPosBarang() {
+            const query = document.getElementById('pos-search').value;
+            renderPosList(query);
+        }
+
+        function tambahKeKeranjang(kode) {
+            const barang = dataBarang.find(b => b.kode === kode);
+            if (!barang || barang.stok <= 0) {
+                alert("Stok barang habis!");
+                return;
+            }
+
+            const itemCart = dataKeranjang.find(c => c.kode === kode);
+            if (itemCart) {
+                if (itemCart.qty < barang.stok) {
+                    itemCart.qty++;
+                } else {
+                    alert("Jumlah melebihi stok!");
+                }
+            } else {
+                dataKeranjang.push({ ...barang, qty: 1 });
+            }
+            renderCart();
+        }
+
+        function updateQtyCart(kode, change) {
+            const itemCart = dataKeranjang.find(c => c.kode === kode);
+            const barang = dataBarang.find(b => b.kode === kode);
+
+            if (itemCart) {
+                itemCart.qty += change;
+                if (itemCart.qty > barang.stok) {
+                    itemCart.qty = barang.stok;
+                    alert("Jumlah melebihi stok!");
+                }
+                if (itemCart.qty <= 0) {
+                    dataKeranjang = dataKeranjang.filter(c => c.kode !== kode);
+                }
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const tbody = document.getElementById('cart-list');
+            tbody.innerHTML = '';
+            let total = 0;
+
+            dataKeranjang.forEach(item => {
+                const subtotal = item.hargaJual * item.qty;
+                total += subtotal;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.nama}</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" onclick="updateQtyCart('${item.kode}', -1)">-</button>
+                            ${item.qty}
+                            <button class="btn btn-secondary btn-sm" onclick="updateQtyCart('${item.kode}', 1)">+</button>
+                        </td>
+                        <td>${formatRupiah(subtotal)}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="updateQtyCart('${item.kode}', -${item.qty})">&times;</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('grand-total').innerText = formatRupiah(total);
+            hitungKembalian();
+        }
+
+        function hitungKembalian() {
+            const total = dataKeranjang.reduce((sum, item) => sum + (item.hargaJual * item.qty), 0);
+            const bayar = cleanNumber(document.getElementById('bayar-input').value);
+            const kembali = bayar - total;
+
+            document.getElementById('kembalian-text').innerText = kembali >= 0 ? formatRupiah(kembali) : "Kurang " + formatRupiah(Math.abs(kembali));
+        }
+
+        function prosesSelesaiTransaksi() {
+            const total = dataKeranjang.reduce((sum, item) => sum + (item.hargaJual * item.qty), 0);
+            const bayar = cleanNumber(document.getElementById('bayar-input').value);
+
+            if (dataKeranjang.length === 0) return alert("Keranjang masih kosong!");
+            if (bayar < total) return alert("Uang pembayaran kurang!");
+
+            let totalProfitTransaksi = 0;
+            dataKeranjang.forEach(cartItem => {
+                const keutunganPerUnit = cartItem.hargaJual - cartItem.hargaBeli;
+                totalProfitTransaksi += (keutunganPerUnit * cartItem.qty);
+
+                const itemIndex = dataBarang.findIndex(b => b.kode === cartItem.kode);
+                if (itemIndex !== -1) {
+                    dataBarang[itemIndex].stok -= cartItem.qty;
+                }
+            });
+
+            const now = new Date();
+            const transaksiBaru = {
+                id: 'TRX-' + Date.now(),
+                tanggalIso: now.toISOString(),
+                tanggalStr: now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID'),
+                total: total,
+                profit: totalProfitTransaksi,
+                bayar: bayar,
+                kembali: bayar - total,
+                items: JSON.stringify(dataKeranjang)
+            };
+
+            dataLaporan.push(transaksiBaru);
+            localStorage.setItem('arya_barang', JSON.stringify(dataBarang));
+            localStorage.setItem('arya_laporan', JSON.stringify(dataLaporan));
+
+            alert("Transaksi Berhasil!");
+            resetTransaksi();
+            renderStokTable();
+            renderPosList();
+            renderLaporanTable();
+        }
+
+        /* --- LOGIC LAPORAN KEUNTUNGAN --- */
+        function renderLaporanTable() {
+            const tbody = document.getElementById('laporan-table-body');
+            tbody.innerHTML = '';
+            
+            let totalProfitToday = 0;
+            let totalProfitMonth = 0;
+            let totalProfitAll = 0;
+
+            const todayDateStr = new Date().toDateString();
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            dataLaporan.forEach(item => {
+                const itemDate = new Date(item.tanggalIso || Date.now());
+                const profit = item.profit || 0;
+
+                if (itemDate.toDateString() === todayDateStr) {
+                    totalProfitToday += profit;
+                }
+
+                if (itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear) {
+                    totalProfitMonth += profit;
+                }
+
+                totalProfitAll += profit;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.tanggalStr || item.tanggal}</td>
+                        <td>${formatRupiah(item.total)}</td>
+                        <td style="color:#4caf50; font-weight:bold;">${formatRupiah(profit)}</td>
+                        <td>${formatRupiah(item.bayar)}</td>
+                        <td>${formatRupiah(item.kembali)}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('profit-today').innerText = formatRupiah(totalProfitToday);
+            document.getElementById('profit-month').innerText = formatRupiah(totalProfitMonth);
+            document.getElementById('profit-total').innerText = formatRupiah(totalProfitAll);
+        }
+
+        /* --- LOGIC PERMANENT SINKRONISASI SHEETS --- */
+        function simpanUrlScript() {
+            const url = document.getElementById('script-url').value.trim();
+            if (!url) return alert("Masukan URL Apps Script yang valid!");
+            
+            localStorage.setItem('arya_script_url', url);
+            alert("URL Google Apps Script Berhasil Disimpan Secara Permanen!");
+        }
+
+        function tarikDataFromSheets() {
+            const url = localStorage.getItem('arya_script_url');
+            if (!url) return alert("URL Apps Script belum disimpan! Masukkan URL pada Pengaturan Sync.");
+
+            fetch(url + "?action=getData")
+            .then(res => res.json())
+            .then(resData => {
+                if (resData.barang) {
+                    dataBarang = resData.barang;
+                    localStorage.setItem('arya_barang', JSON.stringify(dataBarang));
+                }
+                if (resData.laporan) {
+                    dataLaporan = resData.laporan;
+                    localStorage.setItem('arya_laporan', JSON.stringify(dataLaporan));
+                }
+                
+                renderStokTable();
+                renderPosList();
+                renderLaporanTable();
+                alert("Sinkronisasi Sukses: Data Katalog Stok & Laporan berhasil ditarik dari Spreadsheet!");
+            })
+            .catch(err => alert("Gagal Sinkronisasi: " + err));
+        }
+
+        function kirimDataToSheets() {
+            const url = localStorage.getItem('arya_script_url');
+            if (!url) return alert("URL Apps Script belum disimpan! Masukkan URL pada Pengaturan Sync.");
+
+            const payload = {
+                barang: dataBarang,
+                laporan: dataLaporan
+            };
+
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(resData => {
+                alert("Backup Data Sukses: Seluruh Stok & Laporan tersimpan di Google Sheets!");
+            })
+            .catch(err => alert("Gagal Backup: " + err));
+        }
+    </script>
 </body>
 </html>
