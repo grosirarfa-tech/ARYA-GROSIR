@@ -255,6 +255,65 @@
       </div>
     </div>
 
+    <!-- VIEW: DETAIL BELANJA (KERANJANG RIWAYAT BELANJA) -->
+    <div id="view-BELANJA_DETAIL" class="view-panel hidden space-y-3">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+        <div>
+          <h2 id="belanja-detail-id" class="text-sm font-extrabold text-emerald-400 uppercase">Detail Belanja</h2>
+          <p id="belanja-detail-tgl" class="text-[10px] text-slate-400 font-mono"></p>
+        </div>
+        <button onclick="openModalTambahItemBelanjaDetail()" class="btn-gold px-3 py-1.5 rounded-lg text-xs">
+          <i class="fa-solid fa-plus mr-1"></i> Tambah Barang
+        </button>
+      </div>
+
+      <!-- FORM ADD ITEM MODAL / COLLAPSIBLE INSIDE DETAIL -->
+      <div id="form-add-item-belanja-detail" class="hidden card-menu p-3 rounded-lg space-y-2 text-xs border border-emerald-500/50">
+        <div class="flex justify-between items-center mb-1">
+          <h3 class="font-bold text-emerald-400">Tambah Barang ke Transaksi Ini</h3>
+          <button onclick="closeModalTambahItemBelanjaDetail()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="relative">
+          <label class="block mb-1 text-[10px]">Nama Barang</label>
+          <input type="text" id="detail-add-nama" oninput="searchCatalog(this.value, 'detail-add')" class="w-full p-2 rounded text-xs" placeholder="Ketik nama barang...">
+          <div id="detail-add-dropdown" class="absolute left-0 right-0 bg-slate-900 z-50 rounded border border-slate-700 max-h-36 overflow-y-auto hidden mt-1"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div><label class="block mb-1 text-[10px]">Qty</label><input type="text" id="detail-add-qty" inputmode="numeric" oninput="calcTotalDetailAddItem()" class="w-full p-2 rounded text-xs format-number" placeholder="0"></div>
+          <div><label class="block mb-1 text-[10px]">Satuan</label><input type="text" id="detail-add-satuan" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
+          <div><label class="block mb-1 text-[10px]">Total Harga</label><input type="text" id="detail-add-total" readonly class="w-full p-2 rounded bg-slate-900 text-xs format-number" placeholder="0"></div>
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button onclick="saveItemToBelanjaDetail()" class="btn-emerald w-full py-1.5 rounded text-xs font-bold">+ Simpan ke Belanja</button>
+          <button onclick="closeModalTambahItemBelanjaDetail()" class="bg-slate-800 w-full py-1.5 rounded text-xs">Batal</button>
+        </div>
+      </div>
+
+      <!-- LIST ITEM BELANJA DETAIL (KIRI: NAMA, TENGAH: QTY & SATUAN, KANAN: TOTAL HARGA) -->
+      <div class="space-y-1.5">
+        <h3 class="text-xs font-bold uppercase text-slate-400">Daftar Barang Belanja:</h3>
+        <div id="belanja-detail-items" class="space-y-2"></div>
+      </div>
+
+      <!-- SUMMARY CONTAINER -->
+      <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 space-y-1 text-xs font-bold">
+        <div class="flex justify-between text-slate-300">
+          <span>Total Qty:</span>
+          <span id="belanja-detail-totalqty" class="text-white">0</span>
+        </div>
+        <div class="flex justify-between text-emerald-400 text-sm">
+          <span>Total Belanja:</span>
+          <span>Rp <span id="belanja-detail-totalharga">0</span></span>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="saveEditBelanjaDetail()" class="btn-emerald w-full py-2.5 rounded text-xs"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Perubahan (F8)</button>
+        <button onclick="deleteBelanjaDirect()" class="bg-red-900 hover:bg-red-800 text-red-200 px-3 py-2.5 rounded text-xs font-bold" title="Hapus Seluruh Transaksi Belanja Ini"><i class="fa-solid fa-trash-can"></i> Hapus</button>
+        <button onclick="navigateTo('BELANJA_SUB')" class="bg-slate-800 px-4 py-2.5 rounded text-xs">Kembali (F7)</button>
+      </div>
+    </div>
+
     <!-- VIEW: PENJUALAN BARANG SUBMENU -->
     <div id="view-PENJUALAN_SUB" class="view-panel hidden space-y-3">
       <div class="flex justify-between items-center">
@@ -360,7 +419,7 @@
       </div>
     </div>
 
-    <!-- VIEW: DETAIL TRANSAKSI -->
+    <!-- VIEW: DETAIL TRANSAKSI PENJUALAN -->
     <div id="view-DETAIL_TRANSAKSI" class="view-panel hidden space-y-3">
       <h2 id="detail-tx-title" class="text-sm font-bold text-yellow-500 uppercase">Detail Transaksi</h2>
       <div id="detail-tx-items" class="space-y-2"></div>
@@ -493,6 +552,7 @@
       currentSelectedBarang: null
     };
 
+    let editingBelanjaTx = null; // Menyimpan data transaksi belanja yang sedang diedit
     let navigationStack = ['MAIN_MENU'];
     let html5QrCode = null;
     let targetInputId = null;
@@ -564,6 +624,7 @@
         const current = getCurrentView();
         if(current === 'STOK_FORM') saveStok();
         else if(current === 'BELANJA_FORM') checkoutBelanja();
+        else if(current === 'BELANJA_DETAIL') saveEditBelanjaDetail();
         else if(current === 'PENJUALAN_FORM') checkoutJual();
       }
     });
@@ -764,6 +825,12 @@
         appData.currentSelectedBarang = item;
         document.getElementById('jual-qty').focus();
         calcTotalJualItem();
+      } else if(module === 'detail-add') {
+        document.getElementById('detail-add-nama').value = item.nama;
+        document.getElementById('detail-add-satuan').value = item.satuan;
+        appData.currentSelectedBarang = item;
+        document.getElementById('detail-add-qty').focus();
+        calcTotalDetailAddItem();
       }
     }
 
@@ -874,7 +941,7 @@
     function renderBelanjaList() {
       const container = document.getElementById('belanja-list');
       container.innerHTML = appData.belanja.map(b => `
-        <div onclick="openDetailTx('${b.id}', 'BELANJA')" class="card-menu p-3 rounded-lg flex justify-between items-center text-xs cursor-pointer">
+        <div onclick="openDetailBelanja('${b.id}')" class="card-menu p-3 rounded-lg flex justify-between items-center text-xs cursor-pointer">
           <div class="space-y-1">
             <div class="flex items-center gap-2">
               <span class="text-[10px] text-slate-400 font-mono">${b.tgl}</span>
@@ -891,6 +958,143 @@
           </div>
         </div>
       `).join('');
+    }
+
+    // --- DETAIL & EDIT RIWAYAT BELANJA (DARI KLIK LIST RIWAYAT BELANJA) ---
+    function openDetailBelanja(txId) {
+      const tx = appData.belanja.find(b => b.id === txId);
+      if(!tx) return;
+
+      // Copy transaksi untuk proses editing tanpa merusak data asli sebelum disimpan
+      editingBelanjaTx = JSON.parse(JSON.stringify(tx));
+
+      document.getElementById('belanja-detail-id').innerText = editingBelanjaTx.id;
+      document.getElementById('belanja-detail-tgl').innerText = "Tanggal: " + editingBelanjaTx.tgl;
+
+      closeModalTambahItemBelanjaDetail();
+      renderBelanjaDetailItems();
+      navigateTo('BELANJA_DETAIL');
+    }
+
+    function renderBelanjaDetailItems() {
+      const container = document.getElementById('belanja-detail-items');
+      let grandTotalQty = 0;
+      let grandTotalHarga = 0;
+
+      if(!editingBelanjaTx.items || editingBelanjaTx.items.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 text-xs text-center py-4">Keranjang belanja kosong</p>`;
+        document.getElementById('belanja-detail-totalqty').innerText = '0';
+        document.getElementById('belanja-detail-totalharga').innerText = '0';
+        return;
+      }
+
+      container.innerHTML = editingBelanjaTx.items.map((item, idx) => {
+        grandTotalQty += item.qty;
+        grandTotalHarga += item.total;
+
+        return `
+          <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 grid grid-cols-12 items-center text-xs">
+            <!-- KIRI: NAMA BARANG (5/12) -->
+            <div class="col-span-5 pr-1">
+              <p class="font-bold text-yellow-400 text-xs truncate">${item.nama}</p>
+              <p class="text-[9px] text-slate-500 font-mono">${item.barcode || '-'}</p>
+            </div>
+            
+            <!-- TENGAH: QTY DAN SATUAN (3/12) -->
+            <div class="col-span-3 text-center">
+              <span class="bg-slate-800 px-2 py-0.5 rounded text-white font-bold border border-slate-700 text-xs">
+                ${item.qty.toLocaleString('id-ID')} ${item.satuan || 'PCS'}
+              </span>
+            </div>
+
+            <!-- KANAN: TOTAL HARGA PER ITEM + HAPUS ITEM (4/12) -->
+            <div class="col-span-4 flex items-center justify-end gap-2 text-right">
+              <span class="font-bold text-emerald-400 text-xs">Rp ${item.total.toLocaleString('id-ID')}</span>
+              <button onclick="deleteItemBelanjaDetail(${idx})" class="text-red-500 hover:text-red-400 p-1 text-sm" title="Hapus Item Ini">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('belanja-detail-totalqty').innerText = grandTotalQty.toLocaleString('id-ID');
+      document.getElementById('belanja-detail-totalharga').innerText = grandTotalHarga.toLocaleString('id-ID');
+
+      editingBelanjaTx.totalQty = grandTotalQty;
+      editingBelanjaTx.totalHarga = grandTotalHarga;
+    }
+
+    function deleteItemBelanjaDetail(index) {
+      if(confirm("Hapus barang ini dari keranjang belanja?")) {
+        editingBelanjaTx.items.splice(index, 1);
+        renderBelanjaDetailItems();
+      }
+    }
+
+    function openModalTambahItemBelanjaDetail() {
+      document.getElementById('form-add-item-belanja-detail').classList.remove('hidden');
+      document.getElementById('detail-add-nama').focus();
+    }
+
+    function closeModalTambahItemBelanjaDetail() {
+      document.getElementById('form-add-item-belanja-detail').classList.add('hidden');
+      ['detail-add-nama','detail-add-qty','detail-add-satuan','detail-add-total'].forEach(id => document.getElementById(id).value = '');
+    }
+
+    function calcTotalDetailAddItem() {
+      const qty = parseNum(document.getElementById('detail-add-qty').value);
+      const hPokok = appData.currentSelectedBarang ? appData.currentSelectedBarang.hargaPokok : 0;
+      const total = qty * hPokok;
+      document.getElementById('detail-add-total').value = total ? total.toLocaleString('id-ID') : '';
+    }
+
+    function saveItemToBelanjaDetail() {
+      const nama = document.getElementById('detail-add-nama').value;
+      const qty = parseNum(document.getElementById('detail-add-qty').value);
+      const satuan = document.getElementById('detail-add-satuan').value;
+      const total = parseNum(document.getElementById('detail-add-total').value);
+
+      if(!nama || qty <= 0) return alert("Pilih barang dan jumlah Qty!");
+
+      const barcode = appData.currentSelectedBarang ? appData.currentSelectedBarang.barcode : '';
+      editingBelanjaTx.items.push({ barcode, nama, qty, satuan, total });
+
+      closeModalTambahItemBelanjaDetail();
+      renderBelanjaDetailItems();
+    }
+
+    function saveEditBelanjaDetail() {
+      if(!editingBelanjaTx) return;
+
+      const origIdx = appData.belanja.findIndex(b => b.id === editingBelanjaTx.id);
+      if(origIdx >= 0) {
+        // kembalikan stok lama
+        const origTx = appData.belanja[origIdx];
+        origTx.items.forEach(item => {
+          const target = appData.katalog.find(k => k.barcode === item.barcode);
+          if(target) target.qty = Math.max(0, target.qty - item.qty);
+        });
+
+        // apply stok baru
+        editingBelanjaTx.items.forEach(item => {
+          const target = appData.katalog.find(k => k.barcode === item.barcode);
+          if(target) target.qty += item.qty;
+        });
+
+        appData.belanja[origIdx] = editingBelanjaTx;
+        saveData();
+        renderBelanjaList();
+        renderStokList();
+        alert("Perubahan belanja berhasil disimpan!");
+        navigateTo('BELANJA_SUB');
+      }
+    }
+
+    function deleteBelanjaDirect() {
+      if(!editingBelanjaTx) return;
+      deleteBelanja(editingBelanjaTx.id);
+      navigateTo('BELANJA_SUB');
     }
 
     // --- PENJUALAN BARANG ---
