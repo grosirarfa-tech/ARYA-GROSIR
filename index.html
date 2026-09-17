@@ -91,10 +91,16 @@
   <!-- HEADER RATA TENGAH -->
   <header class="bg-black border-b border-yellow-600/40 p-3 sticky top-0 z-40 shadow-xl">
     <div class="max-w-3xl mx-auto flex flex-col items-center justify-center relative">
+      <!-- Tombol Keluar / Tutup Aplikasi (Sisi Kiri Header) -->
+      <button onclick="exitApp()" class="absolute left-0 top-2 text-red-500 hover:text-red-400 p-2 text-xl" title="Keluar Aplikasi">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+
       <div class="flex flex-col items-center cursor-pointer" onclick="navigateTo('MAIN_MENU')">
         <img src="logo web arya.png" alt="ARYA GROSIR" class="h-12 w-auto object-contain mb-1" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'120\' height=\'40\' viewBox=\'0 0 120 40\'><rect width=\'100%\' height=\'100%\' fill=\'%23000000\'/><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23D4AF37\' font-family=\'sans-serif\' font-weight=\'bold\' font-size=\'12\'>ARYA GROSIR</text></svg>';">
         <h1 class="text-xl font-extrabold gold-gradient-text tracking-wider uppercase">ARYA GROSIR</h1>
       </div>
+
       <button onclick="navigateTo('MAIN_MENU')" class="absolute right-0 top-2 text-yellow-500 hover:text-yellow-400 p-2 text-xl">
         <i class="fa-solid fa-house"></i>
       </button>
@@ -289,7 +295,7 @@
         </div>
       </div>
 
-      <!-- LIST ITEM BELANJA DETAIL (KIRI: NAMA, TENGAH: QTY & SATUAN, KANAN: TOTAL HARGA) -->
+      <!-- LIST ITEM BELANJA DETAIL -->
       <div class="space-y-1.5">
         <h3 class="text-xs font-bold uppercase text-slate-400">Daftar Barang Belanja:</h3>
         <div id="belanja-detail-items" class="space-y-2"></div>
@@ -419,13 +425,67 @@
       </div>
     </div>
 
-    <!-- VIEW: DETAIL TRANSAKSI PENJUALAN -->
+    <!-- VIEW: DETAIL TRANSAKSI PENJUALAN (DENGAN EDIT, TAMBAH, HAPUS ITEM SAMA SEPERTI DETAIL BELANJA) -->
     <div id="view-DETAIL_TRANSAKSI" class="view-panel hidden space-y-3">
-      <h2 id="detail-tx-title" class="text-sm font-bold text-yellow-500 uppercase">Detail Transaksi</h2>
-      <div id="detail-tx-items" class="space-y-2"></div>
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+        <div>
+          <h2 id="detail-tx-title" class="text-sm font-bold text-yellow-500 uppercase">Detail Transaksi</h2>
+          <p id="detail-tx-tgl" class="text-[10px] text-slate-400 font-mono"></p>
+        </div>
+        <button onclick="openModalTambahItemJualDetail()" class="btn-gold px-3 py-1.5 rounded-lg text-xs">
+          <i class="fa-solid fa-plus mr-1"></i> Tambah Barang
+        </button>
+      </div>
+
+      <!-- FORM ADD ITEM MODAL UNTUK DETAIL PENJUALAN -->
+      <div id="form-add-item-jual-detail" class="hidden card-menu p-3 rounded-lg space-y-2 text-xs border border-yellow-500/50">
+        <div class="flex justify-between items-center mb-1">
+          <h3 class="font-bold text-yellow-500">Tambah Barang ke Penjualan Ini</h3>
+          <button onclick="closeModalTambahItemJualDetail()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="relative">
+          <label class="block mb-1 text-[10px]">Nama Barang</label>
+          <input type="text" id="detail-add-jual-nama" oninput="searchCatalog(this.value, 'detail-add-jual')" class="w-full p-2 rounded text-xs" placeholder="Ketik nama barang...">
+          <div id="detail-add-jual-dropdown" class="absolute left-0 right-0 bg-slate-900 z-50 rounded border border-slate-700 max-h-36 overflow-y-auto hidden mt-1"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div><label class="block mb-1 text-[10px]">Qty</label><input type="text" id="detail-add-jual-qty" inputmode="numeric" oninput="calcTotalDetailAddJualItem()" class="w-full p-2 rounded text-xs format-number" placeholder="0"></div>
+          <div><label class="block mb-1 text-[10px]">Satuan</label><input type="text" id="detail-add-jual-satuan" readonly class="w-full p-2 rounded bg-slate-900 text-xs"></div>
+          <div><label class="block mb-1 text-[10px]">Total Harga</label><input type="text" id="detail-add-jual-total" readonly class="w-full p-2 rounded bg-slate-900 text-xs format-number" placeholder="0"></div>
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button onclick="saveItemToJualDetail()" class="btn-emerald w-full py-1.5 rounded text-xs font-bold">+ Simpan ke Penjualan</button>
+          <button onclick="closeModalTambahItemJualDetail()" class="bg-slate-800 w-full py-1.5 rounded text-xs">Batal</button>
+        </div>
+      </div>
+
+      <!-- DAFTAR ITEM PENJUALAN -->
+      <div class="space-y-1.5">
+        <h3 class="text-xs font-bold uppercase text-slate-400">Daftar Barang Penjualan:</h3>
+        <div id="detail-tx-items" class="space-y-2"></div>
+      </div>
+
+      <!-- SUMMARY CONTAINER DETAIL PENJUALAN -->
+      <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 space-y-1 text-xs font-bold">
+        <div class="flex justify-between text-slate-300">
+          <span>Total Qty:</span>
+          <span id="jual-detail-totalqty" class="text-white">0</span>
+        </div>
+        <div class="flex justify-between text-yellow-400 text-sm">
+          <span>Total Penjualan:</span>
+          <span>Rp <span id="jual-detail-totalharga">0</span></span>
+        </div>
+      </div>
+
       <div class="flex gap-2 pt-2">
+        <button onclick="saveEditJualDetail()" class="btn-emerald w-full py-2.5 rounded text-xs"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Perubahan (F8)</button>
+        <button onclick="deletePenjualanDirect()" class="bg-red-900 hover:bg-red-800 text-red-200 px-3 py-2.5 rounded text-xs font-bold" title="Hapus Seluruh Transaksi Penjualan Ini"><i class="fa-solid fa-trash-can"></i> Hapus</button>
+      </div>
+
+      <div class="flex gap-2 pt-1">
         <button onclick="renderInvoicePDF()" class="btn-gold w-full py-2.5 rounded text-xs"><i class="fa-solid fa-file-pdf mr-1"></i> Cetak PDF Faktur</button>
         <button onclick="shareToWA()" class="btn-emerald w-full py-2.5 rounded text-xs"><i class="fa-brands fa-whatsapp mr-1"></i> Share WA</button>
+        <button onclick="navigateTo('PENJUALAN_SUB')" class="bg-slate-800 px-4 py-2.5 rounded text-xs">Kembali (F7)</button>
       </div>
     </div>
 
@@ -553,6 +613,7 @@
     };
 
     let editingBelanjaTx = null; // Menyimpan data transaksi belanja yang sedang diedit
+    let editingJualTx = null;    // Menyimpan data transaksi penjualan yang sedang diedit
     let navigationStack = ['MAIN_MENU'];
     let html5QrCode = null;
     let targetInputId = null;
@@ -566,6 +627,16 @@
       renderAllData();
       setInterval(checkAutoBackup, 60000);
     };
+
+    function exitApp() {
+      if (confirm("Apakah Anda yakin ingin keluar dari aplikasi POS ARYA GROSIR?")) {
+        if (navigator.app && navigator.app.exitApp) {
+          navigator.app.exitApp();
+        } else {
+          window.close();
+        }
+      }
+    }
 
     function loadLocalStorage() {
       const saved = localStorage.getItem('ARYA_POS_DATA');
@@ -593,11 +664,7 @@
         const prevView = navigationStack[navigationStack.length - 1];
         renderView(prevView);
       } else {
-        if(confirm("Keluar dari Aplikasi Kasir ARYA GROSIR?")) {
-          navigator.app ? navigator.app.exitApp() : window.close();
-        } else {
-          history.pushState({ view: 'MAIN_MENU' }, '');
-        }
+        exitApp();
       }
     };
 
@@ -626,6 +693,7 @@
         else if(current === 'BELANJA_FORM') checkoutBelanja();
         else if(current === 'BELANJA_DETAIL') saveEditBelanjaDetail();
         else if(current === 'PENJUALAN_FORM') checkoutJual();
+        else if(current === 'DETAIL_TRANSAKSI') saveEditJualDetail();
       }
     });
 
@@ -831,6 +899,12 @@
         appData.currentSelectedBarang = item;
         document.getElementById('detail-add-qty').focus();
         calcTotalDetailAddItem();
+      } else if(module === 'detail-add-jual') {
+        document.getElementById('detail-add-jual-nama').value = item.nama;
+        document.getElementById('detail-add-jual-satuan').value = item.satuan;
+        appData.currentSelectedBarang = item;
+        document.getElementById('detail-add-jual-qty').focus();
+        calcTotalDetailAddJualItem();
       }
     }
 
@@ -960,12 +1034,11 @@
       `).join('');
     }
 
-    // --- DETAIL & EDIT RIWAYAT BELANJA (DARI KLIK LIST RIWAYAT BELANJA) ---
+    // --- DETAIL & EDIT RIWAYAT BELANJA ---
     function openDetailBelanja(txId) {
       const tx = appData.belanja.find(b => b.id === txId);
       if(!tx) return;
 
-      // Copy transaksi untuk proses editing tanpa merusak data asli sebelum disimpan
       editingBelanjaTx = JSON.parse(JSON.stringify(tx));
 
       document.getElementById('belanja-detail-id').innerText = editingBelanjaTx.id;
@@ -994,20 +1067,15 @@
 
         return `
           <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 grid grid-cols-12 items-center text-xs">
-            <!-- KIRI: NAMA BARANG (5/12) -->
             <div class="col-span-5 pr-1">
               <p class="font-bold text-yellow-400 text-xs truncate">${item.nama}</p>
               <p class="text-[9px] text-slate-500 font-mono">${item.barcode || '-'}</p>
             </div>
-            
-            <!-- TENGAH: QTY DAN SATUAN (3/12) -->
             <div class="col-span-3 text-center">
               <span class="bg-slate-800 px-2 py-0.5 rounded text-white font-bold border border-slate-700 text-xs">
                 ${item.qty.toLocaleString('id-ID')} ${item.satuan || 'PCS'}
               </span>
             </div>
-
-            <!-- KANAN: TOTAL HARGA PER ITEM + HAPUS ITEM (4/12) -->
             <div class="col-span-4 flex items-center justify-end gap-2 text-right">
               <span class="font-bold text-emerald-400 text-xs">Rp ${item.total.toLocaleString('id-ID')}</span>
               <button onclick="deleteItemBelanjaDetail(${idx})" class="text-red-500 hover:text-red-400 p-1 text-sm" title="Hapus Item Ini">
@@ -1069,14 +1137,12 @@
 
       const origIdx = appData.belanja.findIndex(b => b.id === editingBelanjaTx.id);
       if(origIdx >= 0) {
-        // kembalikan stok lama
         const origTx = appData.belanja[origIdx];
         origTx.items.forEach(item => {
           const target = appData.katalog.find(k => k.barcode === item.barcode);
           if(target) target.qty = Math.max(0, target.qty - item.qty);
         });
 
-        // apply stok baru
         editingBelanjaTx.items.forEach(item => {
           const target = appData.katalog.find(k => k.barcode === item.barcode);
           if(target) target.qty += item.qty;
@@ -1345,24 +1411,149 @@
       document.getElementById('perkiraan-total-harga').innerText = "Rp " + grandTotalHarga.toLocaleString('id-ID');
     }
 
-    // --- DETAIL TRANSAKSI & INVOICE ---
+    // --- DETAIL & EDIT TRANSAKSI PENJUALAN ---
     let currentSelectedTx = null;
 
     function openDetailTx(txId, type) {
-      navigateTo('DETAIL_TRANSAKSI');
-      const list = type === 'BELANJA' ? appData.belanja : appData.penjualan;
-      currentSelectedTx = list.find(t => t.id === txId);
+      if(type === 'PENJUALAN') {
+        const tx = appData.penjualan.find(p => p.id === txId);
+        if(!tx) return;
 
-      document.getElementById('detail-tx-title').innerText = "Detail " + txId;
-      document.getElementById('detail-tx-items').innerHTML = currentSelectedTx.items.map(item => `
-        <div class="bg-slate-900 p-2.5 rounded text-xs flex justify-between border border-slate-800">
-          <div>
-            <p class="font-bold">${item.nama}</p>
-            <p class="text-[10px] text-slate-400">${item.qty.toLocaleString('id-ID')} ${item.satuan}</p>
+        editingJualTx = JSON.parse(JSON.stringify(tx));
+        currentSelectedTx = editingJualTx;
+
+        document.getElementById('detail-tx-title').innerText = "Detail " + editingJualTx.id;
+        document.getElementById('detail-tx-tgl').innerText = "Tanggal: " + editingJualTx.tgl + " | Pembeli: " + (editingJualTx.pembeli || 'Umum');
+
+        closeModalTambahItemJualDetail();
+        renderJualDetailItems();
+        navigateTo('DETAIL_TRANSAKSI');
+      } else {
+        openDetailBelanja(txId);
+      }
+    }
+
+    function renderJualDetailItems() {
+      const container = document.getElementById('detail-tx-items');
+      let grandTotalQty = 0;
+      let grandTotalHarga = 0;
+
+      if(!editingJualTx.items || editingJualTx.items.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 text-xs text-center py-4">Keranjang penjualan kosong</p>`;
+        document.getElementById('jual-detail-totalqty').innerText = '0';
+        document.getElementById('jual-detail-totalharga').innerText = '0';
+        return;
+      }
+
+      container.innerHTML = editingJualTx.items.map((item, idx) => {
+        grandTotalQty += item.qty;
+        grandTotalHarga += item.total;
+
+        return `
+          <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 grid grid-cols-12 items-center text-xs">
+            <div class="col-span-5 pr-1">
+              <p class="font-bold text-yellow-400 text-xs truncate">${item.nama}</p>
+              <p class="text-[9px] text-slate-500 font-mono">${item.barcode || '-'}</p>
+            </div>
+            <div class="col-span-3 text-center">
+              <span class="bg-slate-800 px-2 py-0.5 rounded text-white font-bold border border-slate-700 text-xs">
+                ${item.qty.toLocaleString('id-ID')} ${item.satuan || 'PCS'}
+              </span>
+            </div>
+            <div class="col-span-4 flex items-center justify-end gap-2 text-right">
+              <span class="font-bold text-yellow-400 text-xs">Rp ${item.total.toLocaleString('id-ID')}</span>
+              <button onclick="deleteItemJualDetail(${idx})" class="text-red-500 hover:text-red-400 p-1 text-sm" title="Hapus Item Ini">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
           </div>
-          <p class="font-bold text-yellow-400">Rp ${item.total.toLocaleString('id-ID')}</p>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+
+      document.getElementById('jual-detail-totalqty').innerText = grandTotalQty.toLocaleString('id-ID');
+      document.getElementById('jual-detail-totalharga').innerText = grandTotalHarga.toLocaleString('id-ID');
+
+      editingJualTx.totalQty = grandTotalQty;
+      editingJualTx.totalHarga = grandTotalHarga;
+    }
+
+    function deleteItemJualDetail(index) {
+      if(confirm("Hapus barang ini dari keranjang penjualan?")) {
+        editingJualTx.items.splice(index, 1);
+        renderJualDetailItems();
+      }
+    }
+
+    function openModalTambahItemJualDetail() {
+      document.getElementById('form-add-item-jual-detail').classList.remove('hidden');
+      document.getElementById('detail-add-jual-nama').focus();
+    }
+
+    function closeModalTambahItemJualDetail() {
+      document.getElementById('form-add-item-jual-detail').classList.add('hidden');
+      ['detail-add-jual-nama','detail-add-jual-qty','detail-add-jual-satuan','detail-add-jual-total'].forEach(id => document.getElementById(id).value = '');
+    }
+
+    function calcTotalDetailAddJualItem() {
+      const qty = parseNum(document.getElementById('detail-add-jual-qty').value);
+      const tipe = editingJualTx ? editingJualTx.tipe : 'retail';
+      let harga = 0;
+      if (appData.currentSelectedBarang) {
+        harga = tipe === 'grosir' ? appData.currentSelectedBarang.hargaGrosir : appData.currentSelectedBarang.hargaRetail;
+      }
+      const total = qty * harga;
+      document.getElementById('detail-add-jual-total').value = total ? total.toLocaleString('id-ID') : '';
+    }
+
+    function saveItemToJualDetail() {
+      const nama = document.getElementById('detail-add-jual-nama').value;
+      const qty = parseNum(document.getElementById('detail-add-jual-qty').value);
+      const satuan = document.getElementById('detail-add-jual-satuan').value;
+      const total = parseNum(document.getElementById('detail-add-jual-total').value);
+
+      if(!nama || qty <= 0) return alert("Pilih barang dan jumlah Qty!");
+
+      const barcode = appData.currentSelectedBarang ? appData.currentSelectedBarang.barcode : '';
+      const hargaPokok = appData.currentSelectedBarang ? appData.currentSelectedBarang.hargaPokok : 0;
+
+      editingJualTx.items.push({ barcode, nama, qty, satuan, total, hargaPokok });
+
+      closeModalTambahItemJualDetail();
+      renderJualDetailItems();
+    }
+
+    function saveEditJualDetail() {
+      if(!editingJualTx) return;
+
+      const origIdx = appData.penjualan.findIndex(p => p.id === editingJualTx.id);
+      if(origIdx >= 0) {
+        const origTx = appData.penjualan[origIdx];
+        
+        // Kembalikan stok lama (tambah stok kembali)
+        origTx.items.forEach(item => {
+          const target = appData.katalog.find(k => k.barcode === item.barcode);
+          if(target) target.qty += item.qty;
+        });
+
+        // Kurangi stok baru
+        editingJualTx.items.forEach(item => {
+          const target = appData.katalog.find(k => k.barcode === item.barcode);
+          if(target) target.qty = Math.max(0, target.qty - item.qty);
+        });
+
+        appData.penjualan[origIdx] = editingJualTx;
+        saveData();
+        renderPenjualanList();
+        renderStokList();
+        alert("Perubahan penjualan berhasil disimpan!");
+        navigateTo('PENJUALAN_SUB');
+      }
+    }
+
+    function deletePenjualanDirect() {
+      if(!editingJualTx) return;
+      deletePenjualan(editingJualTx.id);
+      navigateTo('PENJUALAN_SUB');
     }
 
     function renderInvoicePDF() {
