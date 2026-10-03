@@ -547,7 +547,7 @@
 
     <!-- VIEW: AMBIL LABA -->
     <div id="view-AMBIL_LABA_SUB" class="view-panel hidden space-y-3">
-      <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-money-bill-transfer mr-1.5"></i>Pengambilan Laba / Prive</h2>
+      <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-money-bill-transfer mr-1.5"></i>Peng pengambilan Laba / Prive</h2>
       <div class="card-menu p-3 rounded-lg space-y-2 text-xs border border-purple-500/30">
         <div><label class="block mb-1">Tanggal</label><input type="date" id="laba-tgl" class="w-full p-2 rounded text-xs"></div>
         <div><label class="block mb-1">Keterangan / Keperluan</label><input type="text" id="laba-ket" class="w-full p-2 rounded text-xs uppercase" placeholder="MISAL: AMBIL KEUNTUNGAN BULANAN"></div>
@@ -957,7 +957,11 @@
 
     function renderStokList() {
       const container = document.getElementById('stok-list');
-      container.innerHTML = appData.katalog.map(k => `
+      
+      // Mengurutkan katalog stok secara alfabetis berdasarkan nama barang (A-Z)
+      const sortedKatalog = [...appData.katalog].sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
+      container.innerHTML = sortedKatalog.map(k => `
         <div class="card-menu p-3 rounded-lg flex justify-between items-center text-xs">
           <div onclick="openFormStok('${k.barcode}')" class="cursor-pointer flex-grow space-y-1">
             <p class="font-extrabold text-sm text-yellow-400 uppercase tracking-wide">${k.nama}</p>
@@ -1686,75 +1690,82 @@
       doc.text("----------------------------------", 40, 21, { align: "center" });
 
       doc.setFontSize(8);
-      doc.text(`ID  : ${currentSelectedTx.id}`, 5, 25);
-      doc.text(`Tgl : ${currentSelectedTx.tgl}`, 5, 29);
-      doc.text(`Cust: ${currentSelectedTx.pembeli || 'Umum'}`, 5, 33);
-      doc.text("----------------------------------", 40, 37, { align: "center" });
+      doc.text(`ID: ${currentSelectedTx.id}`, 8, 26);
+      doc.text(`Tgl: ${currentSelectedTx.tgl}`, 8, 30);
+      doc.text(`Pembeli: ${currentSelectedTx.pembeli || 'Umum'}`, 8, 34);
+      doc.text("----------------------------------", 40, 38, { align: "center" });
 
-      let y = 41;
+      let y = 43;
       currentSelectedTx.items.forEach(item => {
-        const unitPrice = item.qty > 0 ? Math.round(item.total / item.qty) : 0;
-        doc.text(`${item.nama.substring(0, 20)}`, 5, y);
-        doc.text(`${item.qty.toLocaleString('id-ID')} x ${unitPrice.toLocaleString('id-ID')} = ${item.total.toLocaleString('id-ID')}`, 5, y + 4);
-        y += 9;
+        doc.text(`${item.nama.substring(0, 22)}`, 8, y);
+        y += 4;
+        doc.text(`${item.qty} x ${((item.total || 0)/(item.qty || 1)).toLocaleString('id-ID')}`, 12, y);
+        doc.text(`Rp ${(item.total || 0).toLocaleString('id-ID')}`, 72, y, { align: "right" });
+        y += 5;
       });
 
       doc.text("----------------------------------", 40, y, { align: "center" });
+      y += 5;
+      doc.text(`Total   : Rp ${(currentSelectedTx.totalHarga || 0).toLocaleString('id-ID')}`, 72, y, { align: "right" });
       y += 4;
-      doc.text(`Total    : Rp ${currentSelectedTx.totalHarga.toLocaleString('id-ID')}`, 5, y);
-      doc.text(`Dibayar  : Rp ${(currentSelectedTx.dibayar || currentSelectedTx.totalHarga).toLocaleString('id-ID')}`, 5, y + 4);
-      doc.text(`Kembali  : Rp ${(currentSelectedTx.kembalian || 0).toLocaleString('id-ID')}`, 5, y + 8);
+      doc.text(`Dibayar : Rp ${(currentSelectedTx.dibayar || 0).toLocaleString('id-ID')}`, 72, y, { align: "right" });
+      y += 4;
+      doc.text(`Kembali : Rp ${(currentSelectedTx.kembalian || 0).toLocaleString('id-ID')}`, 72, y, { align: "right" });
 
-      doc.text("*** LUNAS ***", 40, y + 15, { align: "center" });
+      y += 8;
+      doc.setFontSize(7);
+      doc.text("Terima Kasih Telah Berbelanja!", 40, y, { align: "center" });
 
-      doc.save(`Faktur-${currentSelectedTx.id}.pdf`);
+      doc.save(`Faktur_${currentSelectedTx.id}.pdf`);
     }
 
     function shareToWA() {
       if(!currentSelectedTx) return alert("Pilih transaksi terlebih dahulu!");
-
-      let text = `*ARYA GROSIR*\n*NOTA PENJUALAN*\nWA: 089670179464\n--------------------------------\nID: ${currentSelectedTx.id}\nTgl: ${currentSelectedTx.tgl}\nPembeli: ${currentSelectedTx.pembeli || 'Umum'}\n\n`;
-      
+      let text = `*ARYA GROSIR*\nNota Penjualan: ${currentSelectedTx.id}\nTanggal: ${currentSelectedTx.tgl}\nPembeli: ${currentSelectedTx.pembeli || 'Umum'}\n----------------------------------\n`;
       currentSelectedTx.items.forEach(i => {
-        const unitPrice = i.qty > 0 ? Math.round(i.total / i.qty) : 0;
-        text += `${i.nama}\n  ${i.qty.toLocaleString('id-ID')} ${i.satuan || 'PCS'} x Rp ${unitPrice.toLocaleString('id-ID')} = Rp ${i.total.toLocaleString('id-ID')}\n`;
+        text += `${i.nama}\n  ${i.qty} x Rp ${((i.total || 0)/(i.qty || 1)).toLocaleString('id-ID')} = Rp ${(i.total || 0).toLocaleString('id-ID')}\n`;
       });
-
-      text += `--------------------------------\n*TOTAL: Rp ${currentSelectedTx.totalHarga.toLocaleString('id-ID')}*\n`;
-      if(currentSelectedTx.dibayar) text += `Dibayar: Rp ${currentSelectedTx.dibayar.toLocaleString('id-ID')}\n`;
-      if(currentSelectedTx.kembalian !== undefined) text += `Kembalian: Rp ${currentSelectedTx.kembalian.toLocaleString('id-ID')}\n`;
-      text += `Status: *LUNAS*\n\nTerima Kasih Telah Berbelanja!`;
-
-      const encodedUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-      window.open(encodedUrl, '_blank');
+      text += `----------------------------------\n*Total: Rp ${(currentSelectedTx.totalHarga || 0).toLocaleString('id-ID')}*\nDibayar: Rp ${(currentSelectedTx.dibayar || 0).toLocaleString('id-ID')}\nKembali: Rp ${(currentSelectedTx.kembalian || 0).toLocaleString('id-ID')}\n\nTerima kasih!`;
+      
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
     }
 
-    // --- PENGELUARAN ---
+    // --- PENGELUARAN LAIN ---
     function savePengeluaran() {
       const tgl = formatDate(document.getElementById('pengeluaran-tgl').value);
       const ket = document.getElementById('pengeluaran-ket').value.trim().toUpperCase();
       const jml = parseNum(document.getElementById('pengeluaran-jml').value);
 
-      if(!tgl || !ket || jml <= 0) return alert("Isi data pengeluaran dengan lengkap!");
+      if(!ket || jml <= 0) return alert("Isi keterangan dan jumlah pengeluaran!");
 
       appData.pengeluaran.unshift({ id: Date.now(), tgl, ket, jml });
       saveData();
       renderPengeluaranList();
+
       document.getElementById('pengeluaran-ket').value = '';
       document.getElementById('pengeluaran-jml').value = '';
     }
 
+    function deletePengeluaran(id) {
+      if(confirm("Hapus catatan pengeluaran ini?")) {
+        appData.pengeluaran = appData.pengeluaran.filter(p => p.id !== id);
+        saveData();
+        renderPengeluaranList();
+      }
+    }
+
     function renderPengeluaranList() {
       const container = document.getElementById('pengeluaran-list');
-      container.innerHTML = appData.pengeluaran.map((p, idx) => `
-        <div class="bg-slate-900 p-2.5 rounded text-xs flex justify-between items-center border border-slate-800">
+      container.innerHTML = appData.pengeluaran.map(p => `
+        <div class="card-menu p-3 rounded-lg flex justify-between items-center text-xs">
           <div>
-            <p class="font-bold text-red-400">${p.ket}</p>
-            <p class="text-[10px] text-slate-400">${p.tgl}</p>
+            <span class="text-[10px] text-slate-400 font-mono">${p.tgl}</span>
+            <p class="font-bold text-red-400 uppercase">${p.ket}</p>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-slate-200">Rp ${p.jml.toLocaleString('id-ID')}</span>
-            <button onclick="appData.pengeluaran.splice(${idx},1); saveData(); renderPengeluaranList();" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+          <div class="flex items-center gap-3">
+            <span class="font-bold text-red-400">Rp ${p.jml.toLocaleString('id-ID')}</span>
+            <button onclick="deletePengeluaran(${p.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       `).join('');
@@ -1766,26 +1777,35 @@
       const ket = document.getElementById('modal-ket').value.trim().toUpperCase();
       const jml = parseNum(document.getElementById('modal-jml').value);
 
-      if(!tgl || !ket || jml <= 0) return alert("Isi data tambah modal dengan lengkap!");
+      if(!ket || jml <= 0) return alert("Isi keterangan dan jumlah modal!");
 
       appData.tambahModal.unshift({ id: Date.now(), tgl, ket, jml });
       saveData();
       renderTambahModalList();
+
       document.getElementById('modal-ket').value = '';
       document.getElementById('modal-jml').value = '';
     }
 
+    function deleteTambahModal(id) {
+      if(confirm("Hapus catatan tambah modal ini?")) {
+        appData.tambahModal = appData.tambahModal.filter(m => m.id !== id);
+        saveData();
+        renderTambahModalList();
+      }
+    }
+
     function renderTambahModalList() {
       const container = document.getElementById('tambah-modal-list');
-      container.innerHTML = appData.tambahModal.map((m, idx) => `
-        <div class="bg-slate-900 p-2.5 rounded text-xs flex justify-between items-center border border-slate-800">
+      container.innerHTML = appData.tambahModal.map(m => `
+        <div class="card-menu p-3 rounded-lg flex justify-between items-center text-xs">
           <div>
-            <p class="font-bold text-cyan-400">${m.ket}</p>
-            <p class="text-[10px] text-slate-400">${m.tgl}</p>
+            <span class="text-[10px] text-slate-400 font-mono">${m.tgl}</span>
+            <p class="font-bold text-cyan-400 uppercase">${m.ket}</p>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-slate-200">Rp ${m.jml.toLocaleString('id-ID')}</span>
-            <button onclick="appData.tambahModal.splice(${idx},1); saveData(); renderTambahModalList();" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+          <div class="flex items-center gap-3">
+            <span class="font-bold text-cyan-400">Rp ${m.jml.toLocaleString('id-ID')}</span>
+            <button onclick="deleteTambahModal(${m.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       `).join('');
@@ -1797,171 +1817,188 @@
       const ket = document.getElementById('laba-ket').value.trim().toUpperCase();
       const jml = parseNum(document.getElementById('laba-jml').value);
 
-      if(!tgl || !ket || jml <= 0) return alert("Isi data ambil laba dengan lengkap!");
+      if(!ket || jml <= 0) return alert("Isi keterangan dan jumlah pengambilan laba!");
 
       appData.ambilLaba.unshift({ id: Date.now(), tgl, ket, jml });
       saveData();
       renderAmbilLabaList();
+
       document.getElementById('laba-ket').value = '';
       document.getElementById('laba-jml').value = '';
     }
 
+    function deleteAmbilLaba(id) {
+      if(confirm("Hapus catatan pengambilan laba ini?")) {
+        appData.ambilLaba = appData.ambilLaba.filter(l => l.id !== id);
+        saveData();
+        renderAmbilLabaList();
+      }
+    }
+
     function renderAmbilLabaList() {
       const container = document.getElementById('ambil-laba-list');
-      container.innerHTML = appData.ambilLaba.map((l, idx) => `
-        <div class="bg-slate-900 p-2.5 rounded text-xs flex justify-between items-center border border-slate-800">
+      container.innerHTML = appData.ambilLaba.map(l => `
+        <div class="card-menu p-3 rounded-lg flex justify-between items-center text-xs">
           <div>
-            <p class="font-bold text-purple-400">${l.ket}</p>
-            <p class="text-[10px] text-slate-400">${l.tgl}</p>
+            <span class="text-[10px] text-slate-400 font-mono">${l.tgl}</span>
+            <p class="font-bold text-purple-400 uppercase">${l.ket}</p>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-slate-200">Rp ${l.jml.toLocaleString('id-ID')}</span>
-            <button onclick="appData.ambilLaba.splice(${idx},1); saveData(); renderAmbilLabaList();" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+          <div class="flex items-center gap-3">
+            <span class="font-bold text-purple-400">Rp ${l.jml.toLocaleString('id-ID')}</span>
+            <button onclick="deleteAmbilLaba(${l.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       `).join('');
     }
 
-    // --- DASHBOARD KEUNTUNGAN & RINCIAN ---
+    // --- DASHBOARD KEUNTUNGAN ---
     function renderProfitDashboard() {
       const today = new Date();
-      const yesterday = new Date(Date.now() - 86400000);
-      const formattedYesterday = formatDate(yesterday.toISOString().split('T')[0]);
-      const currentMonthStr = String(today.getMonth() + 1).padStart(2, '0') + '-' + today.getFullYear();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
 
-      let lbKemarin = 0, lbBulanIni = 0, pengKemarin = 0, pengBulanIni = 0;
+      const strToday = formatDate(today.toISOString().split('T')[0]);
+      const strYesterday = formatDate(yesterday.toISOString().split('T')[0]);
+      const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+      const currentYear = today.getFullYear();
+
+      let profitYesterday = 0, profitMonth = 0;
+      let expYesterday = 0, expMonth = 0;
 
       appData.penjualan.forEach(p => {
-        let labaGross = 0;
-        p.items.forEach(i => labaGross += (i.total - (i.qty * (i.hargaPokok || 0))));
+        let pProfit = 0;
+        p.items.forEach(i => {
+          const hPokok = i.hargaPokok || 0;
+          pProfit += (i.total - (hPokok * i.qty));
+        });
 
-        if(p.tgl === formattedYesterday) lbKemarin += labaGross;
-        if(p.tgl && p.tgl.endsWith(currentMonthStr)) lbBulanIni += labaGross;
+        if(p.tgl === strYesterday) profitYesterday += pProfit;
+
+        const parts = p.tgl.split('-');
+        if(parts.length === 3 && parts[1] === currentMonth && parseInt(parts[2], 10) === currentYear) {
+          profitMonth += pProfit;
+        }
       });
 
-      appData.pengeluaran.forEach(pg => {
-        if(pg.tgl === formattedYesterday) pengKemarin += pg.jml;
-        if(pg.tgl && pg.tgl.endsWith(currentMonthStr)) pengBulanIni += pg.jml;
+      appData.pengeluaran.forEach(e => {
+        if(e.tgl === strYesterday) expYesterday += e.jml;
+
+        const parts = e.tgl.split('-');
+        if(parts.length === 3 && parts[1] === currentMonth && parseInt(parts[2], 10) === currentYear) {
+          expMonth += e.jml;
+        }
       });
 
-      document.getElementById('lb-kemarin').innerText = "Rp " + Math.max(0, lbKemarin - pengKemarin).toLocaleString('id-ID');
-      document.getElementById('lb-bulanini').innerText = "Rp " + Math.max(0, lbBulanIni - pengBulanIni).toLocaleString('id-ID');
-      document.getElementById('peng-kemarin').innerText = "Rp " + pengKemarin.toLocaleString('id-ID');
-      document.getElementById('peng-bulanini').innerText = "Rp " + pengBulanIni.toLocaleString('id-ID');
+      document.getElementById('lb-kemarin').innerText = "Rp " + (profitYesterday - expYesterday).toLocaleString('id-ID');
+      document.getElementById('lb-bulanini').innerText = "Rp " + (profitMonth - expMonth).toLocaleString('id-ID');
+      document.getElementById('peng-kemarin').innerText = "Rp " + expYesterday.toLocaleString('id-ID');
+      document.getElementById('peng-bulanini').innerText = "Rp " + expMonth.toLocaleString('id-ID');
 
       renderProfitChart();
-      renderKeuntunganHarianList();
+      renderKeuntunganHarian();
     }
 
-    function renderProfitChart() {
-      const ctx = document.getElementById('profitChart').getContext('2d');
-      const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-      const monthlyProfit = new Array(12).fill(0);
-
-      const currentYear = new Date().getFullYear();
-      appData.penjualan.forEach(p => {
-        if(p.tgl) {
-          const parts = p.tgl.split('-');
-          if(parts.length === 3 && parseInt(parts[2], 10) === currentYear) {
-            const mIndex = parseInt(parts[1], 10) - 1;
-            let gross = 0;
-            p.items.forEach(i => gross += (i.total - (i.qty * (i.hargaPokok || 0))));
-            monthlyProfit[mIndex] += gross;
-          }
-        }
-      });
-
-      appData.pengeluaran.forEach(pg => {
-        if(pg.tgl) {
-          const parts = pg.tgl.split('-');
-          if(parts.length === 3 && parseInt(parts[2], 10) === currentYear) {
-            const mIndex = parseInt(parts[1], 10) - 1;
-            monthlyProfit[mIndex] = Math.max(0, monthlyProfit[mIndex] - pg.jml);
-          }
-        }
-      });
-
-      if(profitChartInstance) profitChartInstance.destroy();
-
-      profitChartInstance = new Chart(ctx, {
-        type: 'bar',
-        plugins: [ChartDataLabels],
-        data: {
-          labels: months,
-          datasets: [{
-            data: monthlyProfit,
-            backgroundColor: monthlyProfit.map(v => v > 1000000 ? '#10B981' : (v > 500000 ? '#FBBF24' : '#EF4444'))
-          }]
-        },
-        options: {
-          responsive: true,
-          layout: { padding: { top: 25 } },
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              anchor: 'end',
-              align: 'top',
-              color: '#D4AF37',
-              font: { weight: 'bold', size: 9 },
-              formatter: function(value) {
-                return value > 0 ? (value >= 1000000 ? (value/1000000).toFixed(1) + 'M' : (value/1000).toFixed(0) + 'k') : '0';
-              }
-            }
-          },
-          scales: {
-            y: { ticks: { color: '#94a3b8' } },
-            x: { ticks: { color: '#94a3b8' } }
-          }
-        }
-      });
-    }
-
-    function renderKeuntunganHarianList() {
+    function renderKeuntunganHarian() {
       const container = document.getElementById('keuntungan-harian-list');
       const dailyMap = {};
 
       appData.penjualan.forEach(p => {
-        if(!p.tgl) return;
-        if(!dailyMap[p.tgl]) dailyMap[p.tgl] = { labaKotor: 0, pengeluaran: 0 };
+        let pProfit = 0;
         p.items.forEach(i => {
-          dailyMap[p.tgl].labaKotor += (i.total - (i.qty * (i.hargaPokok || 0)));
+          const hPokok = i.hargaPokok || 0;
+          pProfit += (i.total - (hPokok * i.qty));
         });
+
+        if(!dailyMap[p.tgl]) dailyMap[p.tgl] = { omset: 0, profitBarang: 0, pengeluaran: 0 };
+        dailyMap[p.tgl].omset += p.totalHarga;
+        dailyMap[p.tgl].profitBarang += pProfit;
       });
 
-      appData.pengeluaran.forEach(pg => {
-        if(!pg.tgl) return;
-        if(!dailyMap[pg.tgl]) dailyMap[pg.tgl] = { labaKotor: 0, pengeluaran: 0 };
-        dailyMap[pg.tgl].pengeluaran += pg.jml;
+      appData.pengeluaran.forEach(e => {
+        if(!dailyMap[e.tgl]) dailyMap[e.tgl] = { omset: 0, profitBarang: 0, pengeluaran: 0 };
+        dailyMap[e.tgl].pengeluaran += e.jml;
       });
 
-      const sortedDates = Object.keys(dailyMap).sort((a, b) => {
-        const pA = a.split('-'), pB = b.split('-');
-        const dA = new Date(pA[2], pA[1] - 1, pA[0]);
-        const dB = new Date(pB[2], pB[1] - 1, pB[0]);
-        return dB - dA;
+      const dates = Object.keys(dailyMap).sort((a,b) => {
+        const da = a.split('-').reverse().join('-');
+        const db = b.split('-').reverse().join('-');
+        return db.localeCompare(da);
       });
 
-      if(sortedDates.length === 0) {
-        container.innerHTML = `<p class="text-slate-500 text-[11px] text-center">Belum ada data keuntungan</p>`;
+      if(dates.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 text-xs text-center py-4">Belum ada riwayat transaksi.</p>`;
         return;
       }
 
-      container.innerHTML = sortedDates.map(date => {
-        const item = dailyMap[date];
-        const labaBersih = Math.max(0, item.labaKotor - item.pengeluaran);
+      container.innerHTML = dates.map(d => {
+        const item = dailyMap[d];
+        const labaBersih = item.profitBarang - item.pengeluaran;
         return `
-          <div class="bg-slate-900 p-2.5 rounded border border-slate-800 space-y-1">
-            <div class="flex justify-between items-center font-bold text-yellow-400">
-              <span>${date}</span>
-              <span class="text-emerald-400">Laba Bersih: Rp ${labaBersih.toLocaleString('id-ID')}</span>
+          <div class="bg-slate-900 p-2.5 rounded border border-slate-800 flex justify-between items-center text-xs">
+            <div>
+              <p class="font-bold text-slate-200 font-mono">${d}</p>
+              <p class="text-[10px] text-slate-400">Omset: Rp ${item.omset.toLocaleString('id-ID')} | Pengeluaran: <span class="text-red-400">Rp ${item.pengeluaran.toLocaleString('id-ID')}</span></p>
             </div>
-            <div class="flex justify-between text-[11px] text-slate-300 pt-1 border-t border-slate-800/60">
-              <span>Laba Kotor: Rp ${item.labaKotor.toLocaleString('id-ID')}</span>
-              <span class="text-red-400">Pengeluaran: Rp ${item.pengeluaran.toLocaleString('id-ID')}</span>
+            <div class="text-right">
+              <span class="text-[10px] text-slate-400 block">Laba Bersih</span>
+              <span class="font-extrabold text-sm ${labaBersih >= 0 ? 'text-emerald-400' : 'text-red-500'}">Rp ${labaBersih.toLocaleString('id-ID')}</span>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    function renderProfitChart() {
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      if(profitChartInstance) profitChartInstance.destroy();
+
+      const monthNames = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+      const monthlyProfits = new Array(12).fill(0);
+
+      appData.penjualan.forEach(p => {
+        let pProfit = 0;
+        p.items.forEach(i => {
+          const hPokok = i.hargaPokok || 0;
+          pProfit += (i.total - (hPokok * i.qty));
+        });
+        const parts = p.tgl.split('-');
+        if(parts.length === 3) {
+          const m = parseInt(parts[1], 10) - 1;
+          if(m >= 0 && m < 12) monthlyProfits[m] += pProfit;
+        }
+      });
+
+      appData.pengeluaran.forEach(e => {
+        const parts = e.tgl.split('-');
+        if(parts.length === 3) {
+          const m = parseInt(parts[1], 10) - 1;
+          if(m >= 0 && m < 12) monthlyProfits[m] -= e.jml;
+        }
+      });
+
+      profitChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: monthNames,
+          datasets: [{
+            label: 'Laba Bersih (Rp)',
+            data: monthlyProfits,
+            backgroundColor: '#10B981',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: '#1e293b' } },
+            x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { display: false } }
+          }
+        }
+      });
     }
 
     // --- SINKRONISASI SPREADSHEET ---
@@ -1981,9 +2018,9 @@
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(appData)
-        }).then(() => alert("Data berhasil dikirim ke Google Spreadsheet!"))
-          .catch(err => alert("Gagal kirim data: " + err));
-      } else if(action === 'PULL') {
+        }).then(() => alert("Data berhasil dikirim ke Spreadsheet!"))
+          .catch(err => alert("Gagal mengirim data: " + err));
+      } else {
         fetch(url)
           .then(res => res.json())
           .then(data => {
@@ -1991,16 +2028,22 @@
               appData = data;
               saveData();
               renderAllData();
-              alert("Data berhasil ditarik dari Google Spreadsheet!");
+              alert("Data berhasil ditarik dari Spreadsheet!");
             }
-          }).catch(err => alert("Gagal tarik data: " + err));
+          })
+          .catch(err => alert("Gagal menarik data: " + err));
       }
     }
 
     function checkAutoBackup() {
-      const now = new Date();
-      if(now.getHours() === 23 && now.getMinutes() === 0) {
-        syncData('PUSH');
+      const url = localStorage.getItem('ARYA_POS_SCRIPT_URL');
+      if(url) {
+        fetch(url, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(appData)
+        }).catch(() => {});
       }
     }
 
@@ -2011,10 +2054,8 @@
       renderPengeluaranList();
       renderTambahModalList();
       renderAmbilLabaList();
-      const todayStr = new Date().toISOString().split('T')[0];
-      document.getElementById('pengeluaran-tgl').value = todayStr;
-      document.getElementById('modal-tgl').value = todayStr;
-      document.getElementById('laba-tgl').value = todayStr;
+      renderPerkiraanBelanja();
+      renderStockOpname();
     }
   </script>
 </body>
