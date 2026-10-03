@@ -137,6 +137,14 @@
           <i class="fa-solid fa-hand-holding-dollar text-2xl text-red-500 mb-2"></i>
           <span class="font-bold text-[11px] tracking-wide leading-tight uppercase">PENGELUARAN LAIN</span>
         </div>
+        <div onclick="navigateTo('TAMBAH_MODAL_SUB')" class="card-menu p-3 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[100px]">
+          <i class="fa-solid fa-wallet text-2xl text-cyan-400 mb-2"></i>
+          <span class="font-bold text-[11px] tracking-wide leading-tight uppercase">TAMBAH MODAL</span>
+        </div>
+        <div onclick="navigateTo('AMBIL_LABA_SUB')" class="card-menu p-3 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[100px]">
+          <i class="fa-solid fa-money-bill-transfer text-2xl text-purple-400 mb-2"></i>
+          <span class="font-bold text-[11px] tracking-wide leading-tight uppercase">AMBIL LABA</span>
+        </div>
         <div onclick="navigateTo('KEUNTUNGAN_SUB')" class="card-menu p-3 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[100px]">
           <i class="fa-solid fa-chart-line text-2xl text-emerald-500 mb-2"></i>
           <span class="font-bold text-[11px] tracking-wide leading-tight uppercase">KEUNTUNGAN</span>
@@ -525,6 +533,30 @@
       <div id="pengeluaran-list" class="space-y-2"></div>
     </div>
 
+    <!-- VIEW: TAMBAH MODAL -->
+    <div id="view-TAMBAH_MODAL_SUB" class="view-panel hidden space-y-3">
+      <h2 class="text-sm font-bold text-cyan-400 uppercase"><i class="fa-solid fa-wallet mr-1.5"></i>Tambah Modal Kasir</h2>
+      <div class="card-menu p-3 rounded-lg space-y-2 text-xs border border-cyan-500/30">
+        <div><label class="block mb-1">Tanggal</label><input type="date" id="modal-tgl" class="w-full p-2 rounded text-xs"></div>
+        <div><label class="block mb-1">Keterangan / Sumber Modal</label><input type="text" id="modal-ket" class="w-full p-2 rounded text-xs uppercase" placeholder="MISAL: TAMBAH MODAL AWAL / KASIR"></div>
+        <div><label class="block mb-1">Jumlah (Rp)</label><input type="text" id="modal-jml" inputmode="numeric" class="w-full p-2 rounded text-xs format-number" placeholder="0"></div>
+        <button onclick="saveTambahModal()" class="bg-cyan-600 hover:bg-cyan-500 text-white w-full py-2 rounded font-bold text-xs">+ Simpan Tambah Modal</button>
+      </div>
+      <div id="tambah-modal-list" class="space-y-2"></div>
+    </div>
+
+    <!-- VIEW: AMBIL LABA -->
+    <div id="view-AMBIL_LABA_SUB" class="view-panel hidden space-y-3">
+      <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-money-bill-transfer mr-1.5"></i>Pengambilan Laba / Prive</h2>
+      <div class="card-menu p-3 rounded-lg space-y-2 text-xs border border-purple-500/30">
+        <div><label class="block mb-1">Tanggal</label><input type="date" id="laba-tgl" class="w-full p-2 rounded text-xs"></div>
+        <div><label class="block mb-1">Keterangan / Keperluan</label><input type="text" id="laba-ket" class="w-full p-2 rounded text-xs uppercase" placeholder="MISAL: AMBIL KEUNTUNGAN BULANAN"></div>
+        <div><label class="block mb-1">Jumlah (Rp)</label><input type="text" id="laba-jml" inputmode="numeric" class="w-full p-2 rounded text-xs format-number" placeholder="0"></div>
+        <button onclick="saveAmbilLaba()" class="bg-purple-600 hover:bg-purple-500 text-white w-full py-2 rounded font-bold text-xs">+ Simpan Ambil Laba</button>
+      </div>
+      <div id="ambil-laba-list" class="space-y-2"></div>
+    </div>
+
     <!-- VIEW: KEUNTUNGAN -->
     <div id="view-KEUNTUNGAN_SUB" class="view-panel hidden space-y-3">
       <h2 class="text-sm font-bold text-emerald-400 uppercase"><i class="fa-solid fa-chart-line mr-1.5"></i>Dashboard Keuntungan</h2>
@@ -630,6 +662,8 @@
       belanja: [],
       penjualan: [],
       pengeluaran: [],
+      tambahModal: [],
+      ambilLaba: [],
       pesananManual: [],
       cartBelanja: [],
       cartJual: [],
@@ -666,6 +700,8 @@
       const saved = localStorage.getItem('ARYA_POS_DATA');
       if(saved) appData = Object.assign(appData, JSON.parse(saved));
       if(!appData.pesananManual) appData.pesananManual = [];
+      if(!appData.tambahModal) appData.tambahModal = [];
+      if(!appData.ambilLaba) appData.ambilLaba = [];
       const url = localStorage.getItem('ARYA_POS_SCRIPT_URL');
       if(url) document.getElementById('script-url').value = url;
     }
@@ -699,6 +735,8 @@
       if(viewId === 'KEUNTUNGAN_SUB') renderProfitDashboard();
       if(viewId === 'PERKIRAAN_BELANJA_SUB') renderPerkiraanBelanja();
       if(viewId === 'STOCK_OPNAME_SUB') renderStockOpname();
+      if(viewId === 'TAMBAH_MODAL_SUB') renderTambahModalList();
+      if(viewId === 'AMBIL_LABA_SUB') renderAmbilLabaList();
     }
 
     document.addEventListener('keydown', function(e) {
@@ -814,9 +852,19 @@
 
     // --- STOCK OPNAME LOGIC ---
     function renderStockOpname() {
-      let totalUangMasuk = 0;
+      let totalPenjualan = 0;
       appData.penjualan.forEach(p => {
-        totalUangMasuk += (p.dibayar || p.totalHarga || 0);
+        totalPenjualan += (p.totalHarga || 0);
+      });
+
+      let totalModalTambah = 0;
+      appData.tambahModal.forEach(m => {
+        totalModalTambah += (m.jml || 0);
+      });
+
+      let totalBelanja = 0;
+      appData.belanja.forEach(b => {
+        totalBelanja += (b.totalHarga || 0);
       });
 
       let totalPengeluaran = 0;
@@ -824,7 +872,13 @@
         totalPengeluaran += (pg.jml || 0);
       });
 
-      const totalKasir = totalUangMasuk - totalPengeluaran;
+      let totalAmbilLaba = 0;
+      appData.ambilLaba.forEach(l => {
+        totalAmbilLaba += (l.jml || 0);
+      });
+
+      // Uang Kasir = Total Penjualan + Modal Tambahan - Total Belanja - Pengeluaran Lain - Ambil Laba
+      const totalKasir = (totalPenjualan + totalModalTambah) - (totalBelanja + totalPengeluaran + totalAmbilLaba);
       document.getElementById('opname-uang-kasir').innerText = "Rp " + totalKasir.toLocaleString('id-ID');
 
       const container = document.getElementById('opname-stok-list');
@@ -1057,7 +1111,7 @@
 
     function deleteBelanja(txId, event) {
       if(event) event.stopPropagation();
-      if(confirm(`Yakin ingin menghapus transaksi belanja ${txId}? Stok katalog akan berkurang otomatis.`)) {
+      if(confirm(`Yakin ingin menghapus transaksi belanja ${txId}? Stok katalog dan saldo laci kasir akan dikembalikan.`)) {
         const txIndex = appData.belanja.findIndex(b => b.id === txId);
         if(txIndex >= 0) {
           const tx = appData.belanja[txIndex];
@@ -1706,6 +1760,68 @@
       `).join('');
     }
 
+    // --- TAMBAH MODAL ---
+    function saveTambahModal() {
+      const tgl = formatDate(document.getElementById('modal-tgl').value);
+      const ket = document.getElementById('modal-ket').value.trim().toUpperCase();
+      const jml = parseNum(document.getElementById('modal-jml').value);
+
+      if(!tgl || !ket || jml <= 0) return alert("Isi data tambah modal dengan lengkap!");
+
+      appData.tambahModal.unshift({ id: Date.now(), tgl, ket, jml });
+      saveData();
+      renderTambahModalList();
+      document.getElementById('modal-ket').value = '';
+      document.getElementById('modal-jml').value = '';
+    }
+
+    function renderTambahModalList() {
+      const container = document.getElementById('tambah-modal-list');
+      container.innerHTML = appData.tambahModal.map((m, idx) => `
+        <div class="bg-slate-900 p-2.5 rounded text-xs flex justify-between items-center border border-slate-800">
+          <div>
+            <p class="font-bold text-cyan-400">${m.ket}</p>
+            <p class="text-[10px] text-slate-400">${m.tgl}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-200">Rp ${m.jml.toLocaleString('id-ID')}</span>
+            <button onclick="appData.tambahModal.splice(${idx},1); saveData(); renderTambahModalList();" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- AMBIL LABA ---
+    function saveAmbilLaba() {
+      const tgl = formatDate(document.getElementById('laba-tgl').value);
+      const ket = document.getElementById('laba-ket').value.trim().toUpperCase();
+      const jml = parseNum(document.getElementById('laba-jml').value);
+
+      if(!tgl || !ket || jml <= 0) return alert("Isi data ambil laba dengan lengkap!");
+
+      appData.ambilLaba.unshift({ id: Date.now(), tgl, ket, jml });
+      saveData();
+      renderAmbilLabaList();
+      document.getElementById('laba-ket').value = '';
+      document.getElementById('laba-jml').value = '';
+    }
+
+    function renderAmbilLabaList() {
+      const container = document.getElementById('ambil-laba-list');
+      container.innerHTML = appData.ambilLaba.map((l, idx) => `
+        <div class="bg-slate-900 p-2.5 rounded text-xs flex justify-between items-center border border-slate-800">
+          <div>
+            <p class="font-bold text-purple-400">${l.ket}</p>
+            <p class="text-[10px] text-slate-400">${l.tgl}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-200">Rp ${l.jml.toLocaleString('id-ID')}</span>
+            <button onclick="appData.ambilLaba.splice(${idx},1); saveData(); renderAmbilLabaList();" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      `).join('');
+    }
+
     // --- DASHBOARD KEUNTUNGAN & RINCIAN ---
     function renderProfitDashboard() {
       const today = new Date();
@@ -1893,7 +2009,12 @@
       renderBelanjaList();
       renderPenjualanList();
       renderPengeluaranList();
-      document.getElementById('pengeluaran-tgl').value = new Date().toISOString().split('T')[0];
+      renderTambahModalList();
+      renderAmbilLabaList();
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById('pengeluaran-tgl').value = todayStr;
+      document.getElementById('modal-tgl').value = todayStr;
+      document.getElementById('laba-tgl').value = todayStr;
     }
   </script>
 </body>
